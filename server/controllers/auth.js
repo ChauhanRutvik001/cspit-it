@@ -5,94 +5,92 @@ import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import cron from "node-cron";
 
+
 export const login = async (req, res) => {
-  console.log("Api hit");
-  const { id, email, password } = req.body;
-  console.log(id, email, password);
+  console.log("API hit");
+  const { id, password } = req.body;
   console.log("-->", req.ip);
 
+  if (!id || !password) {
+    return res.status(400).json({ message: "ID and password are required" });
+  }
+
   try {
-    let user;
-    if (id) {
-      user = await User.findOne({ id });
-    } else if (email) {
-      user = await User.findOne({ email });
+    // Check if there are any users in the database
+    const userCount = await User.countDocuments();
+
+    // If no users found, create the first user and assign them as admin
+    if (userCount === 0) {
+      const firstUser = new User({
+        id,
+        name: id, // You can customize the name or take it from the request body
+        email: `${id}@charusat.edu.in`, // Customize or take email from the request
+        password,
+        role: 'admin', // Assign first user as admin
+        firstTimeLogin: true,
+      });
+
+      await firstUser.save();
+      return res.status(200).json({ message: "First user created and assigned as Admin" });
     }
 
+    // Find the user by ID
+    let user = await User.findOne({ id });
+
+    // If user not found
     if (!user) {
-      return res.status(200).json({
-        message: "Invalid ID & Password!",
+      return res.status(401).json({
+        message: "Invalid ID or Password!",
         success: false,
       });
     }
 
-    if (!user.isApproved) {
-      return res.status(200).json({
-        message: "Your registration request has not been approved yet.",
-        success: false,
-      });
-    }
-
+    // Check if the password is valid
     const isPasswordValid = await user.comparePassword(password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(200).json({
-        message: "Invalid ID & Password!",
+      return res.status(401).json({
+        message: "Invalid ID or Password!",
         success: false,
       });
     }
 
-    const isFirstTime = user.firstTimeLogin;
-
-    if (isFirstTime) {
+    // If it's the user's first time login, inform the frontend to show password change form
+    if (user.firstTimeLogin) {
       return res.status(200).json({
-        firstTimeLogin: isFirstTime,
-        message: "Welcome on your first login!",
+        message: "Please change your password.",
+        firstTimeLogin: true,  // This will trigger the frontend to show the password change form
         success: true,
       });
     }
 
-    if (user.sessionId) {
-      return res.status(400).json({
-        message: "You are already logged in from another session.",
-        success: false,
-      });
-    }
+    // Create a JWT token
+    const token = await createToken({ id: user._id });
 
-    const sessionId = uuidv4();
-    user.sessionId = sessionId;
-    user.lastLoginTime = new Date();
-    await user.save({ validateBeforeSave: false });
-
-    const token = await createToken({ id: user._id, sessionId: sessionId });
     const oneDay = 1000 * 60 * 60 * 24;
 
+    // Set the token in a cookie and send the response
     return res
       .status(200)
       .cookie("token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        expires: new Date(Date.now() + oneDay),
+        secure: process.env.NODE_ENV === "production", // Only secure cookies in production
+        expires: new Date(Date.now() + oneDay), // Expire the cookie in one day
       })
       .json({
         message: "Welcome back!",
-        firstTimeLogin: isFirstTime,
+        firstTimeLogin: user.firstTimeLogin,
         user: {
           _id: user._id,
-          username: user.username,
+          name: user.name,
           id: user.id,
           role: user.role,
-          isApproved: user.isApproved,
           firstTimeLogin: user.firstTimeLogin,
           createdAt: user.createdAt,
           updatedAt: user.updatedAt,
-          sessionId: user.sessionId,
-          isAlreadyLogged: user.isAlreadyLogged,
-          lastLoginTime: user.lastLoginTime,
         },
         success: true,
         token,
-        sessionId,
       });
   } catch (error) {
     console.error("Login Error:", error);
@@ -102,6 +100,8 @@ export const login = async (req, res) => {
     });
   }
 };
+
+
 
 export const changePassword = async (req, res) => {
   try {
@@ -113,24 +113,13 @@ export const changePassword = async (req, res) => {
     }
 
     let email = `${oldPassword.toLowerCase()}@charusat.edu.in`;
-    let facultyEmail = `${oldPassword.toLowerCase()}@charusat.ac.in`;
-
+    console.log(email);
     let user = await User.findOne({ email });
-
-    if (!user) {
-      user = await User.findOne({ email: facultyEmail });
-    }
 
     if (!user) {
       return res
         .status(404)
         .json({ message: "User not found.", success: false });
-    }
-
-    if (!user.isApproved) {
-      return res
-        .status(404)
-        .json({ message: "You are not approved yet.", success: false });
     }
 
     const isPasswordValid = await user.comparePassword(
@@ -158,7 +147,7 @@ export const changePassword = async (req, res) => {
     }
 
     user.password = newPassword;
-    user.firstTimeLogin = false;
+    user.firstTimeLogin = false;  // Only set this to false when the password is actually changed
     await user.save();
 
     return res.status(200).json({
@@ -174,72 +163,8 @@ export const changePassword = async (req, res) => {
   }
 };
 
-export const register = async (req, res) => {
-  try {
-    const userData = req.body;
 
-    if (!userData.id && !userData.email) {
-      return res
-        .status(400)
-        .json({ message: "ID or email is required.", success: false });
-    }
 
-    console.log(userData);
-    let existingUser = "op";
-    if (userData.role === "student") {
-      existingUser = await User.findOne({ id: userData.id });
-    } else if (userData.role === "faculty") {
-      existingUser = await User.findOne({ email: userData.email });
-    }
-
-    console.log(existingUser + "hello");
-
-    if (existingUser) {
-      return res.status(409).json({
-        message: `A ${userData.role} with this ${
-          userData.role === "student" ? "ID" : "email"
-        } already exists.`,
-        success: false,
-      });
-    }
-
-    console.log(userData);
-
-    if (userData.role === "faculty") {
-      const facultyEmailPattern = /^[a-zA-Z0-9._%+-]+@charusat\.ac\.in$/;
-
-      if (!facultyEmailPattern.test(userData.email)) {
-        throw new Error(
-          `Invalid email for faculty. Faculty email must match the pattern "name@charusat.ac.in".`
-        );
-      }
-    }
-
-    const user = await User.create(userData);
-    console.log(user);
-
-    return res.status(201).json({
-      message: "The registration request has been sent successfully.",
-      success: true,
-    });
-  } catch (error) {
-    console.error("Registration error:", error);
-    return res.status(400).json({
-      message: error.message || "Failed to create account.",
-      success: false,
-    });
-  }
-};
-
-export const verifyEmail = async (req, res) => {
-  const { token } = req.query;
-  const decoded = await verifyToken(token);
-  const user = await User.findByIdAndUpdate(decoded.id, { verified: true });
-  if (!user) throw new NotFoundError("invalid");
-
-  await successEmail(user.email);
-  res.status(StatusCodes.OK).json({ status: "success", msg: "email verified" });
-};
 
 export const logout = async (req, res) => {
   const token = req.cookies.token;
@@ -368,19 +293,4 @@ export const fetchSubjects = async (req, res) => {
   }
 };
 
-cron.schedule("* * * * *", async () => {
-  const currentTime = new Date();
-  const expirationTime = 1000 * 60 * 60 * 24;
 
-  const users = await User.find({
-    lastLoginTime: { $lt: new Date(currentTime - expirationTime) },
-  });
-
-  for (let user of users) {
-    user.sessionId = null;
-    user.lastLoginTime = null;
-    await user.save();
-
-    console.log(`User ${user.username}'s session has been expired.`);
-  }
-});
