@@ -5,6 +5,7 @@ import express from "express";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.js";
+import adminRoutes from "./routes/admin.router.js";
 import cors from "cors";
 
 const app = express();
@@ -21,6 +22,7 @@ app.use(cors(corsOptions));
 app.use(express.static("public"));
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/admin", adminRoutes);
 
 const PORT = process.env.PORT || 3100;
 mongoose.set("strictQuery", true);
