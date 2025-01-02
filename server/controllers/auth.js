@@ -5,7 +5,6 @@ import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import cron from "node-cron";
 
-
 export const login = async (req, res) => {
   console.log("API hit");
   const { id, password } = req.body;
@@ -26,12 +25,14 @@ export const login = async (req, res) => {
         name: id, // You can customize the name or take it from the request body
         email: `${id}@charusat.edu.in`, // Customize or take email from the request
         password,
-        role: 'admin', // Assign first user as admin
+        role: "admin", // Assign first user as admin
         firstTimeLogin: true,
       });
 
       await firstUser.save();
-      return res.status(200).json({ message: "First user created and assigned as Admin" });
+      return res
+        .status(200)
+        .json({ message: "First user created and assigned as Admin" });
     }
 
     // Find the user by ID
@@ -59,7 +60,7 @@ export const login = async (req, res) => {
     if (user.firstTimeLogin) {
       return res.status(200).json({
         message: "Please change your password.",
-        firstTimeLogin: true,  // This will trigger the frontend to show the password change form
+        firstTimeLogin: true, // This will trigger the frontend to show the password change form
         success: true,
       });
     }
@@ -100,8 +101,6 @@ export const login = async (req, res) => {
     });
   }
 };
-
-
 
 export const changePassword = async (req, res) => {
   try {
@@ -147,7 +146,7 @@ export const changePassword = async (req, res) => {
     }
 
     user.password = newPassword;
-    user.firstTimeLogin = false;  // Only set this to false when the password is actually changed
+    user.firstTimeLogin = false; // Only set this to false when the password is actually changed
     await user.save();
 
     return res.status(200).json({
@@ -163,17 +162,16 @@ export const changePassword = async (req, res) => {
   }
 };
 
-
-
-
 export const logout = async (req, res) => {
   const token = req.cookies.token;
+  console.log("token", token);
   if (!token) {
     return res.status(401).json({
       message: "Unauthorized",
       success: false,
     });
   }
+  console.log("logout hit");
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
@@ -192,7 +190,7 @@ export const logout = async (req, res) => {
       expires: new Date(Date.now()),
       httpOnly: true,
     });
-
+    console.log("logout success");
     return res
       .status(200)
       .json({ message: "Successfully logged out", success: true });
@@ -253,42 +251,6 @@ export const getCurrentUser = async (req, res) => {
     res.status(500).json({
       message: "Internal Server Error",
       success: false,
-    });
-  }
-};
-
-export const fetchSubjects = async (req, res) => {
-  try {
-    const subjects = await User.find({
-      role: "faculty",
-      isApproved: true,
-    }).select("subject _id username");
-
-    if (!subjects || subjects.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No subjects found for faculty.",
-      });
-    }
-
-    const subjectList = subjects.map((faculty) => ({
-      id: faculty._id,
-      subject: faculty.subject,
-      teacher: faculty.username,
-    }));
-
-    // Return success response with subject list
-    return res.status(200).json({
-      success: true,
-      subjects: subjectList,
-    });
-  } catch (error) {
-    console.error("Error fetching subjects:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: "An error occurred while fetching subjects.",
-      error: error.message,
     });
   }
 };

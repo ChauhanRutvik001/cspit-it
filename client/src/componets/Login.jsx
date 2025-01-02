@@ -10,9 +10,10 @@ import PasswordChange from "./PassWordChange";
 const Login = () => {
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false); // New state for show/hide password
   const [assignLoading, setAssignLoading] = useState(false);
   const [isFirstTime, setIsFirstTime] = useState(false);
-  const [popUp, setPopUp] = useState(""); // Fixed: Added popUp state
+  const [popUp, setPopUp] = useState("");
   const authStatus = useSelector((store) => store.app.authStatus);
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -39,7 +40,7 @@ const Login = () => {
 
     dispatch(setLoading(true));
     const user = { id, password };
-    setAssignLoading(true); // Start loading
+    setAssignLoading(true);
 
     try {
       const url = `auth/login`;
@@ -49,7 +50,6 @@ const Login = () => {
       if (res.data.success) {
         const { firstTimeLogin, user: loggedInUser, token, message } = res.data;
 
-        // If it's the user's first-time login, show password change form
         if (firstTimeLogin) {
           setIsFirstTime(true);
           toast.success(
@@ -62,7 +62,6 @@ const Login = () => {
         localStorage.setItem("UserToken", token);
 
         dispatch(setUser(loggedInUser));
-        // Navigate to the browse page
         navigate("/browse");
       } else {
         toast.error(res.data.message || "Login failed!");
@@ -73,7 +72,7 @@ const Login = () => {
       );
     } finally {
       dispatch(setLoading(false));
-      setAssignLoading(false); // Start loading
+      setAssignLoading(false);
       resetForm();
     }
   };
@@ -129,21 +128,30 @@ const Login = () => {
                   required
                 />
               </div>
-              <div className="mb-6">
+              <div className="mb-6 relative">
                 <label
                   htmlFor="password"
                   className="block text-sm font-medium text-gray-700"
                 >
                   Password
                 </label>
-                <input
-                  type="password"
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  required
-                />
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-3 flex items-center text-gray-500"
+                  >
+                    {showPassword ? "👁️" : "🙅‍♂️"}
+                  </button>
+                </div>
               </div>
               <div className="flex justify-between items-center mb-6">
                 <p

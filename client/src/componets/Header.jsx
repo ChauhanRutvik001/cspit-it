@@ -1,232 +1,209 @@
 import React, { useState, useEffect } from "react";
-import { IoIosArrowDropdown } from "react-icons/io";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate, Link, useLocation } from "react-router-dom";
-import toast from "react-hot-toast";
 import { logout, setUser } from "../redux/userSlice";
+import toast from "react-hot-toast";
+import { Disclosure, Menu } from "@headlessui/react";
+import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import axios from "axios";
 import axiosInstance from "../utils/axiosInstance";
-import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
+
+const navigation = [
+  { name: "Home", to: "/browse" },
+  { name: "Students", to: "/students" },
+  { name: "Alumni", to: "/Alumni" },
+  { name: "Schedule", to: "/schedule" },
+  { name: "Contact Us", to: "/Contact" },
+];
+
+function classNames(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
 
 const Header = () => {
-  const user = useSelector((store) => store.app.user);
-  console.log(user);
   const authStatus = useSelector((store) => store.app.authStatus);
+  const user = useSelector((store) => store.app.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isScreenSmall, setIsScreenSmall] = useState(false);
-  const [isOnMakeContest, setIsOnMakeContest] = useState(false);
 
   useEffect(() => {
-    if (authStatus === false) {
+    if (!authStatus) {
       navigate("/");
     }
-  }, [authStatus]);
-
-  useEffect(() => {
-    setIsAdmin(user?.role);
-  });
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsScreenSmall(window.innerWidth <= 1200);
-    };
-
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
+  }, [authStatus, navigate]);
 
   const logoutHandler = async () => {
     try {
-      await axiosInstance.get(`auth/logout`);
-
+      await axiosInstance.get("/auth/logout");
       dispatch(setUser(null));
       localStorage.removeItem("authToken");
       dispatch(logout());
-
       toast.success("Logged out successfully");
       navigate("/");
     } catch (error) {
-      console.log(error);
       toast.error("Failed to log out. Please try again.");
     }
   };
 
+  // Highlight active page
   const isActive = (path) => location.pathname === path;
 
-  // Determine button text based on user role
-
   return (
-    <div className="z-10 w-full flex items-center justify-between px-4 md:px-6 bg-gradient-to-b bg-black bg-opacity-50 backdrop-blur-md py-2 fixed">
-      <h1
-        className="text-3xl md:text-5xl font-bold text-white"
-        style={{
-          textShadow: "2px 2px 8px rgba(0, 0, 0, 0.9)",
-        }}
-      >
-        Codify
-      </h1>
+    <header className="bg-gray-900 text-white fixed w-full z-20 shadow-md">
+      <Disclosure as="nav" className="bg-gray-800 sticky top-0">
+        {({ open }) => (
+          <>
+            <div className="mx-auto px-2 sm:px-6 lg:px-8">
+              <div className="relative flex h-16 items-center justify-between">
+                <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
+                  {/* Mobile menu button */}
+                  <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                    <span className="sr-only">Open main menu</span>
+                    {open ? (
+                      <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                    ) : (
+                      <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                    )}
+                  </Disclosure.Button>
+                </div>
+                <div className="flex-1 flex items-center justify-between">
+                  {/* Logo */}
+                  <div className="flex items-center">
+                    <img
+                      className="h-14 w-auto"
+                      src="https://th.bing.com/th/id/OIP.tbRmbAR_kwju4zrku5tEWQHaIC?rs=1&pid=ImgDetMain"
+                      alt="Your Company"
+                    />
+                  </div>
+                  {/* Desktop Menu */}
+                  <div className="hidden sm:ml-6 sm:block">
+                    <div className="flex space-x-4">
+                      {navigation.map((item) => (
+                        <Link
+                          key={item.name}
+                          to={item.to}
+                          className={classNames(
+                            isActive(item.to)
+                              ? "bg-gray-900 text-white"
+                              : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                            "rounded-md px-3 py-2 text-sm font-medium"
+                          )}
+                          aria-current={isActive(item.to) ? "page" : undefined}
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
+                      {user?.role === "admin" && (
+                        <Link
+                          to="/admin"
+                          className={classNames(
+                            isActive("/admin")
+                              ? "bg-gray-900 text-white"
+                              : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                            "rounded-md px-3 py-2 text-sm font-medium"
+                          )}
+                          aria-current={isActive("/admin") ? "page" : undefined}
+                        >
+                          Registation
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {/* Notification and Profile */}
+                <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                  <button
+                    type="button"
+                    className="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                  >
+                    <span className="sr-only">View notifications</span>
+                    <BellIcon className="h-6 w-6" aria-hidden="true" />
+                  </button>
+                  {/* Profile dropdown */}
+                  <Menu as="div" className="relative ml-3">
+                    <div>
+                      <Menu.Button className="flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                        <span className="sr-only">Open user menu</span>
+                        <img
+                          className="h-8 w-8 rounded-full"
+                          src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                          alt=""
+                        />
+                      </Menu.Button>
+                    </div>
+                    <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <Menu.Item>
+                        {({ active }) => (
+                          <Link
+                            to="/profile"
+                            className={classNames(
+                              active ? "bg-gray-100" : "",
+                              "block px-4 py-2 text-sm text-gray-700"
+                            )}
+                          >
+                            Your Profile
+                          </Link>
+                        )}
+                      </Menu.Item>
+                      {/* <Menu.Item>
+                        {({ active }) => (
+                          <a
+                            href="/settings"
+                            className={classNames(
+                              active ? "bg-gray-100" : "",
+                              "block px-4 py-2 text-sm text-gray-700"
+                            )}
+                          >
+                            Settings
+                          </a>
+                        )}
+                      </Menu.Item> */}
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            onClick={logoutHandler}
+                            className={classNames(
+                              active ? "bg-gray-100" : "",
+                              "block px-4 py-2 text-sm text-gray-700 text-start"
+                            )}
+                            style={{ width: "100%" }}
+                          >
+                            Sign out
+                          </button>
+                        )}
+                      </Menu.Item>
+                    </Menu.Items>
+                  </Menu>
+                </div>
+              </div>
+            </div>
 
-      {isScreenSmall && user && (
-        <div>
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            {isMenuOpen ? (
-              <AiOutlineClose size={30} className="text-white" />
-            ) : (
-              <AiOutlineMenu size={30} className="text-white" />
-            )}
-          </button>
-        </div>
-      )}
-
-      {!isScreenSmall && user && (
-        <div className="hidden md:flex items-center space-x-4 flex-wrap">
-          <Link
-            to="/browse"
-            className={`text-lg font-semibold transition duration-300 ${
-              isActive("/browse")
-                ? "text-blue-400"
-                : "text-white hover:text-blue-300"
-            }`}
-          >
-            Home
-          </Link>
-          <Link
-            to="/profile"
-            className={`text-lg font-semibold transition duration-300 ${
-              isActive("/profile")
-                ? "text-blue-400"
-                : "text-white hover:text-blue-300"
-            }`}
-          >
-            Profile
-          </Link>
-          <Link
-            to="/support"
-            className={`text-lg font-semibold transition duration-300 ${
-              isActive("/support")
-                ? "text-blue-400"
-                : "text-white hover:text-blue-300"
-            }`}
-          >
-            Support
-          </Link>
-
-          {user?.role === "admin" && (
-            <Link
-              to="/pending-requests"
-              className={`text-lg font-semibold transition duration-300 ${
-                isActive("/pending-requests")
-                  ? "text-blue-400"
-                  : "text-white hover:text-blue-300"
-              }`}
-            >
-              Requests
-            </Link>
-          )}
-          {user?.role === "faculty" && (
-            <Link
-              to="/faculty-section"
-              className={`text-lg font-semibold transition duration-300 ${
-                isActive("/faculty-section")
-                  ? "text-blue-400"
-                  : "text-white hover:text-blue-300"
-              }`}
-            >
-              Requests
-            </Link>
-          )}
-          <div className="flex items-center space-x-2">
-            <IoIosArrowDropdown size="24px" color="white" />
-            <h1 className="text-lg font-medium text-white">
-              {user?.id?.toUpperCase()}
-            </h1>
-          </div>
-          <button
-            onClick={logoutHandler}
-            className="bg-gradient-to-r from-red-500 to-red-700 text-white font-semibold rounded-lg shadow-lg hover:bg-red-600 hover:shadow-2xl transition duration-300 ease-in-out px-4 py-2"
-          >
-            Logout
-          </button>
-        </div>
-      )}
-
-      {isScreenSmall && isMenuOpen && user && (
-        <div className="absolute top-12 right-4 w-48 bg-gray-800 text-white rounded-lg shadow-lg p-4">
-          <Link
-            to="/browse"
-            className={`block mb-2 font-semibold transition duration-300 ${
-              isActive("/browse")
-                ? "text-blue-400"
-                : "text-white hover:text-blue-300"
-            }`}
-            onClick={() => setIsMenuOpen(false)}
-          >
-            Home
-          </Link>
-          <Link
-            to="/profile"
-            className={`block mb-2 font-semibold transition duration-300 ${
-              isActive("/profile")
-                ? "text-blue-400"
-                : "text-white hover:text-blue-300"
-            }`}
-            onClick={() => setIsMenuOpen(false)}
-          >
-            Profile
-          </Link>
-          <Link
-            to="/support"
-            className={`block mb-2 font-semibold transition duration-300 ${
-              isActive("/support")
-                ? "text-blue-400"
-                : "text-white hover:text-blue-300"
-            }`}
-            onClick={() => setIsMenuOpen(false)}
-          >
-            Support
-          </Link>
-
-          {user?.role === "admin" && (
-            <Link
-              to="/pending-requests"
-              className={`block mb-2 font-semibold transition duration-300 ${
-                isActive("/pending-requests")
-                  ? "text-blue-400"
-                  : "text-white hover:text-blue-300"
-              }`}
-            >
-              Requests
-            </Link>
-          )}
-          {user?.role === "faculty" && (
-            <Link
-              to="/faculty-section"
-              className={`block mb-2 font-semibold transition duration-300 ${
-                isActive("/faculty-section")
-                  ? "text-blue-400"
-                  : "text-white hover:text-blue-300"
-              }`}
-            >
-              Requests
-            </Link>
-          )}
-
-          <button
-            onClick={logoutHandler}
-            className="block w-full bg-gradient-to-r from-red-500 to-red-700 text-white font-semibold rounded-lg shadow-lg hover:bg-red-600 hover:shadow-2xl transition duration-300 ease-in-out px-4 py-2 mt-4"
-          >
-            Logout
-          </button>
-        </div>
-      )}
-    </div>
+            {/* Mobile Menu */}
+            <Disclosure.Panel className="sm:hidden">
+              <div className="space-y-1 px-2 pb-3 pt-2">
+                {navigation.map((item) => (
+                  <Disclosure.Button
+                    key={item.name}
+                    as={Link}
+                    to={item.to}
+                    className={classNames(
+                      isActive(item.to)
+                        ? "bg-gray-900 text-white"
+                        : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                      "block rounded-md px-3 py-2 text-base font-medium"
+                    )}
+                    aria-current={isActive(item.to) ? "page" : undefined}
+                  >
+                    {item.name}
+                  </Disclosure.Button>
+                ))}
+              </div>
+            </Disclosure.Panel>
+          </>
+        )}
+      </Disclosure>
+    </header>
   );
 };
 

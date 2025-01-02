@@ -94,7 +94,7 @@ const PasswordChange = ({ id }) => {
                     onClick={() => setShowOldPassword(!showOldPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-blue-500 focus:outline-none"
                 >
-                    {showOldPassword ? "👁️" : "🙈"}
+                    {showConfirmPassword ? "👁️" : "🙅‍♂️"}
                 </button>
             </div>
 
@@ -113,7 +113,7 @@ const PasswordChange = ({ id }) => {
                     onClick={() => setShowNewPassword(!showNewPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-blue-500 focus:outline-none"
                 >
-                    {showNewPassword ? "👁️" : "🙈"}
+                    {showConfirmPassword ? "👁️" : "🙅‍♂️"}
                 </button>
             </div>
 
@@ -132,7 +132,7 @@ const PasswordChange = ({ id }) => {
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-blue-500 focus:outline-none"
                 >
-                    {showConfirmPassword ? "👁️" : "🙈"}
+                    {showConfirmPassword ? "👁️" : "🙅‍♂️"}
                 </button>
             </div>
 
