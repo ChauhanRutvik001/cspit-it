@@ -49,7 +49,7 @@ const Login = () => {
 
       if (res.data.success) {
         const { firstTimeLogin, user: loggedInUser, token, message } = res.data;
-
+        console.log("First time login:", user);
         if (firstTimeLogin) {
           setIsFirstTime(true);
           toast.success(

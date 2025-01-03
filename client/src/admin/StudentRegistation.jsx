@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
@@ -306,7 +306,7 @@ const StudentRegistration = () => {
       )}
 
       <div className="p-4">
-        {errorMessages.length > 0 && (
+        {errorMessages?.length > 0 && (
           <div className="mt-4 bg-red-100 text-red-800 p-4 rounded">
             <h3 className="font-bold">Errors:</h3>
             <ul>
