@@ -10,6 +10,7 @@ import Profile from "./Profile";
 import AdminPage from "../admin/adminPage";
 import StudentRegistation from "../admin/studentRegistation";
 import SchedulePage from "./SchedulePage";
+import Developers from "./Developers";
 
 const Body = () => {
   const appRouter = createBrowserRouter([
@@ -23,6 +24,7 @@ const Body = () => {
     { path: "/profile", element: <Profile /> },
     { path: "/admin", element: <AdminPage /> },
     { path: "/registation", element: <StudentRegistation /> },
+    { path: "/developers", element: <Developers /> },
   ]);
 
   return (

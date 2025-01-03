@@ -1,63 +1,95 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "./Header";
 
+// Import images from the public folder
+const CIDAC_industry_visit = "/CIDAC_industry_visit.jpg";
+const TechMahindra_industry_visit = "/TechMahindra_industry_visit.jpg";
+const Imegica = "/Imegica.jpg";
+const sanket = "/SanketSuthar.jpg";
+const Ashwin = "/ashwin_sir.jpg";
+const Priyanka = "/priyanka.jpg";
+
 const Browse = () => {
-  // Sample data for the college
-  const collegeData = {
-    name: "Charotar University of Science and Technology",
-    location: "Chandubhai S. Patel Institute of Technology, Gujarat, India",
-    courses: [
-      "B.Tech in Computer Science",
-      "B.Tech in Information Technology",
-      "M.Tech in Computer Science",
-    ],
-    contact: {
-      phone: "+91 9464979949",
-      email: "info@charusat.edu.in",
-    },
-  };
+  return (
+    <div className="relative min-h-screen bg-gray-100 text-gray-900">
+      <Header />
+      <div className="content mb-4">
+        <ImageRotation />
+        <Description />
+        <Faculty />
+      </div>
+    </div>
+  );
+};
+
+const ImageRotation = () => {
+  const images = [CIDAC_industry_visit, TechMahindra_industry_visit, Imegica];
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+    }, 3000); // Change image every 3 seconds
+
+    return () => clearInterval(interval); // Clean up the interval on unmount
+  }, [images.length]);
 
   return (
-    <>
-      <div className="relative min-h-screen bg-gray-100 text-gray-900">
-        <Header />
+    <div className="image-rotation flex justify-center items-center">
+      <img
+        src={images[currentIndex]}
+        alt={`Slide ${currentIndex + 1}`}
+        className="w-full h-auto rounded-lg shadow-md"
+      />
+    </div>
+  );
+};
 
-        {/* College Information Section */}
-        <div className="max-w-7xl mx-auto py-8 px-6 sm:px-6 lg:px-8 pt-20">
-          <div className="bg-white shadow-lg rounded-lg p-6">
-            <h1 className="text-3xl font-semibold text-center text-blue-800 mb-4">
-              {collegeData.name}
-            </h1>
-            <p className="text-lg text-center text-gray-600 mb-6">
-              {collegeData.location}
-            </p>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="bg-blue-100 rounded-lg p-4">
-                <h2 className="text-xl font-medium text-blue-600 mb-2">
-                  Courses Offered
-                </h2>
-                <ul className="list-disc pl-5 space-y-2 text-gray-700">
-                  {collegeData.courses.map((course, index) => (
-                    <li key={index}>{course}</li>
-                  ))}
-                </ul>
-              </div>
-              <div className="bg-blue-100 rounded-lg p-4">
-                <h2 className="text-xl font-medium text-blue-600 mb-2">
-                  Contact Us
-                </h2>
-                <p className="text-gray-700 mb-2">
-                  <strong>Phone:</strong> {collegeData.contact.phone}
-                </p>
-                <p className="text-gray-700">
-                  <strong>Email:</strong> {collegeData.contact.email}
-                </p>
-              </div>
-            </div>
+const Description = () => {
+  return (
+    <div className="text-center mt-5 p-6 bg-white shadow-md rounded-lg mx-auto max-w-4xl">
+      <h2 className="text-2xl font-semibold text-blue-600">About Us</h2>
+      <p className="mt-4 text-gray-700">
+        Welcome to our Training and Placement Cell. Here, we prepare students
+        for bright futures by connecting them with top recruiters and providing
+        industry-relevant training.
+      </p>
+    </div>
+  );
+};
+
+const Faculty = () => {
+  const facultyMembers = [
+    { name: "Dr. Sanket Suthar", post: "Training Coordinator", image: sanket },
+    { name: "Dr. Ashwin Makwana", post: "Placement Officer", image: Ashwin },
+    { name: "Dr. Priyanka Patel", post: "Career Counselor", image: Priyanka },
+  ];
+
+  return (
+    <div className="text-center mt-8 mr-4 ml-4">
+      <h2 className="text-2xl font-semibold text-blue-600 mb-4">
+        Faculty Members
+      </h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {facultyMembers.map((faculty, index) => (
+          <div
+            key={index}
+            className="bg-white p-4 rounded-lg shadow-md border border-gray-200"
+          >
+            <img
+              src={faculty.image}
+              alt={faculty.name}
+              className="w-32 h-32 object-cover rounded-full mx-auto mb-4"
+            />
+            <h3 className="text-xl font-medium text-gray-800">
+              {faculty.name}
+            </h3>
+            <p className="text-gray-600">{faculty.post}</p>
           </div>
-        </div>
+        ))}
       </div>
-    </>
+    </div>
   );
 };
 

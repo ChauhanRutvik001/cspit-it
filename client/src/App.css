@@ -1,0 +1,133 @@
+/* App.css */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+  }
+  
+  /* Header styles */
+  header {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;  /* Reduced padding for smaller header */
+    position: fixed;  /* Keeps header fixed at the top */
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    width: 100%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: top 0.3s;
+  }
+  
+  header h1 {
+    margin: 0;
+    font-size: 1.5rem;  /* Reduced font size for header */
+  }
+  
+  header .slogan {
+    font-style: italic;
+    font-size: 1rem;  /* Reduced font size for slogan */
+  }
+  
+  /* Content section adjustment */
+  .content {
+    margin-top: 70px; /* Adjusted space for smaller header */
+  }
+  
+  /* About Us section */
+  .description {
+    margin: 40px auto;  /* Increased margin for separation */
+    max-width: 1900px;   /* Increased max width for larger text space */
+    text-align: center;
+    background-color: #ffffff;  /* White background for the section */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .description h2 {
+    font-size: 2rem;
+    color: #007bff;
+    margin-bottom: 15px;
+  }
+  
+  .description p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #555;
+  }
+  
+  /* Faculty section */
+  .faculty {
+    margin: 40px auto;
+    max-width: 1900px;
+    text-align: center;
+    background-color: #ffffff;  /* White background */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .faculty h2 {
+    font-size: 2rem;
+    color: #007bff;
+    margin-bottom: 20px;
+  }
+  
+  .faculty-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
+  
+  .faculty-card {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 20px;
+    width: 220px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center-align text and image */
+    justify-content: center; /* Vertically center content */
+  }
+  
+  .faculty-card img {
+    border-radius: 50%;
+    max-width: 100px;
+    margin-bottom: 10px;
+    object-fit: cover; /* Ensures the image covers the circle */
+  }
+  
+  .faculty-card h3 {
+    font-size: 1.2rem;
+    margin: 10px 0;
+  }
+  
+  .faculty-card p {
+    font-size: 1rem;
+    color: #555;
+  }
+  
+  /* Image rotation section */
+  .image-rotation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto;
+  }
+  
+  .image-rotation img {
+    width: 1900px;
+    height: 600px;
+    object-fit: cover;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+  }
