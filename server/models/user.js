@@ -36,6 +36,48 @@ const userSchema = new Schema(
       type: Boolean,
       default: true,
     },
+
+    profile: {
+      avatar: {
+        type: String, // URL or path to the user's avatar
+      },
+      semester: {
+        type: Number,
+        min: 1,
+        max: 8,
+      },
+      birthDate: {
+        type: Date,
+      },
+      gender: {
+        type: String,
+        enum: ["Male", "Female", "Other"],
+      },
+      permanentAddress: {
+        type: String,
+      },
+      personalEmail: {
+        type: String,
+        trim: true,
+        lowercase: true,
+      },
+      mobileNo: {
+        type: String,
+        match: [/^\d{10}$/, "Mobile Number must be a valid 10-digit number"],
+      },
+      counsellor: {
+        type: String,
+      },
+      batch: {
+        type: String,
+      },
+      github: {
+        type: String,
+      },
+      linkedIn: {
+        type: String,
+      },
+    },
   },
   { timestamps: true }
 );
