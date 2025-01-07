@@ -36,11 +36,12 @@ const ImageRotation = () => {
   }, [images.length]);
 
   return (
-    <div className="image-rotation flex justify-center items-center">
+    <div className="image-rotation flex justify-center items-center pt-10">
       <img
         src={images[currentIndex]}
         alt={`Slide ${currentIndex + 1}`}
-        className="w-full h-auto rounded-lg shadow-md"
+        className="w-full object-cover rounded-lg shadow-md"
+        style={{ maxHeight: "700px" }}
       />
     </div>
   );

@@ -8,8 +8,8 @@ const ProfileRight = ({
   isEditing,
 }) => {
   return (
-    <div className="flex flex-col space-y-6 p-6 bg-white dark:bg-gray-900 rounded-lg shadow-md">
-      <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
+    <div className="flex flex-col space-y-6 p-6 bg-white text-black rounded-lg shadow-md">
+      <h2 className="text-2xl font-semibold mb-4">
         {isEditing ? "Edit Profile" : "Profile"}
       </h2>
       <form
@@ -17,7 +17,7 @@ const ProfileRight = ({
         className="grid grid-cols-1 md:grid-cols-2 gap-6"
       >
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium mb-1">
             Name<span className="text-red-500">*</span>
           </label>
           <input
@@ -25,52 +25,44 @@ const ProfileRight = ({
             name="name"
             value={formData.name}
             onChange={handleInputChange}
-            className="w-full p-3 bg-gray-100 dark:bg-gray-800 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-700"
+            className="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Enter your full name"
             required
             disabled={!isEditing}
           />
         </div>
 
-        <div className="">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Email
-          </label>
+        <div>
+          <label className="block text-sm font-medium mb-1">Email</label>
           <input
             type="text"
             name="email"
             value={formData.email}
             onChange={handleInputChange}
-            className="w-full p-3 bg-gray-100 dark:bg-gray-800 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-700"
-            placeholder="Enter your full name"
-            readOnly
-          />
-        </div>
-
-        <div className="">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            ID
-          </label>
-          <input
-            type="text"
-            name="id"
-            value={formData.id}
-            onChange={handleInputChange}
-            className="w-full p-3 bg-gray-100 dark:bg-gray-800 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-700"
-            placeholder="Enter your full name"
+            className="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             readOnly
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Semester
-          </label>
+          <label className="block text-sm font-medium mb-1">ID</label>
+          <input
+            type="text"
+            name="id"
+            value={formData.id}
+            onChange={handleInputChange}
+            className="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            readOnly
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Semester</label>
           <select
             name="semester"
             value={formData.semester}
             onChange={handleInputChange}
-            className="w-full p-3 bg-gray-100 dark:bg-gray-800 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-700"
+            className="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             disabled={!isEditing}
           >
             <option value="" disabled>
@@ -85,37 +77,33 @@ const ProfileRight = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Batch
-          </label>
+          <label className="block text-sm font-medium mb-1">Batch</label>
           <input
             type="text"
             name="batch"
             value={formData.batch}
             onChange={handleInputChange}
-            className="w-full p-3 bg-gray-100 dark:bg-gray-800 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-700"
+            className="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Enter your batch"
             disabled={!isEditing}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Counsellor
-          </label>
+          <label className="block text-sm font-medium mb-1">Counsellor</label>
           <input
             type="text"
             name="counsellor"
             value={formData.counsellor}
             onChange={handleInputChange}
-            className="w-full p-3 bg-gray-100 dark:bg-gray-800 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-700"
+            className="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Enter your counsellor's name"
             disabled={!isEditing}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium mb-1">
             Mobile Number
           </label>
           <input
@@ -123,7 +111,7 @@ const ProfileRight = ({
             name="mobileNo"
             value={formData.mobileNo}
             onChange={handleInputChange}
-            className="w-full p-3 bg-gray-100 dark:bg-gray-800 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-700"
+            className="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Enter your mobile number"
             pattern="[0-9]{10}"
             disabled={!isEditing}
@@ -131,56 +119,48 @@ const ProfileRight = ({
         </div>
 
         <div>
-          <label className="block text-gray-700 dark:text-gray-300 mb-2">
-            Github
-          </label>
+          <label className="block text-sm font-medium mb-1">Github</label>
           <input
             name="github"
             value={formData.github}
             onChange={handleInputChange}
-            className="w-full p-3 bg-gray-100 dark:bg-gray-800 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-700"
+            className="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Enter your GitHub profile name"
             disabled={!isEditing}
           />
         </div>
 
         <div>
-          <label className="block text-gray-700 dark:text-gray-300 mb-2">
-            LinkedIn
-          </label>
+          <label className="block text-sm font-medium mb-1">LinkedIn</label>
           <input
             name="linkedIn"
             value={formData.linkedIn}
             onChange={handleInputChange}
-            className="w-full p-3 bg-gray-100 dark:bg-gray-800 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-700"
+            className="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Enter your LinkedIn profile URL"
             disabled={!isEditing}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Birthday
-          </label>
+          <label className="block text-sm font-medium mb-1">Birthday</label>
           <input
             type="date"
             name="birthDate"
             value={formData.birthDate}
             onChange={handleInputChange}
-            className="w-full p-3 bg-gray-100 dark:bg-gray-800 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-700"
+            className="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             disabled={!isEditing}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Gender
-          </label>
+          <label className="block text-sm font-medium mb-1">Gender</label>
           <select
             name="gender"
             value={formData.gender}
             onChange={handleInputChange}
-            className="w-full p-3 bg-gray-100 dark:bg-gray-800 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-700"
+            className="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             disabled={!isEditing}
           >
             <option value="">Select Gender</option>
@@ -191,21 +171,19 @@ const ProfileRight = ({
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Address
-          </label>
+          <label className="block text-sm font-medium mb-1">Address</label>
           <textarea
             name="permanentAddress"
             value={formData.permanentAddress}
             onChange={handleInputChange}
-            className="w-full p-3 bg-gray-100 dark:bg-gray-800 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-700"
+            className="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Enter your address"
             rows={3}
             disabled={!isEditing}
           />
         </div>
 
-        {isEditing ? (
+        {isEditing && (
           <div className="md:col-span-2">
             <button
               type="submit"
@@ -214,8 +192,6 @@ const ProfileRight = ({
               Save Changes
             </button>
           </div>
-        ) : (
-          ""
         )}
       </form>
     </div>

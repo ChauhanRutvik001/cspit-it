@@ -2,8 +2,10 @@ import express from 'express';
 import multer from 'multer';
 import { createSchedule, getSchedules, deleteSchedule } from '../controllers/schedule.controller.js';
 import path from 'path';
+import { isAuthorized } from '../middlewares/auth.js';
 
 const router = express.Router();
+// router.use(isAuthorized);
 
 // Configure Multer for file uploads
 const storage = multer.diskStorage({

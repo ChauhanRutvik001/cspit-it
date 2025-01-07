@@ -11,13 +11,14 @@ import AdminPage from "../admin/adminPage";
 import StudentRegistation from "../admin/studentRegistation";
 import SchedulePage from "./SchedulePage";
 import Developers from "./Developers";
+import StudentSelectionPage from "./StudentSelectionPage"
 
 const Body = () => {
   const appRouter = createBrowserRouter([
     { path: "*", element: <NotFoundError /> },
     { path: "/", element: <Login /> },
     { path: "/browse", element: <Browse /> },
-    { path: "/students", element: <Students /> },
+    { path: "/developer", element: <Developers /> },
     { path: "/alumni", element: <Alumni /> },
     { path: "/schedule", element: <SchedulePage /> },
     { path: "/contact", element: <Contact /> },
@@ -25,6 +26,7 @@ const Body = () => {
     { path: "/admin", element: <AdminPage /> },
     { path: "/registation", element: <StudentRegistation /> },
     { path: "/developers", element: <Developers /> },
+    { path: "/StudentSelectionPage", element: <StudentSelectionPage /> },
   ]);
 
   return (
