@@ -3,8 +3,10 @@ import { FaUser, FaGithub, FaLinkedin } from "react-icons/fa";
 import axiosInstance from "../utils/axiosInstance";
 import { ClipLoader } from "react-spinners";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
+  const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [profilePic, setProfilePic] = useState(null);
@@ -22,7 +24,7 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
         responseType: "blob",
       });
       const imageUrl = URL.createObjectURL(response.data);
-      // console.log("Image URL:", imageUrl);  
+      // console.log("Image URL:", imageUrl);
       setProfilePic(imageUrl);
     } catch (error) {
       console.error("Error fetching profile picture:", error);
@@ -95,10 +97,10 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
     }
   };
   return (
-    <div className="flex flex-col items-center sticky top-20 bg-gray-900 text-white rounded-lg shadow-lg p-6">
+    <div className="flex flex-col items-center sticky top-20 bg-white text-black rounded-lg shadow-lg p-6">
       {/* Profile Image */}
       {loading ? (
-        <ClipLoader size={150} color={"#ffffff"} loading={loading} />
+        <ClipLoader size={150} color={"#000000"} loading={loading} />
       ) : (
         <img
           src={selectedFile ? imagePreview : profilePic || ""}
@@ -121,8 +123,8 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
           target="_blank"
           rel="noopener noreferrer"
           className={`transition-all ${
-            githubURL ? "text-white" : "text-gray-400"
-          } hover:text-gray-200`}
+            githubURL ? "text-black" : "text-gray-400"
+          } hover:text-gray-700`}
         >
           <FaGithub size={30} />
         </a>
@@ -131,8 +133,8 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
           target="_blank"
           rel="noopener noreferrer"
           className={`transition-all ${
-            linkedInURL ? "text-white" : "text-gray-400"
-          } hover:text-gray-200`}
+            linkedInURL ? "text-black" : "text-gray-400"
+          } hover:text-gray-700`}
         >
           <FaLinkedin size={30} />
         </a>
@@ -147,6 +149,11 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
         } text-white`}
       >
         {isEditing ? "Cancel Edit" : "Edit Details"}
+      </button>
+
+      <button className={`px-4 py-2 rounded-md mt-4 transition text-black`}
+      onClick={() => navigate("/StudentSelectionPage")}>
+        Add Domain
       </button>
 
       {isEditing && (

@@ -10,7 +10,7 @@ import axiosInstance from "../utils/axiosInstance";
 
 const navigation = [
   { name: "Home", to: "/browse" },
-  { name: "Students", to: "/students" },
+  { name: "Developer", to: "/developer" },
   { name: "Alumni", to: "/Alumni" },
   { name: "Schedule", to: "/schedule" },
   { name: "Contact Us", to: "/Contact" },
@@ -56,24 +56,24 @@ const Header = () => {
     }
   };
 
-  const fetchProfilePic = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await axiosInstance.get("/user/profile/upload-avatar", {
-        responseType: "blob",
-      });
-      const imageUrl = URL.createObjectURL(response.data);
-      setUrl(imageUrl);
-    } catch (error) {
-      console.error("Error fetching profile picture:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  // const fetchProfilePic = useCallback(async () => {
+  //   setLoading(true);
+  //   try {
+  //     const response = await axiosInstance.get("/user/profile/upload-avatar", {
+  //       responseType: "blob",
+  //     });
+  //     const imageUrl = URL.createObjectURL(response.data);
+  //     setUrl(imageUrl);
+  //   } catch (error) {
+  //     console.error("Error fetching profile picture:", error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }, []);
 
-  useEffect(() => {
-    fetchProfilePic();
-  }, [fetchProfilePic]);
+  // useEffect(() => {
+  //   fetchProfilePic();
+  // }, [fetchProfilePic]);
 
   const isActive = (path) => location.pathname === path;
 

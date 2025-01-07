@@ -102,7 +102,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-gray-900 text-white">
+    <div className="relative min-h-screen bg-white text-black">
       <Header />
       {user ? (
         <section className="pt-16">

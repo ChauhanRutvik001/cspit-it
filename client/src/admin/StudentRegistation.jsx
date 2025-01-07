@@ -180,7 +180,7 @@ const StudentRegistration = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-gray-900 text-white">
+    <div className="relative min-h-screen bg-white text-black">
       <Header />
 
       <div className="pl-10 pt-[6%]">
@@ -216,9 +216,9 @@ const StudentRegistration = () => {
 
       {/* Render Student Data Table */}
       {students.length > 0 ? (
-        <div className="overflow-x-auto bg-gray-900 shadow-md rounded-lg p-8">
-          <table className="min-w-full text-lg text-left text-gray-500">
-            <thead className="bg-gray-900 text-gray-400">
+        <div className="overflow-x-auto bg-white shadow-md rounded-lg p-8">
+          <table className="min-w-full text-lg text-left text-black">
+            <thead className="bg-gray-100 text-black">
               <tr>
                 <th className="py-3 px-6">
                   <input
@@ -240,9 +240,7 @@ const StudentRegistration = () => {
               {paginatedStudents.map((student, index) => (
                 <tr
                   key={index}
-                  className={`${
-                    index % 2 === 0 ? "bg-gray-900" : "bg-gray-800"
-                  }`}
+                  className={`${index % 2 === 0 ? "bg-white" : "bg-gray-100"}`}
                 >
                   <td className="py-3 px-6">
                     <input
@@ -276,17 +274,17 @@ const StudentRegistration = () => {
             <button
               onClick={handlePreviousPage}
               disabled={currentPage === 1}
-              className="bg-gray-700 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition disabled:opacity-50"
+              className="bg-gray-200 text-black py-2 px-4 rounded-lg hover:bg-gray-300 transition disabled:opacity-50"
             >
               Previous
             </button>
-            <span className="text-gray-300 pr-2 pl-2 ">
+            <span className="text-gray-500 pr-2 pl-2 ">
               Page {currentPage} of {totalPages}
             </span>
             <button
               onClick={handleNextPage}
               disabled={currentPage === totalPages}
-              className="bg-gray-700 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition disabled:opacity-50"
+              className="bg-gray-200 text-black py-2 px-4 rounded-lg hover:bg-gray-300 transition disabled:opacity-50"
             >
               Next
             </button>
@@ -300,7 +298,7 @@ const StudentRegistration = () => {
           </button>
         </div>
       ) : (
-        <div className="text-center py-6 text-gray-400">
+        <div className="text-center py-6 text-gray-500">
           <p>No data available</p>
         </div>
       )}
@@ -341,12 +339,11 @@ const StudentRegistration = () => {
                 d="M4 12a8 8 0 018-8v8H4z"
               ></path>
             </svg>
-            <p className="text-white text-lg font-semibold">Registration...</p>
+            <p className="text-black text-lg font-semibold">Registration...</p>
           </div>
         </div>
       )}
 
-      {/* Modal for Adding a Single Student */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white text-black rounded-lg p-6 max-w-sm w-full">

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import { ROLES } from "../utils/constants.js"; // Assuming ROLES are predefined in constants.js
 import bcrypt from "bcrypt";
+import { ROLES } from "../utils/constants.js";
 
 const { Schema } = mongoose;
 
@@ -36,7 +36,6 @@ const userSchema = new Schema(
       type: Boolean,
       default: true,
     },
-
     profile: {
       avatar: {
         type: String, // URL or path to the user's avatar
@@ -78,13 +77,16 @@ const userSchema = new Schema(
         type: String,
       },
     },
+
+    // Reference to Domain schema
+    domains: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Domain",
+      },
+    ],
   },
   { timestamps: true }
-);
-
-userSchema.index(
-  { email: 1, role: 1 },
-  { unique: true, partialFilterExpression: { email: { $exists: true } } }
 );
 
 userSchema.pre("save", async function (next) {
@@ -101,7 +103,6 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.comparePassword = async function (password, DBpassword) {
-  console.log(password, DBpassword);
   const isMatch = await bcrypt.compare(password, DBpassword);
   return isMatch;
 };

@@ -81,12 +81,10 @@ const AdminPage = () => {
 
   const handleDelete = async () => {
     try {
-      console.log(userId);
       const response = await axiosInstance.delete(
         `/admin/remove-user/${userId}`
       );
 
-      console.log(response.data);
       if (response.data.success) {
         toast.success(response.data.message);
         fetchStudents(currentPage);
@@ -101,7 +99,7 @@ const AdminPage = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-gray-900 text-white">
+    <div className="relative min-h-screen bg-white text-black">
       <Header />
 
       <div className="flex justify-center pt-[6%]">
@@ -110,14 +108,20 @@ const AdminPage = () => {
 
       <div className="p-4">
         <button
-          class="bg-blue-500 hover:bg-blue-600 text-white mr-2 font-bold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
+          className="bg-blue-500 hover:bg-blue-600 text-white mr-2 font-bold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
           onClick={() => navigate("/registation")}
         >
           Add Student Using File
         </button>
+        <button
+          onClick={() => navigate("/domain")}
+          className="bg-red-500 hover:bg-red-600 text-white mr-2 font-bold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
+        >
+          Domain
+        </button>
       </div>
 
-      <div className="flex items-center ml-4 text-white py-2 px-4 rounded-full shadow-lg text-lg font-semibold">
+      <div className="flex items-center ml-4 py-2 px-4 rounded-full shadow-lg text-lg font-semibold bg-white">
         <span>Total Number of Students Register:</span>
         <span className="ml-2 text-xl font-bold">{totalStudents}</span>
       </div>
@@ -135,13 +139,13 @@ const AdminPage = () => {
         ) : error ? (
           <p className="text-red-500">{error}</p>
         ) : (
-          <div className="overflow-x-auto bg-gray-900 shadow-md rounded-lg p-4">
-            <table className="min-w-full text-lg text-left text-gray-500">
-              <thead className="bg-gray-900 text-gray-400">
+          <div className="overflow-x-auto bg-white shadow-md rounded-lg p-4">
+            <table className="min-w-full text-lg text-left text-black rounded-lg overflow-hidden">
+              <thead className="bg-gray-200 text-gray-700">
                 <tr>
                   <th className="py-3 px-6">#</th>
                   <th className="py-3 px-6">ID</th>
-                  <th className="py-3 px-6">name</th>
+                  <th className="py-3 px-6">Name</th>
                   <th className="py-3 px-6">Create Date</th>
                   <th className="py-3 px-6">Action</th>
                 </tr>
@@ -151,7 +155,7 @@ const AdminPage = () => {
                   <tr
                     key={student._id}
                     className={`${
-                      index % 2 === 0 ? "bg-gray-900" : "bg-gray-800"
+                      index % 2 === 0 ? "bg-gray-100" : "bg-gray-50"
                     }`}
                   >
                     <td className="py-3 px-6">
@@ -160,7 +164,7 @@ const AdminPage = () => {
                     <td className="py-3 px-6">{student?.id?.toUpperCase()}</td>
                     <td className="capitalize py-3 px-6">{student?.name}</td>
 
-                    <td className="py-3">{formatDate(student?.createdAt)} </td>
+                    <td className="py-3">{formatDate(student?.createdAt)}</td>
                     <td className="py-3 px-6">
                       <button
                         onClick={() => openDeleteModal(student._id)}
@@ -179,17 +183,17 @@ const AdminPage = () => {
               <button
                 onClick={handlePreviousPage}
                 disabled={currentPage === 1}
-                className="bg-gray-700 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition disabled:opacity-50"
+                className="bg-gray-300 text-black py-2 px-4 rounded-lg hover:bg-gray-400 transition disabled:opacity-50"
               >
                 Previous
               </button>
-              <span className="text-gray-300 pr-2 pl-2">
+              <span className="text-black pr-2 pl-2">
                 Page {currentPage} of {totalPages}
               </span>
               <button
                 onClick={handleNextPage}
                 disabled={currentPage === totalPages}
-                className="bg-gray-700 text-white py-2 px-4 rounded-lg hover:bg-gray-600 transition disabled:opacity-50"
+                className="bg-gray-300 text-black py-2 px-4 rounded-lg hover:bg-gray-400 transition disabled:opacity-50"
               >
                 Next
               </button>
@@ -201,18 +205,18 @@ const AdminPage = () => {
       {/* Delete Confirmation Modal */}
       {showDeleteModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          <div className="bg-gray-800 p-6 sm:p-8 rounded-lg w-11/12 max-w-md sm:max-w-lg mx-auto">
-            <h3 className="text-white text-lg sm:text-xl font-bold mb-4 text-center">
+          <div className="bg-white p-6 sm:p-8 rounded-lg w-11/12 max-w-md sm:max-w-lg mx-auto">
+            <h3 className="text-black text-lg sm:text-xl font-bold mb-4 text-center">
               Confirm Deletion
             </h3>
-            <p className="text-gray-300 mb-4 text-sm sm:text-base text-center">
+            <p className="text-gray-700 mb-4 text-sm sm:text-base text-center">
               Are you sure you want to delete this student? This action cannot
               be undone.
             </p>
             <div className="flex justify-center gap-4">
               <button
                 onClick={cancelDelete}
-                className="bg-gray-500 text-white py-2 px-4 sm:py-2.5 sm:px-6 rounded-lg hover:bg-gray-600 transition"
+                className="bg-gray-300 text-black py-2 px-4 sm:py-2.5 sm:px-6 rounded-lg hover:bg-gray-400 transition"
               >
                 Cancel
               </button>
