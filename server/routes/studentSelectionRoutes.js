@@ -1,5 +1,5 @@
 import express from 'express'; // Import express using ES6 import
-import { saveSelections, getSelections, getDomains } from '../controllers/studentSelectionController.js'; // Import the controller
+import { saveSelections, getSelections, getDomains, getAllSelections } from '../controllers/studentSelectionController.js'; // Import the controller
 
 const router = express.Router();
 import { isAuthorized } from "../middlewares/auth.js";
@@ -15,5 +15,8 @@ router.get('/selections/:studentId', getSelections);
 
 // Route to fetch static domains data
 router.get('/domains', getDomains);
+
+// Route to fetch all students' selections
+router.get('/selections', getAllSelections);
 
 export default router; // Export router using ES6 export

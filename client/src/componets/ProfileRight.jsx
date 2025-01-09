@@ -33,7 +33,7 @@ const ProfileRight = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Email</label>
+          <label className="block text-sm font-medium mb-1">Email<span className="text-red-500">*</span></label>
           <input
             type="text"
             name="email"
@@ -45,7 +45,7 @@ const ProfileRight = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">ID</label>
+          <label className="block text-sm font-medium mb-1">ID<span className="text-red-500">*</span></label>
           <input
             type="text"
             name="id"
@@ -57,7 +57,7 @@ const ProfileRight = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Semester</label>
+          <label className="block text-sm font-medium mb-1">Semester<span className="text-red-500">*</span></label>
           <select
             name="semester"
             value={formData.semester}
@@ -77,20 +77,28 @@ const ProfileRight = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Batch</label>
-          <input
-            type="text"
+          <label className="block text-sm font-medium mb-1">Batch<span className="text-red-500">*</span></label>
+          <select
             name="batch"
             value={formData.batch}
             onChange={handleInputChange}
             className="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter your batch"
             disabled={!isEditing}
-          />
+          >
+            <option value="">Select a batch</option>
+            <option value="a1">A1</option>
+            <option value="a2">A2</option>
+            <option value="b1">B1</option>
+            <option value="b2">B2</option>
+            <option value="c1">C1</option>
+            <option value="c2">C2</option>
+            <option value="d1">D1</option>
+            <option value="d2">D2</option>
+          </select>
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Counsellor</label>
+          <label className="block text-sm font-medium mb-1">Counsellor<span className="text-red-500">*</span></label>
           <input
             type="text"
             name="counsellor"
@@ -104,7 +112,7 @@ const ProfileRight = ({
 
         <div>
           <label className="block text-sm font-medium mb-1">
-            Mobile Number
+            Mobile Number<span className="text-red-500">*</span>
           </label>
           <input
             type="tel"
@@ -119,7 +127,7 @@ const ProfileRight = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Github</label>
+          <label className="block text-sm font-medium mb-1">Github<span className="text-red-500">*</span></label>
           <input
             name="github"
             value={formData.github}
@@ -131,7 +139,7 @@ const ProfileRight = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">LinkedIn</label>
+          <label className="block text-sm font-medium mb-1">LinkedIn<span className="text-red-500">*</span></label>
           <input
             name="linkedIn"
             value={formData.linkedIn}
@@ -143,7 +151,7 @@ const ProfileRight = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Birthday</label>
+          <label className="block text-sm font-medium mb-1">Birthday<span className="text-red-500">*</span></label>
           <input
             type="date"
             name="birthDate"
@@ -155,7 +163,7 @@ const ProfileRight = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Gender</label>
+          <label className="block text-sm font-medium mb-1">Gender<span className="text-red-500">*</span></label>
           <select
             name="gender"
             value={formData.gender}
@@ -171,7 +179,7 @@ const ProfileRight = ({
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium mb-1">Address</label>
+          <label className="block text-sm font-medium mb-1">Address<span className="text-red-500">*</span></label>
           <textarea
             name="permanentAddress"
             value={formData.permanentAddress}

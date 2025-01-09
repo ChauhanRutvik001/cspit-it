@@ -56,30 +56,30 @@ const Header = () => {
     }
   };
 
-  // const fetchProfilePic = useCallback(async () => {
-  //   setLoading(true);
-  //   try {
-  //     const response = await axiosInstance.get("/user/profile/upload-avatar", {
-  //       responseType: "blob",
-  //     });
-  //     const imageUrl = URL.createObjectURL(response.data);
-  //     setUrl(imageUrl);
-  //   } catch (error) {
-  //     console.error("Error fetching profile picture:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }, []);
+  const fetchProfilePic = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await axiosInstance.get("/user/profile/upload-avatar", {
+        responseType: "blob",
+      });
+      const imageUrl = URL.createObjectURL(response.data);
+      setUrl(imageUrl);
+    } catch (error) {
+      console.error("Error fetching profile picture:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  // useEffect(() => {
-  //   fetchProfilePic();
-  // }, [fetchProfilePic]);
+  useEffect(() => {
+    fetchProfilePic();
+  }, [fetchProfilePic]);
 
   const isActive = (path) => location.pathname === path;
 
   return (
     <header className="bg-gray-900 text-white fixed w-full z-20 shadow-md">
-      <Disclosure as="nav" className="bg-gray-800 sticky top-0">
+      <Disclosure as="nav" className="bg-black sticky top-0">
         {({ open }) => (
           <>
             <div className="mx-auto px-2 sm:px-6 lg:px-8">
@@ -95,7 +95,7 @@ const Header = () => {
                   </Disclosure.Button>
                 </div>
                 <div className="flex-1 flex items-center justify-between">
-                  <div className="flex items-center">
+                  <div className="flex items-center hover:cursor-pointer" onClick={() => navigate("/browse")}>
                     <img
                       className="h-14 w-auto"
                       src="/collageLogo.jpg"
@@ -110,7 +110,7 @@ const Header = () => {
                           to={item.to}
                           className={classNames(
                             isActive(item.to)
-                              ? "bg-gray-900 text-white"
+                              ? "bg-gray-700 text-white"
                               : "text-gray-300 hover:bg-gray-700 hover:text-white",
                             "rounded-md px-3 py-2 text-sm font-medium"
                           )}
@@ -124,7 +124,7 @@ const Header = () => {
                           to="/admin"
                           className={classNames(
                             isActive("/admin")
-                              ? "bg-gray-900 text-white"
+                              ? "bg-gray-700 text-white"
                               : "text-gray-300 hover:bg-gray-700 hover:text-white",
                             "rounded-md px-3 py-2 text-sm font-medium"
                           )}
@@ -200,7 +200,7 @@ const Header = () => {
                     to={item.to}
                     className={classNames(
                       isActive(item.to)
-                        ? "bg-gray-900 text-white"
+                        ? "bg-gray-800 text-white"
                         : "text-gray-300 hover:bg-gray-700 hover:text-white",
                       "block rounded-md px-3 py-2 text-base font-medium"
                     )}

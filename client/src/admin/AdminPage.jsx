@@ -114,7 +114,7 @@ const AdminPage = () => {
           Add Student Using File
         </button>
         <button
-          onClick={() => navigate("/domain")}
+          onClick={() => navigate("/studentsDomain")}
           className="bg-red-500 hover:bg-red-600 text-white mr-2 font-bold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
         >
           Domain

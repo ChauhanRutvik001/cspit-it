@@ -71,9 +71,34 @@ const Profile = () => {
     const { name, value } = e.target;
     setFormData((prevState) => ({ ...prevState, [name]: value }));
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if any required field in formData is empty
+    const requiredFields = [
+      "gender",
+      "permanentAddress",
+      "birthDate",
+      "counsellor",
+      "batch",
+      "name",
+      "email",
+      "mobileNo",
+      "semester",
+      "github",
+      "linkedIn",
+      "id",
+    ];
+
+    const missingFields = requiredFields.filter((field) => !formData[field]);
+
+    if (missingFields.length > 0) {
+      toast.error(
+        `Please fill in the following fields: ${missingFields.join(", ")}`
+      );
+      return;
+    }
+
     try {
       const response = await axiosInstance.put("user/update", {
         ...formData,

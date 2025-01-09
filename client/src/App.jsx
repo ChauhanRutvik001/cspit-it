@@ -4,6 +4,7 @@ import AuthService from "./Auth/auth";
 import { useDispatch } from "react-redux";
 import { setUser, logout } from "./redux/userSlice";
 import Body from "./componets/Body";
+import Header from "./componets/Header";
 
 function App() {
   const dispatch = useDispatch();

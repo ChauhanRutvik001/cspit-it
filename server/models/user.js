@@ -69,6 +69,7 @@ const userSchema = new Schema(
       },
       batch: {
         type: String,
+        lowercase: true,
       },
       github: {
         type: String,
