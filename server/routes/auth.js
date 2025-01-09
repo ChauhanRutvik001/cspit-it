@@ -8,6 +8,7 @@ router.route("/login").post(login);
 router.route("/logout").get(logout);
 router.route("/get-current-user").get(getCurrentUser);
 router.route("/change-password").post(changePassword);
+router.route("/profile-data").post(changePassword);
 
 
 export default router;

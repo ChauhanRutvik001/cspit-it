@@ -7,11 +7,12 @@ import Students from "./Students";
 import Alumni from "./Alumni";
 import Contact from "./Contact";
 import Profile from "./Profile";
-import AdminPage from "../admin/adminPage";
+import AdminPage from "../admin/AdminPage";
 import StudentRegistation from "../admin/studentRegistation";
 import SchedulePage from "./SchedulePage";
 import Developers from "./Developers";
 import StudentSelectionPage from "./StudentSelectionPage"
+import AllStudentSelections from "../admin/AllStudentSelections";
 
 const Body = () => {
   const appRouter = createBrowserRouter([
@@ -27,6 +28,7 @@ const Body = () => {
     { path: "/registation", element: <StudentRegistation /> },
     { path: "/developers", element: <Developers /> },
     { path: "/StudentSelectionPage", element: <StudentSelectionPage /> },
+    { path: "/studentsDomain", element: <AllStudentSelections /> },
   ]);
 
   return (

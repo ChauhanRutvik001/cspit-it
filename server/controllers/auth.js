@@ -2,8 +2,6 @@ import User from "../models/user.js";
 import { StatusCodes } from "http-status-codes";
 import { createToken, verifyToken } from "../utils/jwt.js";
 import jwt from "jsonwebtoken";
-import { v4 as uuidv4 } from "uuid";
-import cron from "node-cron";
 
 export const login = async (req, res) => {
   console.log("API hit");

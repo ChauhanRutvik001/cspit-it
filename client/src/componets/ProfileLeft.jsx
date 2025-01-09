@@ -115,7 +115,7 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
         <FaUser size={200} className="text-primary mb-3" />
       )}
 
-      <p className="text-xl font-semibold pb-5">{formData.name}</p>
+      <p className="text-xl font-semibold pb-5">{formData.id}</p>
 
       <div className="flex items-center space-x-2">
         <a

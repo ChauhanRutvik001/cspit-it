@@ -1,5 +1,6 @@
 import StudentSelection from "../models/StudentSelection.js"; // Import the model using ES6 import
 
+// Save Student Selections
 const saveSelections = async (req, res) => {
   try {
     const { studentId, selections } = req.body;
@@ -26,11 +27,9 @@ const saveSelections = async (req, res) => {
       }
 
       if (!selection.subdomains || !Array.isArray(selection.subdomains)) {
-        return res
-          .status(400)
-          .json({
-            message: `Each domain must have subdomains (can be empty).`,
-          });
+        return res.status(400).json({
+          message: `Each domain must have subdomains (can be empty).`,
+        });
       }
 
       for (const subdomain of selection.subdomains) {
@@ -41,11 +40,9 @@ const saveSelections = async (req, res) => {
         }
 
         if (!subdomain.topics || !Array.isArray(subdomain.topics)) {
-          return res
-            .status(400)
-            .json({
-              message: `Topics for each subdomain must be an array (can be empty).`,
-            });
+          return res.status(400).json({
+            message: `Topics for each subdomain must be an array (can be empty).`,
+          });
         }
       }
     }
@@ -68,7 +65,6 @@ const saveSelections = async (req, res) => {
   }
 };
 
-
 // Fetch Student Selections
 const getSelections = async (req, res) => {
   try {
@@ -88,6 +84,58 @@ const getSelections = async (req, res) => {
     }
 
     res.status(200).json(studentSelection);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: `Error fetching selections: ${error.message}` });
+  }
+};
+
+export const getAllSelections = async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 10,
+      sortBy = "studentId.name",
+      order = "asc",
+      search = "",
+    } = req.query;
+
+    const searchFilter = search
+      ? {
+          $or: [
+            { "studentId.name": { $regex: search, $options: "i" } },
+            { "studentId.id": { $regex: search, $options: "i" } },
+          ],
+        }
+      : {};
+
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+
+    const skip = (pageNumber - 1) * limitNumber;
+    const sortOrder = order === "asc" ? 1 : -1;
+
+    const allSelections = await StudentSelection.find(searchFilter)
+      .populate("studentId", "name id")
+      .sort({ [sortBy]: sortOrder })
+      .skip(skip)
+      .limit(limitNumber);
+
+    const totalDocuments = await StudentSelection.countDocuments(searchFilter);
+
+    if (!allSelections.length) {
+      return res.status(404).json({ message: "No selections found." });
+    }
+
+    res.status(200).json({
+      data: allSelections,
+      pagination: {
+        totalDocuments,
+        currentPage: pageNumber,
+        totalPages: Math.ceil(totalDocuments / limitNumber),
+      },
+    });
   } catch (error) {
     res
       .status(500)
