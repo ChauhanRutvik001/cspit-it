@@ -2,7 +2,7 @@ import express from 'express'; // Import express using ES6 import
 import { saveSelections, getSelections, getDomains, getAllSelections } from '../controllers/studentSelectionController.js'; // Import the controller
 
 const router = express.Router();
-import { isAuthorized } from "../middlewares/auth.js";
+import { isAdmin, isAuthorized } from "../middlewares/auth.js";
 
 
 router.use(isAuthorized);
@@ -17,6 +17,6 @@ router.get('/selections/:studentId', getSelections);
 router.get('/domains', getDomains);
 
 // Route to fetch all students' selections
-router.get('/selections', getAllSelections);
+router.get('/selections',isAdmin, getAllSelections);
 
 export default router; // Export router using ES6 export

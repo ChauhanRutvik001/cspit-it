@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axiosInstance from "../utils/axiosInstance";
-import Header from "../componets/Header";
 
 const AdminPage = () => {
   const user = useSelector((store) => store.app.user);
@@ -100,10 +99,9 @@ const AdminPage = () => {
 
   return (
     <div className="relative min-h-screen bg-white text-black">
-      <Header />
 
       <div className="flex justify-center pt-[6%]">
-        <h1 className="text-2xl font-bold mb-4">Student Register</h1>
+        <h1 className="text-3xl font-bold mb-4 font-serif">Student Register</h1>
       </div>
 
       <div className="p-4">
@@ -121,13 +119,13 @@ const AdminPage = () => {
         </button>
         <button
           onClick={() => navigate("/students")}
-          className="bg-red-500 hover:bg-red-600 text-white mr-2 font-bold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
+          className="bg-green-500 hover:bg-green-600 text-white mr-2 font-bold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-green-300 transition"
         >
           Student
         </button>
       </div>
 
-      <div className="flex items-center ml-4 py-2 px-4 rounded-full shadow-lg text-lg font-semibold bg-white">
+      <div className="flex items-center py-2 px-4 rounded-full text-lg font-semibold">
         <span>Total Number of Students Register:</span>
         <span className="ml-2 text-xl font-bold">{totalStudents}</span>
       </div>
@@ -146,7 +144,7 @@ const AdminPage = () => {
           <p className="text-red-500">{error}</p>
         ) : (
           <div className="overflow-x-auto bg-white shadow-md rounded-lg p-4">
-            <table className="min-w-full text-lg text-left text-black rounded-lg overflow-hidden">
+            <table className="min-w-full text-left text-black rounded-lg overflow-hidden">
               <thead className="bg-gray-200 text-gray-700">
                 <tr>
                   <th className="py-3 px-6">#</th>

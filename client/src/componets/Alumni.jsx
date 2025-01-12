@@ -60,7 +60,6 @@ const Alumni = () => {
 
     return (
         <div className='relative min-h-screen bg-gray-100 text-gray-900'>
-            <Header />
             <div className="py-10 pt-20">
                 <div className="container mx-auto px-4">
                     <div>

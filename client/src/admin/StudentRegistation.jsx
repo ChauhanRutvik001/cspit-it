@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
-import Header from "../componets/Header";
 
 const StudentRegistration = () => {
   const [students, setStudents] = useState([]); // Holds parsed Excel data
@@ -181,8 +180,6 @@ const StudentRegistration = () => {
 
   return (
     <div className="relative min-h-screen bg-white text-black">
-      <Header />
-
       <div className="pl-10 pt-[6%]">
         <button
           className="py-2 px-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-indigo-700 active:scale-95 transition transform duration-200"

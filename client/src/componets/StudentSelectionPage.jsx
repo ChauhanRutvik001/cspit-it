@@ -191,7 +191,6 @@ const DomainSelection = () => {
   return (
     <>
       <div className="bg-gray-50 min-h-screen">
-        <Header />
         <div className="p-6 pt-20">
           <h1 className="text-3xl font-bold text-center text-blue-600 mb-6">
             Domain Selection

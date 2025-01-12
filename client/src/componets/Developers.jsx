@@ -35,7 +35,6 @@ const Developers = () => {
 
   return (
     <div className="relative min-h-screen bg-gray-100 text-gray-900">
-      <Header />
       <div className="pt-20 p-4">
         <div className="text-center  lg:text-left mb-8">
           <h5 className="text-4xl sm:text-5xl flex justify-center font-inter font-bold mb-12">

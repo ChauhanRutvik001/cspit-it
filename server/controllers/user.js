@@ -1,6 +1,6 @@
-  import User from "../models/user.js";
-  import { GridFSBucket } from "mongodb";
-  import { mongoose } from "../app.js";
+import User from "../models/user.js";
+import { GridFSBucket } from "mongodb";
+import { mongoose } from "../app.js";
 
 export const getUserDetails = async (req, res) => {
   const { id } = req.params; // Updated to match :id in the route
@@ -115,38 +115,40 @@ export const getProfilePic = async (req, res) => {
 };
 
 export const removeProfilePic = async (req, res, next) => {
-  console.log('removeProfilePic API called');
+  console.log("removeProfilePic API called");
   const startTime = Date.now();
 
   try {
     const user = await User.findById(req.user.id);
     if (!user) {
-      console.log('User not found');
-      return res.status(404).json({ message: 'User does not exist.' });
+      console.log("User not found");
+      return res.status(404).json({ message: "User does not exist." });
     }
 
     const fileId = user.profile?.avatar;
     if (!fileId) {
-      console.log('Avatar not found');
-      return res.status(404).json({ message: 'Avatar does not exist.' });
+      console.log("Avatar not found");
+      return res.status(404).json({ message: "Avatar does not exist." });
     }
 
     if (!mongoose.Types.ObjectId.isValid(fileId)) {
-      console.log('Invalid file ID');
-      return res.status(400).json({ message: 'Invalid file ID' });
+      console.log("Invalid file ID");
+      return res.status(400).json({ message: "Invalid file ID" });
     }
 
-    const bucket = new GridFSBucket(mongoose.connection.db, { bucketName: 'uploads' });
-    console.log('Starting delete process at:', startTime);
+    const bucket = new GridFSBucket(mongoose.connection.db, {
+      bucketName: "uploads",
+    });
+    console.log("Starting delete process at:", startTime);
 
     user.profile.avatar = null;
     await user.save();
 
     bucket.delete(new mongoose.Types.ObjectId(fileId), async (err) => {
-      console.log('File deleted');
+      console.log("File deleted");
       if (err) {
-        console.error('Error removing file:', err);
-        return res.status(500).json({ message: 'Error removing avatar.' });
+        console.error("Error removing file:", err);
+        return res.status(500).json({ message: "Error removing avatar." });
       }
 
       console.log("Till here");
@@ -154,20 +156,18 @@ export const removeProfilePic = async (req, res, next) => {
         user.profile.avatar = null;
         await user.save();
       } catch (saveError) {
-        console.error('Error saving user:', saveError);
-        return res.status(500).json({ message: 'Error saving user.' });
+        console.error("Error saving user:", saveError);
+        return res.status(500).json({ message: "Error saving user." });
       }
 
       const endTime = Date.now();
       console.log(`Avatar removed successfully in ${endTime - startTime}ms`);
 
-      return res.status(200).json({ message: 'Avatar removed successfully.' });
+      return res.status(200).json({ message: "Avatar removed successfully." });
     });
-
-    
   } catch (error) {
-    console.error('Error removing profile picture:', error);
-    return res.status(500).json({ message: 'Server error.' });
+    console.error("Error removing profile picture:", error);
+    return res.status(500).json({ message: "Server error." });
   }
 };
 
@@ -241,18 +241,55 @@ export const updateUser = async (req, res) => {
 
 export const getAllStudents = async (req, res) => {
   try {
-    // Fetch all users with only name and id fields
-    console.log("hello")
-    const students = await User.find({ role: "student" }).select("name id profile");
+    const { page = 1, limit = 10 } = req.query;
 
-    if (!students || students.length === 0) {
-      return res.status(404).json({ message: "No students found" });
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+
+    if (
+      isNaN(pageNumber) ||
+      isNaN(limitNumber) ||
+      pageNumber <= 0 ||
+      limitNumber <= 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid page or limit parameter",
+      });
     }
 
-    // Send response with student data
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const students = await User.find({
+      role: "student",
+      profile: { $exists: true, $ne: null },
+    })
+      .select("name id profile")
+      .skip(skip)
+      .limit(limitNumber);
+
+    // Get the total count of students
+    const totalStudents = await User.countDocuments({
+      role: "student",
+      profile: { $exists: true, $ne: null },
+    });
+
+    if (!students || students.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No students with profiles found" });
+    }
+
+    // Send response with paginated data and metadata
     res.status(200).json({
       success: true,
       data: students,
+      meta: {
+        totalStudents,
+        currentPage: pageNumber,
+        totalPages: Math.ceil(totalStudents / limitNumber),
+        limit: limitNumber,
+      },
     });
   } catch (error) {
     console.error("Error fetching students data:", error);
@@ -262,3 +299,4 @@ export const getAllStudents = async (req, res) => {
     });
   }
 };
+

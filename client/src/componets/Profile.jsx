@@ -128,7 +128,6 @@ const Profile = () => {
 
   return (
     <div className="relative min-h-screen bg-white text-black">
-      <Header />
       {user ? (
         <section className="pt-16">
           <div className="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-6 p-4">

@@ -156,11 +156,7 @@ const Header = () => {
                         ) : (
                           <img
                             className="h-10 w-10 rounded-full border-2 border-blue-300 shadow-md"
-                            src={
-                              imagePreview ||
-                              url ||
-                              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1c_Kup7Pd1rkP7yZAWY_sbmjEZlHyFFrrUQ&s"
-                            }
+                            src={imagePreview || url || "/default-img.png"}
                             alt={user?.name || "Default Profile"}
                           />
                         )}
@@ -173,7 +169,7 @@ const Header = () => {
                             to="/profile"
                             className={classNames(
                               active ? "bg-gray-100" : "",
-                              "block px-4 py-2 text-sm text-gray-700"
+                              "block px-4 py-2 text-sm text-gray-700  hover:bg-blue-100 hover:text-blue-600"
                             )}
                           >
                             Your Profile
@@ -186,7 +182,7 @@ const Header = () => {
                             onClick={logoutHandler}
                             className={classNames(
                               active ? "bg-gray-100" : "",
-                              "block px-4 py-2 text-sm text-gray-700 text-start w-full"
+                              "block px-4 py-2 text-sm text-gray-700 text-start w-full hover:bg-blue-100 hover:text-blue-600"
                             )}
                           >
                             Sign out

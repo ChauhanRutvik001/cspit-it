@@ -7,7 +7,6 @@ const Contact = () => {
 
   return (
     <div className="relative min-h-screen bg-gray-100 text-gray-900">
-      <Header />
       <div className="w-full h-screen flex flex-col items-center justify-center bg-gray-50">
         <div className="w-full max-w-5xl bg-white border shadow-md p-8">
           <div className="mt-8 flex items-start">
