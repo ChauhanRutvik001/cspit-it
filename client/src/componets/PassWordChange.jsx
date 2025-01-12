@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const PasswordChange = ({ id }) => {
+  console.log("ID:", id);
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -49,7 +50,7 @@ const PasswordChange = ({ id }) => {
         toast.success(
           `${res.data.message} Please login again with the new password.`
         );
-        navigate("/");
+        navigate("/browse");
       } else {
         setError(
           res.data.message || "An error occurred while changing the password."

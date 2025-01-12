@@ -36,6 +36,10 @@ const userSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    firstTimeData: {
+      type: Boolean,
+      default: true,
+    },
     profile: {
       avatar: {
         type: String, // URL or path to the user's avatar

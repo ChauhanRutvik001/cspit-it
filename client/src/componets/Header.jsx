@@ -78,14 +78,14 @@ const Header = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <header className="bg-gray-900 text-white fixed w-full z-20 shadow-md">
-      <Disclosure as="nav" className="bg-black sticky top-0">
+    <header className="bg-blue-50 text-gray-800 fixed w-full z-20 shadow-md">
+      <Disclosure as="nav" className="sticky top-0">
         {({ open }) => (
           <>
             <div className="mx-auto px-2 sm:px-6 lg:px-8">
               <div className="relative flex h-16 items-center justify-between">
                 <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-                  <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+                  <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-600 hover:bg-blue-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
                     <span className="sr-only">Open main menu</span>
                     {open ? (
                       <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
@@ -95,7 +95,10 @@ const Header = () => {
                   </Disclosure.Button>
                 </div>
                 <div className="flex-1 flex items-center justify-between">
-                  <div className="flex items-center hover:cursor-pointer" onClick={() => navigate("/browse")}>
+                  <div
+                    className="flex items-center hover:cursor-pointer"
+                    onClick={() => navigate("/browse")}
+                  >
                     <img
                       className="h-14 w-auto"
                       src="/collageLogo.jpg"
@@ -110,8 +113,8 @@ const Header = () => {
                           to={item.to}
                           className={classNames(
                             isActive(item.to)
-                              ? "bg-gray-700 text-white"
-                              : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                              ? "bg-blue-200 text-blue-700"
+                              : "text-gray-600 hover:bg-blue-100 hover:text-blue-600",
                             "rounded-md px-3 py-2 text-sm font-medium"
                           )}
                           aria-current={isActive(item.to) ? "page" : undefined}
@@ -124,8 +127,8 @@ const Header = () => {
                           to="/admin"
                           className={classNames(
                             isActive("/admin")
-                              ? "bg-gray-700 text-white"
-                              : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                              ? "bg-blue-200 text-blue-700"
+                              : "text-gray-600 hover:bg-blue-100 hover:text-blue-600",
                             "rounded-md px-3 py-2 text-sm font-medium"
                           )}
                           aria-current={isActive("/admin") ? "page" : undefined}
@@ -139,22 +142,26 @@ const Header = () => {
                 <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                   <button
                     type="button"
-                    className="rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
+                    className="rounded-full bg-blue-100 p-1 text-gray-600 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-blue-50"
                   >
                     <span className="sr-only">View notifications</span>
                     <BellIcon className="h-6 w-6" aria-hidden="true" />
                   </button>
                   <Menu as="div" className="relative ml-3">
                     <div>
-                      <Menu.Button className="flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                      <Menu.Button className="flex rounded-full bg-blue-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-blue-50">
                         <span className="sr-only">Open user menu</span>
                         {loading ? (
-                          <ClipLoader size={24} color="#ffffff" />
+                          <ClipLoader size={24} color="#1D4ED8" />
                         ) : (
                           <img
-                            className="h-10 w-10 rounded-full"
-                            src={imagePreview || url || "/default-profile.png"}
-                            alt="img"
+                            className="h-10 w-10 rounded-full border-2 border-blue-300 shadow-md"
+                            src={
+                              imagePreview ||
+                              url ||
+                              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1c_Kup7Pd1rkP7yZAWY_sbmjEZlHyFFrrUQ&s"
+                            }
+                            alt={user?.name || "Default Profile"}
                           />
                         )}
                       </Menu.Button>
@@ -200,8 +207,8 @@ const Header = () => {
                     to={item.to}
                     className={classNames(
                       isActive(item.to)
-                        ? "bg-gray-800 text-white"
-                        : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                        ? "bg-blue-200 text-blue-700"
+                        : "text-gray-600 hover:bg-blue-100 hover:text-blue-600",
                       "block rounded-md px-3 py-2 text-base font-medium"
                     )}
                     aria-current={isActive(item.to) ? "page" : undefined}

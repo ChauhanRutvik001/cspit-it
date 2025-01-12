@@ -13,6 +13,7 @@ import SchedulePage from "./SchedulePage";
 import Developers from "./Developers";
 import StudentSelectionPage from "./StudentSelectionPage"
 import AllStudentSelections from "../admin/AllStudentSelections";
+import StudentData from "../admin/StudentData";
 
 const Body = () => {
   const appRouter = createBrowserRouter([
@@ -29,6 +30,7 @@ const Body = () => {
     { path: "/developers", element: <Developers /> },
     { path: "/StudentSelectionPage", element: <StudentSelectionPage /> },
     { path: "/studentsDomain", element: <AllStudentSelections /> },
+    { path: "/students", element: <StudentData /> },
   ]);
 
   return (
