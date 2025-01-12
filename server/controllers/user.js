@@ -238,3 +238,27 @@ export const updateUser = async (req, res) => {
     return res.status(500).json({ message: "Server error." });
   }
 };
+
+export const getAllStudents = async (req, res) => {
+  try {
+    // Fetch all users with only name and id fields
+    console.log("hello")
+    const students = await User.find({ role: "student" }).select("name id profile");
+
+    if (!students || students.length === 0) {
+      return res.status(404).json({ message: "No students found" });
+    }
+
+    // Send response with student data
+    res.status(200).json({
+      success: true,
+      data: students,
+    });
+  } catch (error) {
+    console.error("Error fetching students data:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while retrieving student details",
+    });
+  }
+};

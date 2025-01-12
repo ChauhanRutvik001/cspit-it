@@ -119,6 +119,12 @@ const AdminPage = () => {
         >
           Domain
         </button>
+        <button
+          onClick={() => navigate("/students")}
+          className="bg-red-500 hover:bg-red-600 text-white mr-2 font-bold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
+        >
+          Student
+        </button>
       </div>
 
       <div className="flex items-center ml-4 py-2 px-4 rounded-full shadow-lg text-lg font-semibold bg-white">

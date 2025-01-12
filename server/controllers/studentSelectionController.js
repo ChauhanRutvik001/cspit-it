@@ -93,43 +93,47 @@ const getSelections = async (req, res) => {
 
 export const getAllSelections = async (req, res) => {
   try {
-    const {
-      page = 1,
-      limit = 10,
-      sortBy = "studentId.name",
-      order = "asc",
-      search = "",
-    } = req.query;
+    const { page = 1, limit = 10, order = "asc" } = req.query;
 
-    const searchFilter = search
-      ? {
-          $or: [
-            { "studentId.name": { $regex: search, $options: "i" } },
-            { "studentId.id": { $regex: search, $options: "i" } },
-          ],
-        }
-      : {};
-
+    // Removed the search filter
     const pageNumber = parseInt(page, 10);
     const limitNumber = parseInt(limit, 10);
-
     const skip = (pageNumber - 1) * limitNumber;
-    const sortOrder = order === "asc" ? 1 : -1;
 
-    const allSelections = await StudentSelection.find(searchFilter)
-      .populate("studentId", "name id")
-      .sort({ [sortBy]: sortOrder })
-      .skip(skip)
-      .limit(limitNumber);
+    // Fetch all data with population
+    const allSelections = await StudentSelection.find().populate(
+      "studentId",
+      "name id"
+    );
 
-    const totalDocuments = await StudentSelection.countDocuments(searchFilter);
+    // Debugging: Log fetched data
+    // console.log(allSelections);
 
-    if (!allSelections.length) {
+    // Sort data manually based on populated field
+    const sortedSelections = allSelections.sort((a, b) => {
+      const nameA = a.studentId.id.toLowerCase();
+      const nameB = b.studentId.id.toLowerCase();
+      return order === "asc"
+        ? nameA.localeCompare(nameB)
+        : nameB.localeCompare(nameA);
+    });
+
+    // Paginate sorted data
+    const paginatedSelections = sortedSelections.slice(
+      skip,
+      skip + limitNumber
+    );
+
+    const totalDocuments = allSelections.length;
+
+    // Handle no selections found
+    if (!paginatedSelections.length) {
       return res.status(404).json({ message: "No selections found." });
     }
 
+    // Send successful response
     res.status(200).json({
-      data: allSelections,
+      data: paginatedSelections,
       pagination: {
         totalDocuments,
         currentPage: pageNumber,
@@ -137,6 +141,7 @@ export const getAllSelections = async (req, res) => {
       },
     });
   } catch (error) {
+    // Error handling
     res
       .status(500)
       .json({ message: `Error fetching selections: ${error.message}` });

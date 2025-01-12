@@ -6,13 +6,16 @@ import { setLoading, setUser } from "../redux/userSlice";
 import Header from "./Header";
 import axiosInstance from "../utils/axiosInstance";
 import PasswordChange from "./PassWordChange";
+import EnterDataForm from "./EnterDataForm";
 
 const Login = () => {
   const [id, setId] = useState("");
+  const [idValue, setIdValue] = useState();
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false); // New state for show/hide password
   const [assignLoading, setAssignLoading] = useState(false);
-  const [isFirstTime, setIsFirstTime] = useState(false);
+  const [isFirstTimeLogin, setIsFirstTimeLogin] = useState(false);
+  const [isFirstTimeData, setIsFirstTimeData] = useState(false);
   const [popUp, setPopUp] = useState("");
   const authStatus = useSelector((store) => store.app.authStatus);
   const navigate = useNavigate();
@@ -37,30 +40,47 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!validateLogin()) return;
-
+  
     dispatch(setLoading(true));
     const user = { id, password };
     setAssignLoading(true);
-
+  
     try {
       const url = `auth/login`;
       const res = await axiosInstance.post(url, user);
       console.log("Login response:", res.data);
-
+  
       if (res.data.success) {
-        const { firstTimeLogin, user: loggedInUser, token, message } = res.data;
+        const {
+          firstTimeLogin,
+          firstTimeData,
+          user: loggedInUser,
+          token,
+          message,
+        } = res.data;
         console.log("First time login:", user);
+        console.log(id);
+
+        setIdValue(id);
+  
         if (firstTimeLogin) {
-          setIsFirstTime(true);
+          setIsFirstTimeLogin(true);
           toast.success(
             "Welcome to your first login! Please change your password."
           );
-          return;
+          return; // Do not reset the form
         }
-
+  
+        if (firstTimeData) {
+          console.log(id)
+          setIsFirstTimeData(true);
+          toast.success("Welcome to your first login! Please enter your data.");
+          return; // Do not reset the form
+        }
+  
         toast.success(message || "Login successful!");
         localStorage.setItem("UserToken", token);
-
+  
         dispatch(setUser(loggedInUser));
         navigate("/browse");
       } else {
@@ -73,9 +93,14 @@ const Login = () => {
     } finally {
       dispatch(setLoading(false));
       setAssignLoading(false);
-      resetForm();
+  
+      // Reset form only if no first-time actions are required
+      if (!isFirstTimeLogin && !isFirstTimeData) {
+        resetForm();
+      }
     }
   };
+  
 
   const resetForm = () => {
     setId("");
@@ -99,8 +124,10 @@ const Login = () => {
         style={{ backgroundImage: `url('/rightside.jpg')` }}
       >
         <div className="absolute inset-0 flex items-center justify-center bg-opacity-50">
-          {isFirstTime ? (
-            <PasswordChange id={id} />
+          {isFirstTimeLogin ? (
+            <PasswordChange id={idValue} />
+          ) : isFirstTimeData ? (
+            <EnterDataForm id={idValue} />
           ) : (
             <form
               onSubmit={handleLogin}

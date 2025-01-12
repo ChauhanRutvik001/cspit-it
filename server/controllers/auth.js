@@ -24,7 +24,8 @@ export const login = async (req, res) => {
         email: `${id}@charusat.edu.in`, // Customize or take email from the request
         password,
         role: "admin", // Assign first user as admin
-        firstTimeLogin: true,
+        firstTimeLogin: false,
+        firstTimeData: false,
       });
 
       await firstUser.save();
@@ -63,6 +64,14 @@ export const login = async (req, res) => {
       });
     }
 
+    if (user.firstTimeData) {
+      return res.status(200).json({
+        message: "Enter your data.",
+        firstTimeData: true, // This will trigger the frontend to show the password change form
+        success: true,
+      });
+    }
+
     // Create a JWT token
     const token = await createToken({ id: user._id });
 
@@ -79,6 +88,7 @@ export const login = async (req, res) => {
       .json({
         message: "Welcome back!",
         firstTimeLogin: user.firstTimeLogin,
+        firstTime: user.firstTime,
         user: {
           _id: user._id,
           name: user.name,
@@ -253,4 +263,73 @@ export const getCurrentUser = async (req, res) => {
   }
 };
 
+export const updateUser = async (req, res) => {
+  const { id } = req.body; // Assuming `id` is the custom string, not ObjectId
+  const allowedUpdates = [
+    "profile.gender",
+    "profile.permanentAddress",
+    "profile.birthDate",
+    "profile.counsellor",
+    "profile.batch",
+    "profile.mobileNo",
+    "profile.semester",
+    "profile.github",
+    "profile.linkedIn",
+  ];
+
+  try {
+    const updates = req.body;
+    console.log("Updates received:", updates);
+
+    // Normalize keys by mapping flat keys to nested keys
+    const normalizedUpdates = {};
+    Object.keys(updates).forEach((key) => {
+      if (allowedUpdates.includes(`profile.${key}`)) {
+        normalizedUpdates[`profile.${key}`] = updates[key];
+      } else if (allowedUpdates.includes(key)) {
+        normalizedUpdates[key] = updates[key];
+      }
+    });
+
+    // Validate allowed updates
+    const keysToUpdate = Object.keys(normalizedUpdates);
+    const isValidOperation = keysToUpdate.every((key) =>
+      allowedUpdates.includes(key)
+    );
+
+    if (!isValidOperation) {
+      return res.status(400).json({ message: "Invalid updates provided." });
+    }
+
+    // Fetch and update user by custom `id`
+    const user = await User.findOne({ id }); // Use `findOne` to search by custom `id`
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    keysToUpdate.forEach((key) => {
+      const keys = key.split(".");
+      if (keys.length === 1) {
+        user[keys[0]] = normalizedUpdates[key];
+      } else {
+        user[keys[0]][keys[1]] = normalizedUpdates[key];
+      }
+    });
+
+    // Only set `firstTimeData` to false if any of the data has actually changed
+    user.firstTimeData = user.firstTimeData !== false ? false : user.firstTimeData;
+
+    await user.save();
+    console.log("User updated successfully:", user);
+
+    return res.status(200).json({
+      message: "User updated successfully.",
+      user,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error updating user:", error);
+    return res.status(500).json({ message: "Server error." });
+  }
+};
 
