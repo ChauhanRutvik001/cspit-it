@@ -5,7 +5,6 @@ const NotFoundError = () => {
   return (
     <>
       <div className='relative min-h-screen bg-gray-900 text-white flex flex-col'>
-        <Header />
         <div className='flex-grow flex items-center justify-center p-4 md:p-0'>
           <section className='text-center max-w-md mx-auto'>
             <div className="mb-8">

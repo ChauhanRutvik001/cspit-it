@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import Header from "./Header";
 
 // Import images from the public folder
 const CIDAC_industry_visit = "/CIDAC_industry_visit.jpg";
@@ -12,7 +11,6 @@ const Priyanka = "/priyanka.jpg";
 const Browse = () => {
   return (
     <div className="relative min-h-screen bg-gray-100 text-gray-900">
-      <Header />
       <div className="content mb-4">
         <ImageRotation />
         <Description />

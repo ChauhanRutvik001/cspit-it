@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../utils/axiosInstance";
-import Header from "../componets/Header";
 import { jsPDF } from "jspdf"; // Import jsPDF for PDF generation
 import * as XLSX from "xlsx"; // Import xlsx for Excel generation
 import "jspdf-autotable"; // Import the autoTable plugin
+import { ClipLoader } from "react-spinners";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const AllStudentSelections = () => {
+  const user = useSelector((store) => store.app.user);
+    const navigate = useNavigate();
   const [selections, setSelections] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -16,6 +20,10 @@ const AllStudentSelections = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalDocuments, setTotalDocuments] = useState(0);
   const [searchTerm, setSearchTerm] = useState(""); // New state for search term
+
+  useEffect(() => {
+      if (user?.role !== "admin") navigate("/browse");
+    }, [user, navigate]);
 
   useEffect(() => {
     const fetchSelections = async () => {
@@ -97,18 +105,16 @@ const AllStudentSelections = () => {
         .join(", ") || "";
 
     return (
-      studentId.toLowerCase().includes(searchTerm) ||
-      studentName.toLowerCase().includes(searchTerm) ||
-      domain.toLowerCase().includes(searchTerm) ||
-      subdomains.toLowerCase().includes(searchTerm) ||
-      topics.toLowerCase().includes(searchTerm)
+      studentId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      domain.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      subdomains.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      topics.toLowerCase().includes(searchTerm.toLowerCase())
     );
   });
 
-  const sortedSelections = [
-    ...filteredSelections,
-    ...selections.filter((student) => !filteredSelections.includes(student)),
-  ];
+  // Remove items that don't match the search term
+  const sortedSelections = filteredSelections;
 
   // Export to PDF
   const exportToPDF = () => {
@@ -153,6 +159,23 @@ const AllStudentSelections = () => {
 
   // Export to Excel
   const exportToExcel = () => {
+    // Add a summary row at the top with the number of students
+    const summaryRow = [
+      {
+        "Student ID": "Total Students",
+        "Student Name": filteredSelections.length,
+      },
+    ];
+
+    // Define table headers
+    const headers = [
+      "Student ID",
+      "Student Name",
+      "Domain",
+      "Subdomains",
+      "Topics",
+    ];
+
     // Prepare table data
     const tableData = filteredSelections.map((student) => ({
       "Student ID": student.studentId?.id || "",
@@ -174,17 +197,11 @@ const AllStudentSelections = () => {
           .join(", ") || "",
     }));
 
-    // Add a summary row at the top
-    const summaryRow = [
-      {
-        "Student ID": "Total Students",
-        "Student Name": filteredSelections.length,
-      },
-      ...tableData,
-    ];
+    // Combine summaryRow, headers, and tableData into a single array
+    const data = [summaryRow[0],  ...tableData];
 
     // Create Excel sheet
-    const ws = XLSX.utils.json_to_sheet(summaryRow);
+    const ws = XLSX.utils.json_to_sheet(data, { header: headers });
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Selections");
 
@@ -196,10 +213,9 @@ const AllStudentSelections = () => {
   };
 
   return (
-    <div className="container mx-auto min-h-screen">
-      <Header />
+    <div className="mx-auto min-h-screen">
       <div className="p-4 pt-20">
-        <h1 className="text-3xl font-semibold text-center mb-6">
+        <h1 className="text-3xl font-semibold text-center mb-6 font-serif">
           All Student Domain Selections
         </h1>
 
@@ -241,6 +257,24 @@ const AllStudentSelections = () => {
           </div>
         </div>
 
+        <div className="mb-4">
+          <label htmlFor="limit" className="mr-2">
+            Items per page:
+          </label>
+          <select
+            id="limit"
+            value={limit}
+            onChange={handleLimitChange}
+            className="border border-gray-300 rounded-md p-1"
+          >
+            {[10, 50, 100, 500, 1000].map((value) => (
+              <option key={value} value={value}>
+                {value}
+              </option>
+            ))}
+          </select>
+        </div>
+
         {/* Table */}
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-lg">
@@ -270,9 +304,9 @@ const AllStudentSelections = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="5" className="text-center py-4 text-gray-500">
+                  <td colSpan="6" className="text-center py-4 text-gray-500">
                     <div className="flex justify-center items-center h-16">
-                      <div className="loader" />
+                      <ClipLoader size={40} color="#1D4ED8" />
                     </div>
                   </td>
                 </tr>
@@ -321,24 +355,7 @@ const AllStudentSelections = () => {
           </table>
         </div>
 
-        <div className="flex justify-between items-center mt-6">
-          <div>
-            <label htmlFor="limit" className="mr-2">
-              Items per page:
-            </label>
-            <select
-              id="limit"
-              value={limit}
-              onChange={handleLimitChange}
-              className="border border-gray-300 rounded-md p-1"
-            >
-              {[10, 50, 100, 200, 500, 1000].map((value) => (
-                <option key={value} value={value}>
-                  {value}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className="flex justify-center items-center mt-6">
           <div className="flex space-x-2">
             <button
               className="px-4 py-2 bg-gray-200 rounded-md"
