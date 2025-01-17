@@ -2,6 +2,7 @@ import React, { useState, useEffect, memo } from "react";
 import axios from "axios";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
+import axiosInstance from "../utils/axiosInstance";
 
 const Schedule = () => {
   const [notes, setNotes] = useState(""); // Controlled input state
@@ -15,7 +16,7 @@ const Schedule = () => {
   useEffect(() => {
     const fetchSchedules = async () => {
       try {
-        const { data } = await axios.get("http://localhost:3100/api/v1/schedules");
+        const { data } = await axiosInstance.get("/schedules");
         setSchedules(data);
       } catch (error) {
         console.error("Error fetching schedules:", error);
@@ -53,8 +54,8 @@ const Schedule = () => {
       formData.append("notes", notes);
       files.forEach((file) => formData.append("files", file));
 
-      const { data } = await axios.post(
-        "http://localhost:3100/api/v1/schedules",
+      const { data } = await axiosInstance.post(
+        "/schedules",
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
@@ -75,7 +76,7 @@ const Schedule = () => {
 
   const handleDelete = async () => {
     try {
-      const res = await axios.delete(`http://localhost:3100/api/v1/schedules/${deleteId}`);
+      const res = await axiosInstance.delete(`/schedules/${deleteId}`);
       if (res.data.success) {
         setSchedules(schedules.filter((schedule) => schedule._id !== deleteId));
         setShowConfirm(false);

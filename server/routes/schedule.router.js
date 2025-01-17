@@ -1,15 +1,18 @@
-import express from 'express';
-import multer from 'multer';
-import { createSchedule, getSchedules, deleteSchedule } from '../controllers/schedule.controller.js';
-import path from 'path';
-import { isAuthorized } from '../middlewares/auth.js';
+import express from "express";
+import multer from "multer";
+import {
+  createSchedule,
+  getSchedules,
+  deleteSchedule,
+} from "../controllers/schedule.controller.js";
+import path from "path";
+import { isAdmin, isAuthorized } from "../middlewares/auth.js";
 
 const router = express.Router();
-// router.use(isAuthorized);
 
 // Configure Multer for file uploads
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
+  destination: (req, file, cb) => cb(null, "uploads/"),
   filename: (req, file, cb) => cb(null, `${Date.now()}-${file.originalname}`),
 });
 
@@ -20,7 +23,9 @@ const upload = multer({
   },
   fileFilter: (req, file, cb) => {
     const allowedTypes = /pdf|xlsx|xls|jpg|png|jpeg/;
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const extname = allowedTypes.test(
+      path.extname(file.originalname).toLowerCase()
+    );
     const mimetype = allowedTypes.test(file.mimetype);
     if (extname && mimetype) {
       return cb(null, true);
@@ -31,8 +36,8 @@ const upload = multer({
 });
 
 // Routes
-router.post('/', upload.array('files'), createSchedule);
-router.get('/', getSchedules);
-router.delete('/:id', deleteSchedule);
+router.post("/", isAuthorized, isAdmin, upload.array("files"), createSchedule);
+router.get("/", isAuthorized, getSchedules);
+router.delete("/:id", isAuthorized, isAdmin, deleteSchedule);
 
 export default router;
