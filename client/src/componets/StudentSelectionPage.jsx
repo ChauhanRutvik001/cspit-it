@@ -68,6 +68,16 @@ const DomainSelection = () => {
           ]);
         }
       } catch (error) {
+        // setDataLoaded(true);
+        setDomainSelections([
+          {
+            selectedDomain: null,
+            selectedSubdomains: [],
+            selectedTopics: {},
+            subdomainOptions: [],
+            topicOptions: {},
+          },
+        ]);
         console.error("Error fetching selections:", error);
       }
     };

@@ -336,7 +336,7 @@ const StudentRegistration = () => {
                 d="M4 12a8 8 0 018-8v8H4z"
               ></path>
             </svg>
-            <p className="text-black text-lg font-semibold">Registration...</p>
+            <p className="text-white text-lg font-semibold">Registration...</p>
           </div>
         </div>
       )}
