@@ -94,12 +94,8 @@ export const login = async (req, res) => {
           name: user.name,
           id: user.id,
           role: user.role,
-          firstTimeLogin: user.firstTimeLogin,
-          createdAt: user.createdAt,
-          updatedAt: user.updatedAt,
         },
         success: true,
-        token,
       });
   } catch (error) {
     console.error("Login Error:", error);
@@ -198,6 +194,7 @@ export const logout = async (req, res) => {
       expires: new Date(Date.now()),
       httpOnly: true,
     });
+
     console.log("logout success");
     return res
       .status(200)

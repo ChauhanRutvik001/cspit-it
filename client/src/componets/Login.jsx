@@ -79,7 +79,7 @@ const Login = () => {
         }
   
         toast.success(message || "Login successful!");
-        localStorage.setItem("UserToken", token);
+        // localStorage.setItem("UserToken", token);
   
         dispatch(setUser(loggedInUser));
         navigate("/browse");

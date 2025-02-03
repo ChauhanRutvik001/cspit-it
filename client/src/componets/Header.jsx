@@ -47,7 +47,7 @@ const Header = () => {
     try {
       await axiosInstance.get("/auth/logout");
       dispatch(setUser(null));
-      localStorage.removeItem("authToken");
+      // localStorage.removeItem("authToken");
       dispatch(logout());
       toast.success("Logged out successfully");
       navigate("/");
