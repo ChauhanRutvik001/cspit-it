@@ -135,11 +135,14 @@ const CDPCDetails = () => {
               </div>
             </div>
             <a
-              href="mailto:ashwinmakwana.ce@charusat.ac.in"
+              href="https://mail.google.com/mail/?view=cm&fs=1&to=ashwinmakwana.ce@charusat.ac.in"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-blue-500 underline hover:text-blue-600 transition block mb-2"
             >
               ashwinmakwana.ce@charusat.ac.in
             </a>
+
             <p className="text-gray-600">+91-2697-265214</p>
           </div>
 
@@ -156,11 +159,14 @@ const CDPCDetails = () => {
               </div>
             </div>
             <a
-              href="mailto:tnp@charusat.ac.in"
+              href="https://mail.google.com/mail/?view=cm&fs=1&to=tnp@charusat.ac.in"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-blue-500 underline hover:text-blue-600 transition block mb-2"
             >
               tnp@charusat.ac.in
             </a>
+
             <p className="text-gray-600">+91-2697-265213 | +91-9662255116</p>
           </div>
         </div>
@@ -218,7 +224,7 @@ const Faculty = () => {
         {facultyMembers.map((faculty, index) => (
           <div
             key={index}
-            className="bg-white p-6 rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300"
+            className="bg-white p-6 rounded-lg shadow-lg border border-gray-200 hover:shadow-xl transition-shadow duration-300 cursor-pointer"
           >
             <img
               src={faculty.image}
