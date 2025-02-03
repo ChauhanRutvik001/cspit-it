@@ -261,7 +261,7 @@ export const getCurrentUser = async (req, res) => {
 };
 
 export const updateUser = async (req, res) => {
-  const { id } = req.body; // Assuming `id` is the custom string, not ObjectId
+  const { id } = req.body; // Assuming `id` is a custom string, not ObjectId
   const allowedUpdates = [
     "profile.gender",
     "profile.permanentAddress",
@@ -278,6 +278,30 @@ export const updateUser = async (req, res) => {
     const updates = req.body;
     console.log("Updates received:", updates);
 
+    // Ensure all required fields are provided
+    for (const field of allowedUpdates) {
+      const key = field.replace("profile.", ""); // Normalize key
+      if (!(key in updates) || updates[key] === undefined || updates[key] === "") {
+        return res.status(400).json({ message: `Field '${key}' is required.` });
+      }
+    }
+
+    // Validate `semester` (must be between 1 and 8)
+    if (updates.semester && (isNaN(updates.semester) || updates.semester < 1 || updates.semester > 8)) {
+      return res.status(400).json({ message: "Semester must be between 1 and 8." });
+    }
+
+    // Validate `batch` (must be A1-D1 or A2-D2)
+    const validBatches = ["a1", "b1", "c1", "d1", "a2", "b2", "c2", "d2"];
+    if (updates.batch && !validBatches.includes(updates.batch)) {
+      return res.status(400).json({ message: "Batch must be A1 to D1 or A2 to D2." });
+    }
+
+    // Validate `mobileNo` (must be exactly 10 digits)
+    if (updates.mobileNo && !/^\d{10}$/.test(updates.mobileNo)) {
+      return res.status(400).json({ message: "Mobile number must be exactly 10 digits." });
+    }
+
     // Normalize keys by mapping flat keys to nested keys
     const normalizedUpdates = {};
     Object.keys(updates).forEach((key) => {
@@ -290,9 +314,7 @@ export const updateUser = async (req, res) => {
 
     // Validate allowed updates
     const keysToUpdate = Object.keys(normalizedUpdates);
-    const isValidOperation = keysToUpdate.every((key) =>
-      allowedUpdates.includes(key)
-    );
+    const isValidOperation = keysToUpdate.every((key) => allowedUpdates.includes(key));
 
     if (!isValidOperation) {
       return res.status(400).json({ message: "Invalid updates provided." });
@@ -329,4 +351,5 @@ export const updateUser = async (req, res) => {
     return res.status(500).json({ message: "Server error." });
   }
 };
+
 
