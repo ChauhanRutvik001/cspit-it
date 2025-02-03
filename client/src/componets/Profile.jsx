@@ -82,7 +82,6 @@ const Profile = () => {
       "counsellor",
       "batch",
       "name",
-      "email",
       "mobileNo",
       "semester",
       "github",
@@ -152,8 +151,16 @@ const Profile = () => {
           </div>
         </section>
       ) : (
-        <div className="flex justify-center items-center h-screen">
-          <p>Loading user data...</p>
+        <div className="flex flex-col justify-center items-center h-screen space-y-4">
+          <div className="relative">
+            <div className="w-16 h-16 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+            <div className="absolute inset-0 flex justify-center items-center">
+              <span className="text-gray-600 font-semibold text-sm">⏳</span>
+            </div>
+          </div>
+          <p className="text-lg font-medium text-gray-700 animate-pulse">
+            Loading user data...
+          </p>
         </div>
       )}
     </div>

@@ -8,7 +8,7 @@ const userSchema = new Schema(
   {
     name: {
       type: String,
-      required: [true, "Username is required"],
+      required: [true, "User name is required"],
     },
     id: {
       type: String,
@@ -46,8 +46,8 @@ const userSchema = new Schema(
       },
       semester: {
         type: Number,
-        min: 1,
-        max: 8,
+        min: [1, "Semester must be between 1 and 8"],
+        max: [8, "Semester must be between 1 and 8"],
       },
       birthDate: {
         type: Date,
@@ -74,6 +74,7 @@ const userSchema = new Schema(
       batch: {
         type: String,
         lowercase: true,
+        enum: ["a1", "b1", "c1", "d1", "a2", "b2", "c2", "d2"],
       },
       github: {
         type: String,
@@ -94,6 +95,7 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
+// Hash password before saving
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     return next();
@@ -107,9 +109,9 @@ userSchema.pre("save", async function (next) {
   }
 });
 
+// Method to compare passwords
 userSchema.methods.comparePassword = async function (password, DBpassword) {
-  const isMatch = await bcrypt.compare(password, DBpassword);
-  return isMatch;
+  return await bcrypt.compare(password, DBpassword);
 };
 
 export default mongoose.model("User", userSchema);

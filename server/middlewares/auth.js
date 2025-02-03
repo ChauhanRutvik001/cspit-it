@@ -31,14 +31,14 @@ export const isAuthorized = async (req, res, next) => {
 };
 
 export const isAdmin = (req, res, next) => {
-  console.log("Checking admin access for user:", req.user);
+  // console.log("Checking admin access for user:", req.user);
 
   if (req.user && req.user.role === "admin") {
     console.log("User is admin. Access granted.");
     return next();
   }
 
-  console.log("User is not admin. Access denied.");
+  // console.log("User is not admin. Access denied.");
   return res
     .status(403)
     .json({ error: "You are not allowed to access this route" });
