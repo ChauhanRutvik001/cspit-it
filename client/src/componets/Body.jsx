@@ -9,7 +9,7 @@ import Alumni from "./Alumni";
 import Contact from "./Contact";
 import Profile from "./Profile";
 import AdminPage from "../admin/AdminPage";
-import StudentRegistation from "../admin/studentRegistation";
+import StudentRegistation from "../admin/StudentRegistation";
 import SchedulePage from "./SchedulePage";
 import Developers from "./Developers";
 import StudentSelectionPage from "./StudentSelectionPage";

@@ -101,15 +101,26 @@ const DomainSelection = () => {
   };
 
   const saveSelections = async () => {
+    // Ensure at least one domain is selected
+    if (domainSelections.length === 0) {
+      toast.error("Please select at least one domain.");
+      return;
+    }
+
+    // Validate subdomains and topics for each domain
     const allSelectionsValid = domainSelections.every(
       (selection) =>
-        selection.selectedSubdomains.length > 0 &&
-        Object.keys(selection.selectedTopics).length > 0
+        selection.selectedSubdomains.length > 0 && // At least one subdomain
+        selection.selectedSubdomains.every(
+          (subdomain) =>
+            selection.selectedTopics[subdomain] &&
+            selection.selectedTopics[subdomain].length > 0 // At least one topic for each subdomain
+        )
     );
 
     if (!allSelectionsValid) {
       toast.error(
-        "Please select at least one subdomain and topic for each domain."
+        "Each selected domain must have at least one subdomain and one topic."
       );
       return;
     }
@@ -229,12 +240,14 @@ const DomainSelection = () => {
                     <h2 className="text-xl font-semibold text-gray-700">
                       Select Domain #{index + 1}
                     </h2>
-                    <button
-                      className="text-red-600 hover:text-red-700 font-semibold"
-                      onClick={() => removeDomainBox(index)}
-                    >
-                      Remove
-                    </button>
+                    {domainSelections.length > 1 && (
+                      <button
+                        className="text-red-600 hover:text-red-700 font-semibold"
+                        onClick={() => removeDomainBox(index)}
+                      >
+                        Remove
+                      </button>
+                    )}
                   </div>
                   <Select
                     options={getAvailableDomains(index).map((domain) => ({

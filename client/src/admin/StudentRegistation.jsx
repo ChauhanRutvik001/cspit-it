@@ -179,8 +179,8 @@ const StudentRegistration = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-white text-black">
-      <div className="pl-10 pt-[6%]">
+    <div className="relative min-h-screen bg-white text-black p-4 md:p-10">
+      <div className="pl-4 pt-24">
         <button
           className="py-2 px-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-indigo-700 active:scale-95 transition transform duration-200"
           onClick={() => navigate(-1)}
@@ -189,19 +189,18 @@ const StudentRegistration = () => {
         </button>
       </div>
 
-      <div className="pl-10 pr-10 mt-10 flex items-center justify-between">
-        <div>
+      <div className="px-6 mt-10 flex md:flex-row flex-col md:items-center md:justify-between gap-4">
+        <div className="md:w-auto w-full sm:text-center">
           <h1 className="text-2xl font-bold mb-4">Bulk Student Registration</h1>
           {/* File Upload Input */}
           <input
             type="file"
             accept=".xlsx, .xls"
             onChange={handleFileUpload}
-            className="mb-4"
-            style={{ cursor: "pointer" }}
+            className="mb-4 cursor-pointer"
           />
         </div>
-        <div>
+        <div className="md:w-auto w-full sm:flex sm:justify-center">
           <button
             className="py-2 px-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-indigo-700 active:scale-95 transition transform duration-200"
             onClick={() => setIsModalOpen(true)}
@@ -289,7 +288,7 @@ const StudentRegistration = () => {
 
           <button
             onClick={handleRegisterSelected}
-            className="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded-lg shadow transition"
+            className="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded-lg shadow transition mt-4"
           >
             Register Selected
           </button>

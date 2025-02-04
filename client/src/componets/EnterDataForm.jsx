@@ -83,7 +83,7 @@ const EnterDataForm = ({ id }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white bg-opacity-90 p-8 mt-10 rounded-2xl shadow-2xl max-w-4xl w-full mx-auto mb-10"
+      className=" bg-white bg-opacity-90 p-8 sm:p-6 rounded-lg shadow-md w-[100%] max-w-2xl max-h-[90vh] overflow-y-auto"
     >
       <div className="flex justify-between items-center mb-2">
         <h2 className="text-3xl font-extrabold text-gray-800">
@@ -124,7 +124,7 @@ const EnterDataForm = ({ id }) => {
                   name={field}
                   value={formData[field]}
                   onChange={handleInputChange}
-                  className="w-full p-3 bg-white border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="mt-1 block w-full p-2 sm:p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base"
                   required
                 >
                   <option value="">
@@ -208,7 +208,7 @@ const EnterDataForm = ({ id }) => {
                 name={field}
                 value={formData[field]}
                 onChange={handleInputChange}
-                className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                className="mt-1 block w-full p-2 sm:p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base"
                 required
                 placeholder={`Enter ${field.replace(/([A-Z])/g, " $1")}`}
               />

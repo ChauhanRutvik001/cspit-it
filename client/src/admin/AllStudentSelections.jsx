@@ -213,171 +213,163 @@ const AllStudentSelections = () => {
   };
 
   return (
-    <div className="mx-auto min-h-screen">
-      <div className="p-4 pt-20">
-        <h1 className="text-3xl font-semibold text-center mb-6 font-serif">
-          All Student Domain Selections
-        </h1>
+    <div className="mx-auto min-h-screen p-4">
+  <div className="pt-20">
+    <h1 className="text-2xl sm:text-3xl font-semibold text-center mb-6 font-serif">
+      All Student Domain Selections
+    </h1>
 
-        <div className="mb-4">
-          <div className="text-lg text-gray-700 font-serif">
-            <span className="text-black-500 font-medium">
-              Total Student Select Domain:
-            </span>{" "}
-            {totalDocuments}
-          </div>
-        </div>
+    {/* Total Students Info */}
+    <div className="mb-4 text-lg text-gray-700 font-serif">
+      <span className="text-black font-medium">Total Student Select Domain:</span>{" "}
+      {totalDocuments}
+    </div>
 
-        {error && <div className="text-red-600 text-center">{error}</div>}
+    {error && <div className="text-red-600 text-center">{error}</div>}
 
-        {/* Search Bar */}
-        <div className="mb-4 flex justify-between space-x-4">
-          <input
-            type="text"
-            placeholder="Search by ID, Name, Domain, Subdomain, or Topic"
-            className="p-3 w-full md:w-1/2 lg:w-1/3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            onChange={handleSearch}
-            value={searchTerm}
-          />
+    {/* Search & Download Section */}
+    <div className="mb-4 flex flex-col sm:flex-row justify-between space-y-3 sm:space-y-0 sm:space-x-4">
+      <input
+        type="text"
+        placeholder="Search by ID, Name, Domain, Subdomain, or Topic"
+        className="p-3 w-full sm:w-1/2 lg:w-1/3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        onChange={handleSearch}
+        value={searchTerm}
+      />
 
-          {/* Download Buttons */}
-          <div className="">
-            <button
-              onClick={exportToPDF}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md mr-2"
-            >
-              Download as PDF
-            </button>
-            <button
-              onClick={exportToExcel}
-              className="px-4 py-2 bg-green-500 text-white rounded-md"
-            >
-              Download as Excel
-            </button>
-          </div>
-        </div>
-
-        <div className="mb-4">
-          <label htmlFor="limit" className="mr-2">
-            Items per page:
-          </label>
-          <select
-            id="limit"
-            value={limit}
-            onChange={handleLimitChange}
-            className="border border-gray-300 rounded-md p-1"
-          >
-            {[10, 50, 100, 500, 1000].map((value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-lg">
-            <thead className="bg-gray-200">
-              <tr>
-                <th
-                  className="px-6 py-3 border-b text-left font-medium text-gray-700 cursor-pointer"
-                  onClick={() => handleSort("studentId.id")}
-                >
-                  Student ID{" "}
-                  {sortBy === "studentId.id" && (order === "asc" ? "↑" : "↓")}
-                </th>
-                <th className="px-6 py-3 border-b text-left font-medium text-gray-700">
-                  Student Name
-                </th>
-                <th className="px-6 py-3 border-b text-left font-medium text-gray-700">
-                  Domain
-                </th>
-                <th className="px-6 py-3 border-b text-left font-medium text-gray-700">
-                  Subdomains
-                </th>
-                <th className="px-6 py-3 border-b text-left font-medium text-gray-700">
-                  Topics
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                <tr>
-                  <td colSpan="6" className="text-center py-4 text-gray-500">
-                    <div className="flex justify-center items-center h-16">
-                      <ClipLoader size={40} color="#1D4ED8" />
-                    </div>
-                  </td>
-                </tr>
-              ) : (
-                sortedSelections.map((student, index) => (
-                  <tr key={index}>
-                    <td className="px-6 py-3 border-b text-left text-gray-700">
-                      {highlightText(student.studentId?.id)}
-                    </td>
-                    <td className="px-6 py-3 border-b text-left text-gray-700">
-                      {highlightText(student.studentId?.name)}
-                    </td>
-                    <td className="px-6 py-3 border-b text-left text-gray-700">
-                      {highlightText(
-                        student.selections
-                          .map((selection) => selection.domain)
-                          .join(", ")
-                      )}
-                    </td>
-                    <td className="px-6 py-3 border-b text-left text-gray-700">
-                      {highlightText(
-                        student.selections
-                          .flatMap((selection) =>
-                            selection.subdomains.map(
-                              (subdomain) => subdomain.subdomain
-                            )
-                          )
-                          .join(", ")
-                      )}
-                    </td>
-                    <td className="px-6 py-3 border-b text-left text-gray-700">
-                      {highlightText(
-                        student.selections
-                          .flatMap((selection) =>
-                            selection.subdomains.flatMap(
-                              (subdomain) => subdomain.topics
-                            )
-                          )
-                          .join(", ")
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="flex justify-center items-center mt-6">
-          <div className="flex space-x-2">
-            <button
-              className="px-4 py-2 bg-gray-200 rounded-md"
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            >
-              Previous
-            </button>
-            <span className="px-4 py-2">
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              className="px-4 py-2 bg-gray-200 rounded-md"
-              disabled={currentPage >= totalPages}
-              onClick={() => setCurrentPage((prev) => prev + 1)}
-            >
-              Next
-            </button>
-          </div>
-        </div>
+      <div className="flex space-x-2">
+        <button
+          onClick={exportToPDF}
+          className="px-4 py-2 bg-blue-500 text-white rounded-md"
+        >
+          Download PDF
+        </button>
+        <button
+          onClick={exportToExcel}
+          className="px-4 py-2 bg-green-500 text-white rounded-md"
+        >
+          Download Excel
+        </button>
       </div>
     </div>
+
+    {/* Items Per Page */}
+    <div className="mb-4 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0">
+      <label htmlFor="limit" className="mr-2 text-gray-700">
+        Items per page:
+      </label>
+      <select
+        id="limit"
+        value={limit}
+        onChange={handleLimitChange}
+        className="border border-gray-300 rounded-md p-2 sm:p-1"
+      >
+        {[10, 50, 100, 500, 1000].map((value) => (
+          <option key={value} value={value}>
+            {value}
+          </option>
+        ))}
+      </select>
+    </div>
+
+    {/* Responsive Table */}
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-lg">
+        <thead className="bg-gray-200">
+          <tr className="text-sm sm:text-base">
+            <th
+              className="px-4 py-3 border-b text-left font-medium text-gray-700 cursor-pointer"
+              onClick={() => handleSort("studentId.id")}
+            >
+              Student ID {sortBy === "studentId.id" && (order === "asc" ? "↑" : "↓")}
+            </th>
+            <th className="px-4 py-3 border-b text-left font-medium text-gray-700">
+              Name
+            </th>
+            <th className="px-4 py-3 border-b text-left font-medium text-gray-700">
+              Domain
+            </th>
+            <th className="px-4 py-3 border-b text-left font-medium text-gray-700">
+              Subdomains
+            </th>
+            <th className="px-4 py-3 border-b text-left font-medium text-gray-700">
+              Topics
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {loading ? (
+            <tr>
+              <td colSpan="6" className="text-center py-4 text-gray-500">
+                <div className="flex justify-center items-center h-16">
+                  <ClipLoader size={40} color="#1D4ED8" />
+                </div>
+              </td>
+            </tr>
+          ) : (
+            sortedSelections.map((student, index) => (
+              <tr key={index} className="text-sm sm:text-base">
+                <td className="px-4 py-3 border-b text-left text-gray-700">
+                  {highlightText(student.studentId?.id)}
+                </td>
+                <td className="px-4 py-3 border-b text-left text-gray-700">
+                  {highlightText(student.studentId?.name)}
+                </td>
+                <td className="px-4 py-3 border-b text-left text-gray-700">
+                  {highlightText(
+                    student.selections.map((selection) => selection.domain).join(", ")
+                  )}
+                </td>
+                <td className="px-4 py-3 border-b text-left text-gray-700">
+                  {highlightText(
+                    student.selections
+                      .flatMap((selection) =>
+                        selection.subdomains.map((subdomain) => subdomain.subdomain)
+                      )
+                      .join(", ")
+                  )}
+                </td>
+                <td className="px-4 py-3 border-b text-left text-gray-700">
+                  {highlightText(
+                    student.selections
+                      .flatMap((selection) =>
+                        selection.subdomains.flatMap((subdomain) => subdomain.topics)
+                      )
+                      .join(", ")
+                  )}
+                </td>
+              </tr>
+            ))
+          )}
+        </tbody>
+      </table>
+    </div>
+
+    {/* Pagination */}
+    <div className="flex justify-center items-center mt-6">
+      <div className="flex space-x-2">
+        <button
+          className="px-4 py-2 bg-gray-200 rounded-md disabled:opacity-50"
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+        >
+          Previous
+        </button>
+        <span className="px-4 py-2">
+          Page {currentPage} of {totalPages}
+        </span>
+        <button
+          className="px-4 py-2 bg-gray-200 rounded-md disabled:opacity-50"
+          disabled={currentPage >= totalPages}
+          onClick={() => setCurrentPage((prev) => prev + 1)}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
   );
 };
 

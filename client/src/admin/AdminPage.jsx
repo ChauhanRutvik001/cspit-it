@@ -100,30 +100,31 @@ const AdminPage = () => {
   return (
     <div className="relative min-h-screen bg-white text-black">
 
-      <div className="flex justify-center pt-[6%]">
+      <div className="flex justify-center sm:justify-center pt-24">
         <h1 className="text-3xl font-bold mb-4 font-serif">Student Register</h1>
       </div>
 
-      <div className="p-4">
+      <div className="p-4 flex flex-wrap gap-2 justify-start">
         <button
-          className="bg-blue-500 hover:bg-blue-600 text-white mr-2 font-bold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
+          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300 transition w-full sm:w-auto"
           onClick={() => navigate("/registation")}
         >
           Add Student Using File
         </button>
         <button
           onClick={() => navigate("/studentsDomain")}
-          className="bg-red-500 hover:bg-red-600 text-white mr-2 font-bold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
+          className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-red-300 transition w-full sm:w-auto"
         >
           Domain
         </button>
         <button
           onClick={() => navigate("/students")}
-          className="bg-green-500 hover:bg-green-600 text-white mr-2 font-bold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-green-300 transition"
+          className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-green-300 transition w-full sm:w-auto"
         >
           Student
         </button>
       </div>
+
 
       <div className="flex items-center py-2 px-4 rounded-full text-lg font-semibold">
         <span>Total Number of Students Register:</span>

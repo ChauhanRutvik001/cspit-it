@@ -70,10 +70,10 @@ const PasswordChange = ({ id }) => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col w-full max-w-lg p-8 space-y-6 bg-white bg-opacity-95 rounded-lg shadow-lg"
+      className="flex flex-col  max-w-lg bg-white bg-opacity-95 p-6 sm:p-8 rounded-lg shadow-md"
     >
       {/* Logo */}
-      <div className="flex justify-center mb-6">
+      <div className="flex justify-center mb-4">
         <img src="/logo2.jpg" alt="CHARUSAT" className="h-16" />
       </div>
 
@@ -104,7 +104,7 @@ const PasswordChange = ({ id }) => {
               setOldPassword(e.target.value);
               setError("");
             }}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            className="mt-1 block w-full p-2 sm:p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base"
             placeholder="Enter old password"
           />
           <button
@@ -134,7 +134,7 @@ const PasswordChange = ({ id }) => {
               setNewPassword(e.target.value);
               setError("");
             }}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            className="mt-1 block w-full p-2 sm:p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base"
             placeholder="Enter new password"
           />
           <button
@@ -164,7 +164,7 @@ const PasswordChange = ({ id }) => {
               setConfirmPassword(e.target.value);
               setError("");
             }}
-            className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            className="mt-1 block w-full p-2 sm:p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base"
             placeholder="Confirm new password"
           />
           <button
