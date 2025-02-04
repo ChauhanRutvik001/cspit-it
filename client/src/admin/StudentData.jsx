@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 const StudentData = () => {
   const user = useSelector((store) => store.app.user);
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,13 +22,13 @@ const StudentData = () => {
     setSearchTerm(e.target.value.toLowerCase());
   };
   useEffect(() => {
-      if (user?.role !== "admin") navigate("/browse");
-    }, [user, navigate]);
+    if (user?.role !== "admin") navigate("/browse");
+  }, [user, navigate]);
 
   const filteredSelections = students.filter((student) => {
     // Access the relevant fields, ensuring they are properly handled
     const semester = student.profile?.semester || ''; // default to empty string if semester is missing
-    
+
     const searchFields = [
       student.id,
       student.name,
@@ -42,10 +42,10 @@ const StudentData = () => {
       .filter(Boolean) // Filter out any falsy values (e.g., null, undefined, '')
       .join(" ")
       .toLowerCase(); // Convert the entire search string to lowercase for case-insensitive search
-  
+
     return searchFields.includes(searchTerm); // Check if searchTerm is included in any of the fields
   });
-  
+
 
   const highlightText = (text) => {
     if (typeof text !== "string") {
@@ -201,32 +201,33 @@ const StudentData = () => {
             {totalDocuments}
           </div>
         </div>
-        <div className="mb-4 flex justify-between space-x-4">
+        <div className="mb-4 flex flex-col md:flex-row justify-between items-center md:space-x-4">
           <input
             type="text"
             placeholder="Search by ID, Name, Batch, Semester, Counsellor, Mobile, Github"
-            className="p-3 w-full md:w-1/2 lg:w-1/3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="p-3 w-full md:w-1/2 lg:w-1/3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4 md:mb-0"
             onChange={handleSearch}
             value={searchTerm}
           />
-          <div className="">
+          <div className="flex space-x-2 w-full md:w-auto justify-start md:justify-normal">
             <button
               onClick={exportToPDF}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md mr-2"
+              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
             >
               Download as PDF
             </button>
             <button
               onClick={exportToExcel}
-              className="px-4 py-2 bg-green-500 text-white rounded-md"
+              className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition"
             >
               Download as Excel
             </button>
           </div>
         </div>
 
+
         <div className="mb-4">
-          <label htmlFor="limit" className="mr-2">
+          <label htmlFor="recordsPerPage" className="mr-2">
             Items per page:
           </label>
           <select
@@ -243,96 +244,99 @@ const StudentData = () => {
           </select>
         </div>
 
-        <table className="table-auto w-full border-collapse border border-gray-300">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="border p-2 text-left">ID</th>
-              <th className="border p-2 text-left">Name</th>
-              <th className="border p-2 text-left">Batch</th>
-              <th className="border p-2 text-left">Semester</th>
-              <th className="border p-2 text-left">Mobile No</th>
-              <th className="border p-2 text-left">Gender</th>
-              <th className="border p-2 text-left">BirthDate</th>
-              <th className="border p-2 text-left">Counsellor</th>
-              <th className="border p-2 text-left">GitHub</th>
-              <th className="border p-2 text-left">LinkedIn</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr>
-                <td colSpan="10" className="text-center py-4 text-gray-500">
-                  <ClipLoader size={40} color="#1D4ED8" />
-                </td>
+        <div className="overflow-x-auto">
+          <table className="table-auto w-full border-collapse border border-gray-300">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="border p-2 text-left">ID</th>
+                <th className="border p-2 text-left">Name</th>
+                <th className="border p-2 text-left">Batch</th>
+                <th className="border p-2 text-left">Semester</th>
+                <th className="border p-2 text-left">Mobile No</th>
+                <th className="border p-2 text-left">Gender</th>
+                <th className="border p-2 text-left">BirthDate</th>
+                <th className="border p-2 text-left">Counsellor</th>
+                <th className="border p-2 text-left">GitHub</th>
+                <th className="border p-2 text-left">LinkedIn</th>
               </tr>
-            ) : filteredSelections.length > 0 ? (
-              filteredSelections.map((student) => (
-                <tr
-                  key={student.id}
-                  className="odd:bg-white even:bg-gray-50 hover:bg-gray-100"
-                >
-                  <td className="border p-2">{highlightText(student.id?.toUpperCase())}</td>
-                  <td className="border p-2 capitalize">{highlightText(student.name)}</td>
-                  <td className="border p-2">
-                    {highlightText(student.profile?.batch?.toUpperCase() || "N/A")}
-                  </td>
-                  <td className="border p-2">
-                    {highlightText(student.profile?.semester || "N/A")}
-                  </td>
-                  <td className="border p-2">
-                    {highlightText(student.profile?.mobileNo || "N/A")}
-                  </td>
-                  <td className="border p-2">
-                    {highlightText(student.profile?.gender || "N/A")}
-                  </td>
-                  <td className="border p-2">
-                    {student.profile?.birthDate
-                      ? new Date(student.profile.birthDate).toLocaleDateString()
-                      : "N/A"}
-                  </td>
-                  <td className="border p-2 capitalize">
-                    {highlightText(student.profile?.counsellor || "N/A")}
-                  </td>
-                  <td className="border p-2">
-                    {student.profile?.github ? (
-                      <a
-                        href={`https://github.com/${student.profile.github}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 underline"
-                      >
-                        {highlightText(student.profile.github)}
-                      </a>
-                    ) : (
-                      "N/A"
-                    )}
-                  </td>
-                  <td className="border p-2">
-                    {student.profile?.linkedIn ? (
-                      <a
-                        href={student.profile.linkedIn}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-500 underline"
-                        title={student.profile.linkedIn}
-                      >
-                        LinkedIn
-                      </a>
-                    ) : (
-                      "N/A"
-                    )}
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="10" className="text-center py-4 text-gray-500">
+                    <ClipLoader size={40} color="#1D4ED8" />
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan="10" className="text-center py-4 text-gray-500">
-                  No records found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              ) : filteredSelections.length > 0 ? (
+                filteredSelections.map((student) => (
+                  <tr
+                    key={student.id}
+                    className="odd:bg-white even:bg-gray-50 hover:bg-gray-100"
+                  >
+                    <td className="border p-2">{highlightText(student.id?.toUpperCase())}</td>
+                    <td className="border p-2 capitalize">{highlightText(student.name)}</td>
+                    <td className="border p-2">
+                      {highlightText(student.profile?.batch?.toUpperCase() || "N/A")}
+                    </td>
+                    <td className="border p-2">
+                      {highlightText(student.profile?.semester || "N/A")}
+                    </td>
+                    <td className="border p-2">
+                      {highlightText(student.profile?.mobileNo || "N/A")}
+                    </td>
+                    <td className="border p-2">
+                      {highlightText(student.profile?.gender || "N/A")}
+                    </td>
+                    <td className="border p-2">
+                      {student.profile?.birthDate
+                        ? new Date(student.profile.birthDate).toLocaleDateString()
+                        : "N/A"}
+                    </td>
+                    <td className="border p-2 capitalize">
+                      {highlightText(student.profile?.counsellor || "N/A")}
+                    </td>
+                    <td className="border p-2">
+                      {student.profile?.github ? (
+                        <a
+                          href={`https://github.com/${student.profile.github}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 underline"
+                        >
+                          {highlightText(student.profile.github)}
+                        </a>
+                      ) : (
+                        "N/A"
+                      )}
+                    </td>
+                    <td className="border p-2">
+                      {student.profile?.linkedIn ? (
+                        <a
+                          href={student.profile.linkedIn}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-500 underline"
+                          title={student.profile.linkedIn}
+                        >
+                          LinkedIn
+                        </a>
+                      ) : (
+                        "N/A"
+                      )}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="10" className="text-center py-4 text-gray-500">
+                    No records found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
         <div className="flex justify-center items-center space-x-4 mt-6">
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
@@ -354,6 +358,7 @@ const StudentData = () => {
         </div>
       </div>
     </div>
+
   );
 };
 

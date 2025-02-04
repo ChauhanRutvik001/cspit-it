@@ -37,7 +37,7 @@ const Developers = () => {
     <div className="relative min-h-screen bg-gray-100 text-gray-900">
       <div className="pt-20 p-4">
         <div className="text-center  lg:text-left mb-8">
-          <h5 className="text-4xl sm:text-5xl flex justify-center font-inter font-bold mb-12">
+          <h5 className="text-3xl flex justify-center font-inter font-bold mb-12 sm:text-3xl md:text-4xl lg:text-5xl">
             CDPC-KDPIT
           </h5>
           <p className="text-[#505050] sm:mt-0   mx-auto text-justify px-4 sm:px-6 lg:px-0 text-lg font-poppins font-medium">
@@ -55,7 +55,7 @@ const Developers = () => {
         </div>
         <div className="min-h-screen bg-gray-100 text-gray-900 flex flex-col items-center py-8">
           {/* Grid Section */}
-          <div className="grid grid-cols-3 gap-8 px-4">
+          <div className="grid xs:grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
             {/* First row with 2 cards and logo */}
             <div className="bg-white shadow-lg rounded-lg p-8 flex flex-col items-center space-y-6 w-64 h-80">
               <img

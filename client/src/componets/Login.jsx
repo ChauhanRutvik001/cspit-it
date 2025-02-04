@@ -40,16 +40,16 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (!validateLogin()) return;
-  
+
     dispatch(setLoading(true));
     const user = { id, password };
     setAssignLoading(true);
-  
+
     try {
       const url = `auth/login`;
       const res = await axiosInstance.post(url, user);
       console.log("Login response:", res.data);
-  
+
       if (res.data.success) {
         const {
           firstTimeLogin,
@@ -62,7 +62,7 @@ const Login = () => {
         console.log(id);
 
         setIdValue(id);
-  
+
         if (firstTimeLogin) {
           setIsFirstTimeLogin(true);
           toast.success(
@@ -70,17 +70,17 @@ const Login = () => {
           );
           return; // Do not reset the form
         }
-  
+
         if (firstTimeData) {
-          console.log(id)
+          console.log(id);
           setIsFirstTimeData(true);
           toast.success("Welcome to your first login! Please enter your data.");
           return; // Do not reset the form
         }
-  
+
         toast.success(message || "Login successful!");
         // localStorage.setItem("UserToken", token);
-  
+
         dispatch(setUser(loggedInUser));
         navigate("/browse");
       } else {
@@ -93,14 +93,13 @@ const Login = () => {
     } finally {
       dispatch(setLoading(false));
       setAssignLoading(false);
-  
+
       // Reset form only if no first-time actions are required
       if (!isFirstTimeLogin && !isFirstTimeData) {
         resetForm();
       }
     }
   };
-  
 
   const resetForm = () => {
     setId("");
@@ -108,9 +107,9 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen overflow-hidden">
+    <div className="flex min-h-screen overflow-hidden ">
       {/* Left Section */}
-      <div className="w-3/3 h-screen">
+      <div className="hidden lg:block w-3/3 h-screen">
         <img
           src="/leftside.png"
           alt="Logo"
@@ -120,85 +119,92 @@ const Login = () => {
 
       {/* Right Section */}
       <div
-        className="w-2/3 h-screen bg-cover bg-center relative"
+        className="w-full lg:w-2/3 h-screen bg-cover bg-center relative"
         style={{ backgroundImage: `url('/rightside.jpg')` }}
       >
-        <div className="absolute inset-0 flex items-center justify-center bg-opacity-50">
-          {isFirstTimeLogin ? (
-            <PasswordChange id={idValue} />
-          ) : isFirstTimeData ? (
-            <EnterDataForm id={idValue} />
-          ) : (
-            <form
-              onSubmit={handleLogin}
-              className="max-w-md w-full bg-white bg-opacity-90 p-8 rounded shadow"
-            >
-              <div className="mb-4">
-                <img src="/logo2.jpg" alt="CHARUSAT" className="mx-auto h-16" />
-                <h2 className="text-center font-bold text-gray-800">
-                  Gateway to Your Career Opportunities
-                </h2>
-              </div>
-              <div className="mb-6">
-                <label
-                  htmlFor="id"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Username
-                </label>
-                <input
-                  type="text"
-                  id="id"
-                  value={id}
-                  onChange={(e) => setId(e.target.value)}
-                  className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  required
-                />
-              </div>
-              <div className="mb-6 relative">
-                <label
-                  htmlFor="password"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Password
-                </label>
-                <div className="relative">
+        <div className="inset-0 absolute flex items-center justify-center bg-gray-900 bg-opacity-50 px-4 sm:px-6">
+          <div className="w-full max-w-2xl sm:max-w-lg bg-opacity-90">
+            {isFirstTimeLogin ? (
+              <PasswordChange id={idValue} />
+            ) : isFirstTimeData ? (
+              <EnterDataForm id={idValue} />
+            ) : (
+              <form onSubmit={handleLogin} className="w-full bg-white p-6 sm:p-8 rounded-lg shadow-md">
+                <div className="mb-6 text-center">
+                  <img
+                    src="/logo2.jpg"
+                    alt="CHARUSAT"
+                    className="mx-auto h-12 sm:h-16"
+                  />
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
+                    Gateway to Your Career Opportunities
+                  </h2>
+                </div>
+                <div className="mb-4">
+                  <label
+                    htmlFor="id"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Username
+                  </label>
                   <input
-                    type={showPassword ? "text" : "password"}
-                    id="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="mt-1 block w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    type="text"
+                    id="id"
+                    value={id}
+                    onChange={(e) => setId(e.target.value)}
+                    className="mt-1 block w-full p-2 sm:p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base"
                     required
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute inset-y-0 right-3 flex items-center text-gray-500"
-                  >
-                    {showPassword ? "👁️" : "🙅‍♂️"}
-                  </button>
                 </div>
-              </div>
-              <div className="flex justify-between items-center mb-6">
-                <p
-                  onClick={() =>
-                    setPopUp("We can't change your password at the moment.")
-                  }
-                  className="text-indigo-600 cursor-pointer hover:underline"
+                <div className="mb-4 relative">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      id="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="mt-1 block w-full p-2 sm:p-3 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm sm:text-base"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+                    >
+                      {showPassword ? "👁️" : "🙅‍♂️"}
+                    </button>
+                  </div>
+                </div>
+                <div className="flex justify-between items-center mb-4">
+                  <p
+                    onClick={() =>
+                      setPopUp("We can't change your password at the moment.")
+                    }
+                    className="text-indigo-600 text-sm cursor-pointer hover:underline"
+                  >
+                    Forgot your password?
+                  </p>
+                </div>
+                <button
+                  type="submit"
+                  className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition"
                 >
-                  Forgot your password?
-                </p>
-              </div>
-              <button
-                type="submit"
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
-                Login
-              </button>
-              <h2 className="text-center mt-4 text-red-600 text-sm">{popUp}</h2>
-            </form>
-          )}
+                  Login
+                </button>
+                {popUp && (
+                  <p className="text-center mt-4 text-red-600 text-sm">
+                    {popUp}
+                  </p>
+                )}
+              </form>
+            )}
+          </div>
         </div>
       </div>
 

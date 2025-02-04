@@ -84,16 +84,6 @@ const Header = () => {
           <>
             <div className="mx-auto px-2 sm:px-6 lg:px-8">
               <div className="relative flex h-16 items-center justify-between">
-                <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-                  <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-600 hover:bg-blue-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
-                    <span className="sr-only">Open main menu</span>
-                    {open ? (
-                      <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
-                    ) : (
-                      <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-                    )}
-                  </Disclosure.Button>
-                </div>
                 <div className="flex-1 flex items-center justify-between">
                   <div
                     className="flex items-center hover:cursor-pointer"
@@ -105,7 +95,7 @@ const Header = () => {
                       alt="Your Company"
                     />
                   </div>
-                  <div className="hidden sm:ml-6 sm:block">
+                  <div className="hidden sm:ml-6 md:block">
                     <div className="flex space-x-4">
                       {navigation.map((item) => (
                         <Link
@@ -140,6 +130,16 @@ const Header = () => {
                   </div>
                 </div>
                 <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                  <div className="inset-y-0 mx-2 flex items-center md:hidden">
+                    <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-600 hover:bg-blue-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
+                      <span className="sr-only">Open main menu</span>
+                      {open ? (
+                        <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                      ) : (
+                        <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                      )}
+                    </Disclosure.Button>
+                  </div>
                   <button
                     type="button"
                     className="rounded-full bg-blue-100 p-1 text-gray-600 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-blue-50"
