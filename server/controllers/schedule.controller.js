@@ -12,7 +12,13 @@ export const createSchedule = async (req, res) => {
       url: `/uploads/${file.filename}`,
     }));
 
-    console.log(files);
+    
+    console.log(files.length + "file");
+
+    if(!files.length){
+      res.status(500).json({ message: "Please upload a file." });
+      return;
+    }
 
     const schedule = new Schedule({ notes, files });
     await schedule.save();

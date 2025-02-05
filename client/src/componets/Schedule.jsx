@@ -20,7 +20,7 @@ const Schedule = () => {
         setSchedules(data);
       } catch (error) {
         console.error("Error fetching schedules:", error);
-        toast.error("Failed to fetch schedules.");
+        toast.error(error?.response?.data?.message || "Failed to fetch schedules.");
       }
     };
 
@@ -68,7 +68,7 @@ const Schedule = () => {
       toast.success("Schedule created successfully.");
     } catch (error) {
       console.error("Error creating schedule:", error);
-      toast.error("An error occurred while creating the schedule.");
+      toast.error(error?.response?.data?.message || "An error occurred while creating the schedule.");
     } finally {
       setLoading(false);
     }
