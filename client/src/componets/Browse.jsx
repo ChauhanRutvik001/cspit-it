@@ -10,7 +10,7 @@ const Priyanka = "/priyanka.jpg";
 const Browse = () => {
   return (
     <div className="relative min-h-screen bg-white text-gray-900">
-      <div className="content mb-4">
+      <div className="content mb-4 pt-10">
         <CDPCDetails />
         {/* <ImageRotation /> */}
         <Description />
@@ -64,7 +64,7 @@ const CDPCDetails = () => {
         <h2 className="text-3xl font-semibold text-orange-500 mb-6">
           CDPC Activities
         </h2>
-        <ul className="list-disc list-inside text-gray-700 text-lg space-y-4">
+        <ul className="list-disc list-inside text-gray-700 text-lg space-y-4 text-justify">
           <li>
             One-to-one guidance to each student to help them achieve their
             desired career.
