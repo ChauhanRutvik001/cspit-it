@@ -31,7 +31,7 @@ const AllStudentSelections = () => {
       setError(null);
       try {
         const response = await axiosInstance.get(
-          "/studentSelection/selections",
+          "/studentSelection/ALLselections",
           {
             params: {
               page: currentPage,

@@ -111,7 +111,7 @@ const CDPCDetails = () => {
         <img
           src="/CDPC_Placement.webp" // Replace with the actual path where the image is hosted
           alt="CDPC Overview"
-          width={"80%"}
+          width={"90%"}
           className="h-full rounded-lg shadow-xl"
         />
       </section>

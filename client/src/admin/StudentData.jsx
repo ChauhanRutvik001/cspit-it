@@ -27,17 +27,19 @@ const StudentData = () => {
 
   const filteredSelections = students.filter((student) => {
     // Access the relevant fields, ensuring they are properly handled
-    const semester = student.profile?.semester || ''; // default to empty string if semester is missing
+    const semester = student.profile?.semester || ""; // default to empty string if semester is missing
 
     const searchFields = [
       student.id,
       student.name,
+      student.certificatesLength,
       student.profile?.batch,
       semester, // Ensure semester is properly included
       student.profile?.counsellor,
       student.profile?.mobileNo,
       student.profile?.github,
       student.profile?.gender,
+      student.profile?.birthDate,
     ]
       .filter(Boolean) // Filter out any falsy values (e.g., null, undefined, '')
       .join(" ")
@@ -45,7 +47,6 @@ const StudentData = () => {
 
     return searchFields.includes(searchTerm); // Check if searchTerm is included in any of the fields
   });
-
 
   const highlightText = (text) => {
     if (typeof text !== "string") {
@@ -85,6 +86,7 @@ const StudentData = () => {
         ? new Date(student.profile.birthDate).toLocaleDateString()
         : "N/A", // Format the birthdate
       student.profile?.github || "N/A",
+      student?.certificatesLength || "0",
     ]);
 
     // Generate Table
@@ -100,6 +102,7 @@ const StudentData = () => {
           "Mobile No",
           "Birth Date",
           "GitHub",
+          "Total Certificates",
         ],
       ],
       body: tableData,
@@ -128,6 +131,7 @@ const StudentData = () => {
       "Mobile No",
       "Birth Date",
       "GitHub",
+      "Total Certificates",
     ];
 
     // Map student data to rows, starting from the second row
@@ -142,6 +146,7 @@ const StudentData = () => {
         ? new Date(student.profile.birthDate).toLocaleDateString()
         : "N/A", // Format the birthdate
       student.profile?.github || "N/A",
+      student?.certificatesLength || "0",
     ]);
 
     // Combine the number of students row, headers, and table data into a single array
@@ -166,6 +171,7 @@ const StudentData = () => {
         const response = await axiosInstance.get(
           `/user/profile/getAllstudent?page=${currentPage}&limit=${recordsPerPage}`
         );
+
         setStudents(response.data.data);
         console.log(response.data);
         setTotalDocuments(response.data.meta.totalStudents);
@@ -225,7 +231,6 @@ const StudentData = () => {
           </div>
         </div>
 
-
         <div className="mb-4">
           <label htmlFor="recordsPerPage" className="mr-2">
             Items per page:
@@ -258,6 +263,7 @@ const StudentData = () => {
                 <th className="border p-2 text-left">Counsellor</th>
                 <th className="border p-2 text-left">GitHub</th>
                 <th className="border p-2 text-left">LinkedIn</th>
+                <th className="border p-2 text-left">Certificates</th>
               </tr>
             </thead>
             <tbody>
@@ -270,13 +276,24 @@ const StudentData = () => {
               ) : filteredSelections.length > 0 ? (
                 filteredSelections.map((student) => (
                   <tr
-                    key={student.id}
-                    className="odd:bg-white even:bg-gray-50 hover:bg-gray-100"
+                    key={student._id}
+                    className="odd:bg-white even:bg-gray-50 hover:bg-gray-100 hover:cursor-pointer"
+                    onClick={() =>
+                      navigate(`/adminCertificate/${student._id}`, {
+                        state: { id: student.id, name: student.name },
+                      })
+                    }
                   >
-                    <td className="border p-2">{highlightText(student.id?.toUpperCase())}</td>
-                    <td className="border p-2 capitalize">{highlightText(student.name)}</td>
                     <td className="border p-2">
-                      {highlightText(student.profile?.batch?.toUpperCase() || "N/A")}
+                      {highlightText(student.id?.toUpperCase())}
+                    </td>
+                    <td className="border p-2 capitalize">
+                      {highlightText(student.name)}
+                    </td>
+                    <td className="border p-2">
+                      {highlightText(
+                        student.profile?.batch?.toUpperCase() || "N/A"
+                      )}
                     </td>
                     <td className="border p-2">
                       {highlightText(student.profile?.semester || "N/A")}
@@ -289,7 +306,9 @@ const StudentData = () => {
                     </td>
                     <td className="border p-2">
                       {student.profile?.birthDate
-                        ? new Date(student.profile.birthDate).toLocaleDateString()
+                        ? new Date(
+                            student.profile.birthDate
+                          ).toLocaleDateString()
                         : "N/A"}
                     </td>
                     <td className="border p-2 capitalize">
@@ -323,6 +342,9 @@ const StudentData = () => {
                       ) : (
                         "N/A"
                       )}
+                    </td>
+                    <td className="border p-2">
+                      {highlightText(student?.certificatesLength || "0")}
                     </td>
                   </tr>
                 ))
@@ -358,7 +380,6 @@ const StudentData = () => {
         </div>
       </div>
     </div>
-
   );
 };
 

@@ -16,6 +16,8 @@ import StudentSelectionPage from "./StudentSelectionPage";
 import AllStudentSelections from "../admin/AllStudentSelections";
 import StudentData from "../admin/StudentData";
 import Layout from "./Layout";  // Import the Layout component
+import Certificate from "./Certificate";
+import StudentCertificate from "../admin/StudentCertificate";
 
 const Body = () => {
   const appRouter = createBrowserRouter([
@@ -33,6 +35,8 @@ const Body = () => {
     { path: "/StudentSelectionPage", element: <Layout><StudentSelectionPage /></Layout> },
     { path: "/studentsDomain", element: <Layout><AllStudentSelections /></Layout> },
     { path: "/students", element: <Layout><StudentData /></Layout> },
+    { path: "/Certificate", element: <Layout><Certificate /></Layout> },
+    { path: "/adminCertificate/:id", element: <Layout><StudentCertificate /></Layout> },
   ]);
 
   return (

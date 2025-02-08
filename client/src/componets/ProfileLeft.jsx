@@ -23,6 +23,7 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
       const response = await axiosInstance.get("/user/profile/upload-avatar", {
         responseType: "blob",
       });
+      console.log("Response:", response.data);
       const imageUrl = URL.createObjectURL(response.data);
       // console.log("Image URL:", imageUrl);
       setProfilePic(imageUrl);
@@ -150,11 +151,26 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
       >
         {isEditing ? "Cancel Edit" : "Edit Details"}
       </button>
-
-      <button className={`px-4 py-2 rounded-md mt-4 transition text-black`}
-      onClick={() => navigate("/StudentSelectionPage")}>
-        Add Domain
-      </button>
+      <div>
+        <button
+          className={`px-4 py-2 rounded-md mt-4 transition text-black`}
+          onClick={() => navigate("/StudentSelectionPage")}
+        >
+          Domain
+        </button>
+        <button
+          className={`px-4 py-2 rounded-md mt-4 transition text-black`}
+          onClick={() => navigate("/Certificate")}
+        >
+          Certificate
+        </button>
+        <button
+          className={`px-4 py-2 rounded-md mt-4 transition text-black`}
+          onClick={() => navigate("/StudentSelectionPage")}
+        >
+         Resume 
+        </button>
+      </div>
 
       {isEditing && (
         <div className="w-full mt-4 space-y-4">

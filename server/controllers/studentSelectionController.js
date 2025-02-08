@@ -3,7 +3,9 @@ import StudentSelection from "../models/StudentSelection.js"; // Import the mode
 // Save Student Selections
 const saveSelections = async (req, res) => {
   try {
-    const { studentId, selections } = req.body;
+    const { selections } = req.body;
+
+    const studentId = req.user.id; // Get student ID from token
 
     console.log(req.body); // Debugging: Log request body
 
@@ -68,7 +70,8 @@ const saveSelections = async (req, res) => {
 // Fetch Student Selections
 const getSelections = async (req, res) => {
   try {
-    const { studentId } = req.params;
+    const studentId = req.user.id;
+    // const { studentId } = req.params;
 
     // Validate required parameter
     if (!studentId) {
@@ -94,6 +97,7 @@ const getSelections = async (req, res) => {
 export const getAllSelections = async (req, res) => {
   try {
     const { page = 1, limit = 10, order = "asc" } = req.query;
+    console.log("hello")
 
     // Removed the search filter
     const pageNumber = parseInt(page, 10);

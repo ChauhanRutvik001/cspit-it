@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import Select from "react-select";
 import BeatLoader from "react-spinners/BeatLoader";
 import axiosInstance from "../utils/axiosInstance";
-import { useSelector } from "react-redux";
-import Header from "./Header";
 import toast from "react-hot-toast";
 
 const DomainSelection = () => {
@@ -11,13 +9,13 @@ const DomainSelection = () => {
   const [domainSelections, setDomainSelections] = useState([]);
   const [loading, setLoading] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
-  const user = useSelector((state) => state.app.user);
 
   useEffect(() => {
     const fetchDomains = async () => {
       setLoading(true);
       try {
         const response = await axiosInstance.get("/studentSelection/domains");
+        // console.log(response.data)
         setDomains(response.data);
         setDataLoaded(true);
       } catch (error) {
@@ -32,11 +30,11 @@ const DomainSelection = () => {
 
   useEffect(() => {
     const fetchSelections = async () => {
-      if (!user?._id) return;
       try {
         const response = await axiosInstance.get(
-          `/studentSelection/selections/${user._id}`
+          `/studentSelection/selections`
         );
+        // console.log(response.data)
         const existingSelections = response.data?.selections || [];
         if (existingSelections.length > 0) {
           const updatedSelections = existingSelections.map((selection) => {
@@ -83,7 +81,7 @@ const DomainSelection = () => {
     };
 
     fetchSelections();
-  }, [user]);
+  }, [dataLoaded]);
 
   const fetchSubdomains = (selectedDomain) => {
     const subdomains =
@@ -136,7 +134,6 @@ const DomainSelection = () => {
       }));
 
       await axiosInstance.post("/studentSelection/selections", {
-        studentId: user?._id,
         selections: selectionsToSave,
       });
 
