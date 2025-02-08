@@ -264,9 +264,25 @@ export const getAllStudents = async (req, res) => {
       role: "student",
       profile: { $exists: true, $ne: null },
     })
-      .select("name id profile")
+      .select("name id profile certificates")
       .skip(skip)
-      .limit(limitNumber);
+      .limit(limitNumber)
+      .lean(); // Convert MongoDB documents to plain JavaScript objects
+
+    if (!students || students.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No students with profiles found" });
+    }
+
+    // Send only certificates length
+    const studentsWithCertLength = students.map((student) => ({
+      name: student.name,
+      id: student.id,
+      _id : student._id,
+      profile: student.profile,
+      certificatesLength: student.certificates ? student.certificates.length : 0,
+    }));
 
     // Get the total count of students
     const totalStudents = await User.countDocuments({
@@ -274,16 +290,10 @@ export const getAllStudents = async (req, res) => {
       profile: { $exists: true, $ne: null },
     });
 
-    if (!students || students.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No students with profiles found" });
-    }
-
     // Send response with paginated data and metadata
     res.status(200).json({
       success: true,
-      data: students,
+      data: studentsWithCertLength,
       meta: {
         totalStudents,
         currentPage: pageNumber,
@@ -299,4 +309,7 @@ export const getAllStudents = async (req, res) => {
     });
   }
 };
+
+
+
 

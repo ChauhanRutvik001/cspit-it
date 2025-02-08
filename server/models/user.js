@@ -91,6 +91,13 @@ const userSchema = new Schema(
         ref: "Domain",
       },
     ],
+
+    certificates: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Certificate",
+      }
+    ]
   },
   { timestamps: true }
 );

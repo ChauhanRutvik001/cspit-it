@@ -5,43 +5,25 @@ import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import path from "path";
-import fs from "fs";
-
 
 // Import routes
 import authRoutes from "./routes/auth.js";
 import adminRoutes from "./routes/admin.router.js";
 import scheduleRoutes from "./routes/schedule.router.js";
 import user from "./routes/user.js";
-import studentSelectionRoutes from './routes/studentSelectionRoutes.js';
+import studentSelectionRoutes from "./routes/studentSelectionRoutes.js";
+import certificateRoutes from "./routes/certificate.routes.js"; // Add this import
 
 // Load environment variables
 config();
 
 const app = express();
 
-// Resolve __dirname for ES Modules (to avoid errors with __dirname)
-const __dirname = path.resolve();
-
-// Ensure the uploads directory exists
-const uploadDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadDir)) {
-  try {
-    console.log('Uploads directory does not exist. Creating it...');
-    fs.mkdirSync(uploadDir, { recursive: true });
-  } catch (err) {
-    console.error('Error creating uploads directory:', err);
-  }
-}
-
 // Middleware configurations
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-// Static files configuration
-app.use("/public", express.static(path.join(__dirname, "public")));
-app.use("/uploads", express.static(uploadDir)); // Static upload folder path
 
 // CORS setup
 const corsOptions = {
@@ -56,6 +38,7 @@ app.use("/api/v1/admin", adminRoutes);
 app.use("/api/v1/schedules", scheduleRoutes);
 app.use("/api/v1/user", user);
 app.use("/api/v1/studentSelection", studentSelectionRoutes);
+app.use("/api/v1/certificates", certificateRoutes);
 
 // Database connection and server initialization
 const PORT = process.env.PORT || 3100;
