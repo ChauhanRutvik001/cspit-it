@@ -25,7 +25,7 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
       });
       console.log("Response:", response.data);
       const imageUrl = URL.createObjectURL(response.data);
-      // console.log("Image URL:", imageUrl);
+      console.log("Image URL:", imageUrl);
       setProfilePic(imageUrl);
     } catch (error) {
       console.error("Error fetching profile picture:", error);
@@ -166,7 +166,7 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
         </button>
         <button
           className={`px-4 py-2 rounded-md mt-4 transition text-black`}
-          onClick={() => navigate("/StudentSelectionPage")}
+          onClick={() => navigate("/resume")}
         >
          Resume 
         </button>

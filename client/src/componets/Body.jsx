@@ -18,6 +18,7 @@ import StudentData from "../admin/StudentData";
 import Layout from "./Layout";  // Import the Layout component
 import Certificate from "./Certificate";
 import StudentCertificate from "../admin/StudentCertificate";
+import ResumeViewer from "./ResumeViewer";
 
 const Body = () => {
   const appRouter = createBrowserRouter([
@@ -36,6 +37,7 @@ const Body = () => {
     { path: "/studentsDomain", element: <Layout><AllStudentSelections /></Layout> },
     { path: "/students", element: <Layout><StudentData /></Layout> },
     { path: "/Certificate", element: <Layout><Certificate /></Layout> },
+    { path: "/resume", element: <Layout><ResumeViewer /></Layout> },
     { path: "/adminCertificate/:id", element: <Layout><StudentCertificate /></Layout> },
   ]);
 
