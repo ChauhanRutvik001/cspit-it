@@ -4,7 +4,6 @@ import express from "express";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import path from "path";
 
 // Import routes
 import authRoutes from "./routes/auth.js";
@@ -13,6 +12,8 @@ import scheduleRoutes from "./routes/schedule.router.js";
 import user from "./routes/user.js";
 import studentSelectionRoutes from "./routes/studentSelectionRoutes.js";
 import certificateRoutes from "./routes/certificate.routes.js"; // Add this import
+import resumeRoutes from "./routes/resume.routes.js"; 
+
 
 // Load environment variables
 config();
@@ -23,7 +24,7 @@ const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
-
+app.use('/uploads', express.static('uploads'));
 
 // CORS setup
 const corsOptions = {
@@ -39,6 +40,8 @@ app.use("/api/v1/schedules", scheduleRoutes);
 app.use("/api/v1/user", user);
 app.use("/api/v1/studentSelection", studentSelectionRoutes);
 app.use("/api/v1/certificates", certificateRoutes);
+app.use("/api/v1/resumes", resumeRoutes);
+
 
 // Database connection and server initialization
 const PORT = process.env.PORT || 3100;
