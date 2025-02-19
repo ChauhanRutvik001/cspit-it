@@ -1,15 +1,23 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../utils/axiosInstance";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
+import { Viewer, Worker } from "@react-pdf-viewer/core";  // ✅ Import Viewer
+import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
+import "@react-pdf-viewer/core/lib/styles/index.css";
+import "@react-pdf-viewer/default-layout/lib/styles/index.css";
+
 
 const StudentResume = () => {
-  const [pdfUrl, setPdfUrl] = useState("");
+  const [pdfUrl, setPdfUrl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
   const { id: userId } = useParams();
   const location = useLocation();
-  const { id, name } = location.state || {};
+  const { id } = location.state || {};
+
+  // Initialize the default layout plugin (adds toolbar, navigation, etc.)
+  const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
   useEffect(() => {
     fetchResume();
@@ -18,86 +26,73 @@ const StudentResume = () => {
   const fetchResume = async () => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get(
-        `/resumes/getUserResume/${userId}`,
-        { responseType: "blob" }
-      );
+      const response = await axiosInstance.get(`/resumes/getUserResume/${userId}`, {
+        responseType: "blob",
+      });
 
       if (response.data.type !== "application/pdf") {
         throw new Error("Invalid file type");
       }
 
       const blob = new Blob([response.data], { type: "application/pdf" });
-      const url = URL.createObjectURL(blob);
-      setPdfUrl(url);
+      setPdfUrl(URL.createObjectURL(blob));
       setError(null);
     } catch (error) {
       setError("No resume found.");
-      setPdfUrl("");
+      setPdfUrl(null);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="pt-20">
-      <div className="p-2 mx-auto bg-white rounded-lg">
-        <div className="flex justify-between items-center mb-4">
+    <div className="pt-20 px-4">
+      <div className="p-4 mx-auto bg-white rounded-lg max-w-6xl">
+        {/* Header with Buttons */}
+        <div className="flex flex-wrap justify-between items-center mb-4">
           <button
-            className="py-2 px-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-indigo-700 active:scale-95 transition transform duration-200"
+            className="py-2 px-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition duration-200"
             onClick={() => navigate(-1)}
           >
-            Back
+            ← Back
           </button>
 
           {pdfUrl && (
             <a
               href={pdfUrl}
               download={`Resume_${id}.pdf`}
-              className="py-2 px-6 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 active:scale-95 transition duration-200"
+              className="py-2 px-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600 transition duration-200"
             >
               📥 Download Resume
             </a>
           )}
         </div>
 
-        <h2 className="text-3xl font-bold text-center mb-6 text-gray-800">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-4 text-gray-800">
           Resume Viewer
         </h2>
 
-        <h3 className="text-lg font-semibold text-gray-800 mb-0 mt-2">
-          📜 <span className="mr-2">{id?.toUpperCase()}</span>-
-          <span className="ml-2">
-            {name?.charAt(0).toUpperCase() + name?.slice(1).toLowerCase()}
-          </span>
-        </h3>
-
+        {/* Loading & Error Messages */}
         {loading ? (
-          <div className="flex flex-col justify-center items-center h-40 space-y-4">
-            <div className="relative">
-              <div className="w-16 h-16 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
-              <div className="absolute inset-0 flex justify-center items-center">
-                <span className="text-gray-600 font-semibold text-sm">⏳</span>
-              </div>
-            </div>
-            <p className="text-lg font-medium text-gray-700 animate-pulse">
+          <div className="flex flex-col justify-center items-center h-40">
+            <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
+            <p className="mt-3 text-lg font-medium text-gray-700 animate-pulse">
               Loading your resume...
             </p>
           </div>
-        ) : pdfUrl ? (
-          <div className="mt-3 max-w-6xl mx-auto bg-white shadow-lg overflow-hidden relative mb-4">
-            <div className="w-full h-[90vh]">
-              <iframe
-                src={`${pdfUrl}#zoom=FitH`}
-                className="w-full h-full"
-                title="Resume Viewer"
-              />
-            </div>
-          </div>
-        ) : (
-          <p className="text-red-500 text-center mt-5 text-lg font-medium animate-pulse">
+        ) : error ? (
+          <p className="text-red-500 text-center mt-5 text-lg font-medium">
             {error}
           </p>
+        ) : (
+          <div className="border rounded-lg shadow-lg overflow-hidden">
+            <Worker workerUrl={`https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`}>
+              <div className="h-[75vh] md:h-[100vh] w-full">
+                {/* Enhanced PDF Viewer with Toolbar */}
+                <Viewer fileUrl={pdfUrl} plugins={[defaultLayoutPluginInstance]} defaultScale={1.0} />
+              </div>
+            </Worker>
+          </div>
         )}
       </div>
     </div>

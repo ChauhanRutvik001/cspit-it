@@ -1,14 +1,14 @@
 import React, { useState, useEffect, memo } from "react";
-import axios from "axios";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import axiosInstance from "../utils/axiosInstance";
 
 const Schedule = () => {
-  const [notes, setNotes] = useState(""); // Controlled input state
+  const [notes, setNotes] = useState("");
   const [files, setFiles] = useState([]);
   const [schedules, setSchedules] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const user = useSelector((store) => store.app.user);
@@ -17,11 +17,12 @@ const Schedule = () => {
     const fetchSchedules = async () => {
       try {
         const { data } = await axiosInstance.get("/schedules");
-        console.log(data);
         setSchedules(data);
       } catch (error) {
         console.error("Error fetching schedules:", error);
-        toast.error(error?.response?.data?.message || "Failed to fetch schedules.");
+        toast.error(
+          error?.response?.data?.message || "Failed to fetch schedules."
+        );
       }
     };
 
@@ -30,20 +31,16 @@ const Schedule = () => {
 
   const handleFileChange = (e) => {
     const selectedFiles = [...e.target.files];
-    const allowedExtensions = ["image/jpeg", "image/png", "application/pdf"];
-    const invalidFiles = selectedFiles.filter(
-      (file) => !allowedExtensions.includes(file.type)
+    const allowedTypes = ["image/jpeg", "image/png"];
+    const validFiles = selectedFiles.filter((file) =>
+      allowedTypes.includes(file.type)
     );
 
-    if (invalidFiles.length > 0) {
-      toast.error(
-        `Unsupported files detected: ${invalidFiles
-          .map((f) => f.name)
-          .join(", ")}`
-      );
+    if (validFiles.length !== selectedFiles.length) {
+      toast.error("Only JPG and PNG images are allowed.");
     }
 
-    setFiles(selectedFiles.filter((file) => allowedExtensions.includes(file.type)));
+    setFiles(validFiles);
   };
 
   const handleSubmit = async (e) => {
@@ -55,27 +52,26 @@ const Schedule = () => {
       formData.append("notes", notes);
       files.forEach((file) => formData.append("files", file));
 
-      const { data } = await axiosInstance.post(
-        "/schedules",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+      const { data } = await axiosInstance.post("/schedules", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       setSchedules([data, ...schedules]);
-      setNotes(""); // Reset notes after submit
-      setFiles([]); // Clear selected files after submit
+      setNotes("");
+      setFiles([]);
       toast.success("Schedule created successfully.");
     } catch (error) {
       console.error("Error creating schedule:", error);
-      toast.error(error?.response?.data?.message || "An error occurred while creating the schedule.");
+      toast.error(
+        error?.response?.data?.message || "Failed to create schedule."
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async () => {
+    setDeleting(true);
     try {
       const res = await axiosInstance.delete(`/schedules/${deleteId}`);
       if (res.data.success) {
@@ -83,11 +79,13 @@ const Schedule = () => {
         setShowConfirm(false);
         toast.success("Schedule deleted successfully.");
       } else {
-        toast.error("An error occurred while deleting the schedule.");
+        toast.error("Failed to delete the schedule.");
       }
     } catch (error) {
       console.error("Error deleting schedule:", error);
-      toast.error("An error occurred while deleting the schedule.");
+      toast.error("An error occurred while deleting.");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -98,54 +96,41 @@ const Schedule = () => {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    const hours = String(date.getHours()).padStart(2, "0");
-    const minutes = String(date.getMinutes()).padStart(2, "0");
-    return `${day}-${month}-${year} ${hours}:${minutes}`;
+    return date.toLocaleString();
   };
 
   const ScheduleItem = memo(({ schedule, index }) => (
     <li className="p-6 bg-white rounded-lg shadow-md border border-gray-200 hover:shadow-lg transition-shadow duration-200">
       <h3 className="text-lg font-bold text-gray-800">Schedule #{index + 1}</h3>
+      <p className="text-sm text-gray-600">
+        Posted on: {formatDate(schedule?.createdAt)}
+      </p>
+      <p className="mt-2 text-gray-700">
+        <span className="font-bold">Notice:</span> {schedule.notes}
+      </p>
 
-      <ul className="space-y-2 mt-2">
-        {schedule.files.map((file) => (
-          <li key={file.url}>
-            <div className="text-sm text-gray-800 mb-2">
-              Posted on: {formatDate(schedule?.createdAt)}
-            </div>
-
-            <p className="mb-4 mt-4 text-justify text-gray-700">
-              <span className="font-bold">Notice:</span>
-              <span>{schedule.notes}</span>
-            </p>
-
-            {file.url.match(/\.(jpg|jpeg|png)$/i) ? (
-              <img
-                src={`http://localhost:3100${file.url}`}
-                alt={file.name}
-                width="50%"
-                className="h-auto m-auto object-contain rounded-md shadow-sm border border-gray-300"
-              />
-            ) : (
-              <iframe
-                src={`http://localhost:3100${file.url}`}
-                title={file.name}
-                height={"600px"}
-                width={"90%"}
-                className="rounded-md m-auto border border-gray-300 shadow-sm"
-              />
-            )}
-          </li>
-        ))}
-      </ul>
+      {schedule.files.map((file) => (
+        <div key={file.url} className="mt-4">
+          {file.url.match(/\.(jpg|jpeg|png)$/i) ? (
+            <img
+              src={`http://localhost:3100${file.url}`}
+              alt={file.name}
+              className="w-1/2 mx-auto rounded-md shadow border border-gray-300"
+            />
+          ) : (
+            <iframe
+              src={`http://localhost:3100${file.url}`}
+              title={file.name}
+              className="w-11/12 h-96 mx-auto border rounded-md shadow"
+            />
+          )}
+        </div>
+      ))}
 
       {user?.role === "admin" && (
         <button
           onClick={() => handleShowConfirm(schedule._id)}
-          className="mt-4 bg-red-600 text-white py-2 px-6 rounded-lg shadow hover:bg-red-700 transition-colors duration-200"
+          className="mt-4 bg-red-600 text-white py-2 px-6 rounded-lg shadow hover:bg-red-700 transition-all"
         >
           Delete
         </button>
@@ -175,8 +160,9 @@ const Schedule = () => {
               <button
                 onClick={handleDelete}
                 className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                disabled={deleting}
               >
-                Delete
+                {deleting ? "Deleting..." : "Delete"}
               </button>
             </div>
           </div>
@@ -190,7 +176,7 @@ const Schedule = () => {
         >
           <textarea
             value={notes}
-            onChange={(e) => setNotes(e.target.value)} // Controlled input
+            onChange={(e) => setNotes(e.target.value)}
             placeholder="Write your notes..."
             className="w-full border p-2 mb-2 rounded"
             required
@@ -200,11 +186,11 @@ const Schedule = () => {
             multiple
             onChange={handleFileChange}
             className="mb-2"
-            accept="image/jpeg,image/png,application/pdf"
+            accept="image/jpeg,image/png"
           />
           <button
             type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded"
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition-all"
             disabled={loading}
           >
             {loading ? "Uploading..." : "Add Schedule"}
@@ -218,7 +204,11 @@ const Schedule = () => {
       ) : (
         <ul className="space-y-4">
           {schedules.map((schedule, index) => (
-            <ScheduleItem key={schedule._id} schedule={schedule} index={index} />
+            <ScheduleItem
+              key={schedule._id}
+              schedule={schedule}
+              index={index}
+            />
           ))}
         </ul>
       )}

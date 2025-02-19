@@ -5,6 +5,10 @@ import { AiOutlineCloudUpload } from "react-icons/ai";
 import toast from "react-hot-toast";
 import { Trash2 } from "lucide-react";
 import { Dialog } from "@headlessui/react"; // For custom modal
+import { Viewer, Worker } from "@react-pdf-viewer/core"; // ✅ Import Viewer
+import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
+import "@react-pdf-viewer/core/lib/styles/index.css";
+import "@react-pdf-viewer/default-layout/lib/styles/index.css";
 
 const ResumeViewer = () => {
   const [pdfUrl, setPdfUrl] = useState("");
@@ -14,6 +18,8 @@ const ResumeViewer = () => {
   const [error, setError] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // Delete confirmation state
   const userId = useSelector((state) => state.app.user._id);
+
+  const defaultLayoutPluginInstance = defaultLayoutPlugin();
 
   useEffect(() => {
     fetchResume();
@@ -134,6 +140,7 @@ const ResumeViewer = () => {
         )}
 
         {pdfUrl && (
+          <div className="flex justify-normal  gap-4 mt-6">
             <a
               href={pdfUrl}
               download={`Resume.pdf`}
@@ -141,7 +148,17 @@ const ResumeViewer = () => {
             >
               📥 Download Resume
             </a>
-          )}
+
+            <div
+              className="flex items-center justify- cursor-pointer 
+   transition-all duration-300 rounded-full p-3
+   text-red-500 hover:bg-red-600 hover:text-white"
+              onClick={() => setIsDeleteModalOpen(true)}
+            >
+              <Trash2 size={18} />
+            </div>
+          </div>
+        )}
 
         {/* Resume Preview */}
         {loading ? (
@@ -159,22 +176,21 @@ const ResumeViewer = () => {
         ) : pdfUrl ? (
           <div className="mt-3 max-w-6xl mx-auto bg-white overflow-hidden relative">
             {/* Delete Button */}
-            <div
-              className="absolute top-3 right-32 flex items-center justify-center cursor-pointer 
-             transition-all duration-300 rounded-full p-2 
-             bg-transparent text-white hover:bg-[rgb(66,69,71)]"
-              onClick={() => setIsDeleteModalOpen(true)}
-            >
-              <Trash2 size={18} />
-            </div>
 
             {/* PDF Viewer */}
             <div className="w-full h-[90vh]">
-              <iframe
-                src={`${pdfUrl}#zoom=FitH`}
-                className="w-full h-full"
-                title="Resume Viewer"
-              />
+              <Worker
+                workerUrl={`https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js`}
+              >
+                <div className="h-[75vh] md:h-[100vh] w-full">
+                  {/* Enhanced PDF Viewer with Toolbar */}
+                  <Viewer
+                    fileUrl={pdfUrl}
+                    plugins={[defaultLayoutPluginInstance]}
+                    defaultScale={1.0}
+                  />
+                </div>
+              </Worker>
             </div>
           </div>
         ) : (
