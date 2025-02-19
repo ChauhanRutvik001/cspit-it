@@ -137,7 +137,9 @@ const Header = () => {
                         <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
                       ) : (
                         <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+                        
                       )}
+                      
                     </Disclosure.Button>
                   </div>
                   <button
@@ -211,7 +213,22 @@ const Header = () => {
                   >
                     {item.name}
                   </Disclosure.Button>
+                  
                 ))}
+                {user?.role === "admin" && (
+                        <Link
+                          to="/admin"
+                          className={classNames(
+                            isActive("/admin")
+                              ? "bg-blue-200 text-blue-700"
+                              : "text-gray-600 hover:bg-blue-100 hover:text-blue-600",
+                            "block rounded-md px-3 py-2 text-base font-medium"
+                          )}
+                          aria-current={isActive("/admin") ? "page" : undefined}
+                        >
+                          Registration
+                        </Link>
+                      )}
               </div>
             </Disclosure.Panel>
           </>
@@ -220,5 +237,4 @@ const Header = () => {
     </header>
   );
 };
-
 export default Header;
