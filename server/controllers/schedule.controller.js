@@ -6,18 +6,13 @@ import path from "path";
 export const createSchedule = async (req, res) => {
   try {
     const { notes } = req.body;
-    console.log(notes);
     const files = req.files.map((file) => ({
       name: file.originalname,
       url: `/uploads/${file.filename}`,
     }));
 
-    
-    console.log(files.length + "file");
-
-    if(!files.length){
-      res.status(500).json({ message: "Please upload a file." });
-      return;
+    if (!files.length) {
+      return res.status(400).json({ message: "Please upload at least one image file." });
     }
 
     const schedule = new Schedule({ notes, files });
