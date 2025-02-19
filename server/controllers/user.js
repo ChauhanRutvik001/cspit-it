@@ -264,7 +264,7 @@ export const getAllStudents = async (req, res) => {
       role: "student",
       profile: { $exists: true, $ne: null },
     })
-      .select("name id profile certificates")
+      .select("name id profile certificates resume")
       .skip(skip)
       .limit(limitNumber)
       .lean(); // Convert MongoDB documents to plain JavaScript objects
@@ -282,6 +282,7 @@ export const getAllStudents = async (req, res) => {
       _id : student._id,
       profile: student.profile,
       certificatesLength: student.certificates ? student.certificates.length : 0,
+      resume: student.resume && student.resume.length > 0,
     }));
 
     // Get the total count of students
