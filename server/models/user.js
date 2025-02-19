@@ -97,6 +97,13 @@ const userSchema = new Schema(
         type: mongoose.Schema.Types.ObjectId,
         ref: "Certificate",
       }
+    ],
+
+    resume:[
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Resume",
+      }
     ]
   },
   { timestamps: true }

@@ -264,6 +264,7 @@ const StudentData = () => {
                 <th className="border p-2 text-left">GitHub</th>
                 <th className="border p-2 text-left">LinkedIn</th>
                 <th className="border p-2 text-left">Certificates</th>
+                <th className="border p-2 text-left">Resume</th>
               </tr>
             </thead>
             <tbody>
@@ -277,12 +278,7 @@ const StudentData = () => {
                 filteredSelections.map((student) => (
                   <tr
                     key={student._id}
-                    className="odd:bg-white even:bg-gray-50 hover:bg-gray-100 hover:cursor-pointer"
-                    onClick={() =>
-                      navigate(`/adminCertificate/${student._id}`, {
-                        state: { id: student.id, name: student.name },
-                      })
-                    }
+                    className="odd:bg-white even:bg-gray-50 hover:bg-gray-100"
                   >
                     <td className="border p-2">
                       {highlightText(student.id?.toUpperCase())}
@@ -343,8 +339,29 @@ const StudentData = () => {
                         "N/A"
                       )}
                     </td>
-                    <td className="border p-2">
+                    <td
+                      className="border p-2 hover:cursor-pointer"
+                      onClick={() =>
+                        navigate(`/adminCertificate/${student._id}`, {
+                          state: { id: student.id, name: student.name },
+                        })
+                      }
+                    >
                       {highlightText(student?.certificatesLength || "0")}
+                    </td>
+                    <td className="border p-2 hover:cursor-pointer">
+                      <span
+                        className={
+                          student?.resume ? "text-green-500" : "text-red-500"
+                        }
+                        onClick={() =>
+                          navigate(`/adminResume/${student._id}`, {
+                            state: { id: student.id, name: student.name },
+                          })
+                        }
+                      >
+                        {highlightText(student?.resume ? "✅" : "❌")}
+                      </span>
                     </td>
                   </tr>
                 ))
