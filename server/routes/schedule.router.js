@@ -29,9 +29,9 @@ const upload = multer({
   },
 });
 
-// Routes
-router.post("/", isAuthorized, isAdmin, upload.array("files"), createSchedule);
-router.get("/", isAuthorized, getSchedules);
-router.delete("/:id", isAuthorized, isAdmin, deleteSchedule);
+router.post("/", isAuthorized, isAdmin, upload.array("files"), createSchedule); // Schdeule.jsx
+router.get("/", isAuthorized, getSchedules); // Schedule.jsx
+router.delete("/:id", isAuthorized, isAdmin, deleteSchedule); // Schedule.jsx
+
 
 export default router;

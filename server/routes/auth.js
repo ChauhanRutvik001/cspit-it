@@ -4,11 +4,11 @@ import { isAuthorized } from '../middlewares/auth.js';
 
 const router = express.Router();
 
-router.route("/login").post(login);
-router.route("/logout").get(logout);
-router.route("/get-current-user").get(getCurrentUser);
-router.route("/change-password").post(changePassword);
-router.route("/enter-data").post(updateUser);
+router.route("/login").post(login); //Login.jsx
+router.route("/logout").get(logout); //Header.jsx
+router.route("/get-current-user").get(getCurrentUser); //auth.js
+router.route("/change-password").post(changePassword); //PassWordChange.jsx
+router.route("/enter-data").post(updateUser); //EnterDataForm.jsx
 
 
 export default router;

@@ -8,15 +8,15 @@ import { isAdmin, isAuthorized } from "../middlewares/auth.js";
 router.use(isAuthorized);
 
 // Route to save or update student selections
-router.post('/selections', saveSelections);
+router.post('/selections', saveSelections); //StudentSelectionPage.jsx
 
 // Route to fetch student selections
-router.get('/selections', getSelections);
+router.get('/selections', getSelections); //StudentSelectionPage.jsx
 
 // Route to fetch static domains data
-router.get('/domains', getDomains);
+router.get('/domains', getDomains); //StudentSelectionPage.jsx
 
 // Route to fetch all students' selections
-router.get('/ALLselections',isAdmin, getAllSelections);
+router.get('/ALLselections',isAdmin, getAllSelections);  //AllStudentSelections.jsx
 
-export default router; // Export router using ES6 export
+export default router; 
