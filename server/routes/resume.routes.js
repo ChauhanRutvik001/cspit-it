@@ -5,12 +5,12 @@ import { isAdmin, isAuthorized } from "../middlewares/auth.js";
 
 const router = express.Router();
 
-router.post("/upload", isAuthorized, upload.single("resume"), uploadResume);
-router.get("/all",isAuthorized, isAdmin, getAllResumes);
-router.get("/:filename", isAuthorized, getResume);
-router.delete("/:id", isAuthorized, deleteResume);
-router.get("/getResumebyUserID/:id", isAuthorized, getResumebyUserID);
-router.get("/getUserResume/:id", isAuthorized,isAdmin, getResumebyUserIDAdmin);
+router.post("/upload", isAuthorized, upload.single("resume"), uploadResume); //ResumeViewer.jsx
+// router.get("/all",isAuthorized, isAdmin, getAllResumes); not use
+// router.get("/:filename", isAuthorized, getResume); not use
+router.delete("/:id", isAuthorized, deleteResume); //ResumeViewer.jsx
+router.get("/getResumebyUserID/:id", isAuthorized, getResumebyUserID); //ResumeViewer.jsx
+router.get("/getUserResume/:id", isAuthorized,isAdmin, getResumebyUserIDAdmin); //StudentResume.jsx
 
 
 export default router;

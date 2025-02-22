@@ -13,17 +13,17 @@ import { upload } from "../utils/multer.utils.js"
 
 const router = express.Router();
 
-router.get('/getStudentData/:id', isAuthorized, getUserDetails);
+router.get('/getStudentData/:id', isAuthorized, getUserDetails); //Profile.jsx
 
-router.put("/update",isAuthorized, updateUser);
+router.put("/update",isAuthorized, updateUser); //Profile.jsx
 
-router.post('/upload-avatar', isAuthorized, upload.single('avatar'), uploadProfilePic);
+router.post('/upload-avatar', isAuthorized, upload.single('avatar'), uploadProfilePic); //ProfileLeft.jsx
 
-router.get('/profile/upload-avatar', isAuthorized, getProfilePic);
+router.get('/profile/upload-avatar', isAuthorized, getProfilePic); //ProfileLeft.jsx and Header.jsx
 
-router.delete('/profile/remove-profile-pic', isAuthorized, removeProfilePic);
+router.delete('/profile/remove-profile-pic', isAuthorized, removeProfilePic); //ProfileLeft.jsx
 
-router.get('/profile/getAllstudent', isAuthorized,isAdmin, getAllStudents);
+router.get('/profile/getAllstudent', isAuthorized,isAdmin, getAllStudents); //StudentData.jsx
 
 
 export default router;
