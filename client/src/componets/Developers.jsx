@@ -8,7 +8,7 @@ const Developers = () => {
       id: "22IT015",
       name: "Rutvik chauhan",
       image:
-        "https://t3.ftcdn.net/jpg/02/43/12/34/360_F_243123463_zTooub557xEWABDLk0jJklDyLSGl2jrr.jpg", // Update with actual path
+        "/rutvik.jpg", // Update with actual path
     },
     {
       id: "22IT012",
