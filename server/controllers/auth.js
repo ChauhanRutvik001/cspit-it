@@ -64,13 +64,13 @@ export const login = async (req, res) => {
       });
     }
 
-    if (user.firstTimeData) {
-      return res.status(200).json({
-        message: "Enter your data.",
-        firstTimeData: true, // This will trigger the frontend to show the password change form
-        success: true,
-      });
-    }
+    // if (user.firstTimeData) {
+    //   return res.status(200).json({
+    //     message: "Enter your data.",
+    //     firstTimeData: true, // This will trigger the frontend to show the password change form
+    //     success: true,
+    //   });
+    // }
 
     // Create a JWT token
     const token = await createToken({ id: user._id });

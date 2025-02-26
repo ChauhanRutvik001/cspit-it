@@ -47,7 +47,7 @@ const StudentResume = () => {
 
   return (
     <div className="pt-20 px-4">
-  <div className="p-4 mx-auto bg-white rounded-lg shadow-md max-w-6xl">
+  <div className="p-4 mx-auto bg-white rounded-lg max-w-6xl">
     {/* Header with Buttons */}
     <div className="flex flex-wrap justify-between items-center mb-4 gap-3">
       <button

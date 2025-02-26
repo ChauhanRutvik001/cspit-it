@@ -1,5 +1,8 @@
 import User from "../models/user.js";
 import bcrypt from "bcrypt";
+import Certificate from "../models/certificateSchema.js";
+import Resume from "../models/Resume.js";
+import DomainModel from "../models/StudentSelection.js";
 
 const adminController = {
   BulkRequests: async (req, res) => {
@@ -103,38 +106,43 @@ const adminController = {
     console.log("User ID received:", userId);
 
     if (!userId) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Missing User ID." });
+        return res.status(400).json({ success: false, message: "Missing User ID." });
     }
 
     try {
-      // Check if the user exists
-      const user = await User.findById(userId); // Assuming `userId` is an ObjectId
-      if (!user) {
-        return res
-          .status(404)
-          .json({ success: false, message: "User not found." });
-      }
+        // Check if the user exists
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found." });
+        }
 
-      console.log("User found:", user);
-      const userName = user.id;
+        console.log("User found:", user);
 
-      // Remove the user
-      await User.deleteOne({ _id: userId }); // Assuming `_id` is the field for user ID
+        // Remove related certificates
+        await Certificate.deleteMany({ uploadedBy : userId });
 
-      return res.status(200).json({
-        success: true,
-        message: `User with ID ${userName} and all related data have been successfully removed.`,
-      });
+        // Remove related resume
+        await Resume.deleteMany({ userId });
+
+        // Remove domain model data
+        await DomainModel.deleteMany({ studentId: userId });
+
+        // Finally, remove the user
+        await User.deleteOne({ _id: userId });
+
+        return res.status(200).json({
+            success: true,
+            message: `User with ID ${userId} and all related data have been successfully removed.`,
+        });
     } catch (error) {
-      console.error("Error in removing user:", error.message);
-      return res.status(500).json({
-        success: false,
-        message: "Internal server error.",
-      });
+        console.error("Error in removing user:", error.message);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error.",
+        });
     }
-  },
+},
+
 };
 
 export default adminController;
