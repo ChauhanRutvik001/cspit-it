@@ -45,7 +45,7 @@ const AllStudentSelections = () => {
         setSelections(data || []);
         setTotalPages(pagination.totalPages || 1);
       } catch (err) {
-        setError(err.response?.data?.message || "Failed to fetch data");
+        setError(err.response?.data?.message || "An error occurred");
       } finally {
         setLoading(false);
       }
@@ -225,7 +225,7 @@ const AllStudentSelections = () => {
       {totalDocuments}
     </div>
 
-    {error && <div className="text-red-600 text-center">{error}</div>}
+    
 
     {/* Search & Download Section */}
     <div className="mb-4 flex flex-col sm:flex-row justify-between space-y-3 sm:space-y-0 sm:space-x-4">
@@ -298,6 +298,7 @@ const AllStudentSelections = () => {
           </tr>
         </thead>
         <tbody>
+        {error && <td colSpan="6" className="text-red-600 py-4 text-center">{error}</td>}
           {loading ? (
             <tr>
               <td colSpan="6" className="text-center py-4 text-gray-500">
@@ -341,6 +342,7 @@ const AllStudentSelections = () => {
               </tr>
             ))
           )}
+          
         </tbody>
       </table>
     </div>

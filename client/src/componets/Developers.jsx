@@ -1,101 +1,149 @@
 import React from "react";
-import Header from "./Header";
-import "../index.css";
+import { Github, Linkedin, Mail, ExternalLink } from "lucide-react";
 
 const Developers = () => {
   const studentsData = [
     {
       id: "22IT015",
-      name: "Rutvik chauhan",
-      image:
-        "/rutvik.jpg", // Update with actual path
+      name: "Rutvik Chauhan",
+      image: "/rutvik.jpg",
+      role: "Full Stack Developer (Team Lead)",
+      github: "https://github.com/ChauhanRutvik001",
+      linkedin: "https://www.linkedin.com/in/chauhanrutvik/",
+      email: "https://mail.google.com/mail/?view=cm&fs=1&to=22it015@charusat.edu.in",
     },
     {
       id: "22IT012",
       name: "Jay Bodra",
-      image:
-        "https://techcrunch.com/wp-content/uploads/2016/09/2016_01_23_weebly_45251web.jpg", // Update with actual path
+      image: "/jay.jpg",
+      role: "AI/ML Expert",
+      github: "https://github.com",
+      linkedin: "https://linkedin.com",
+      email: "chrome://settings/handlers",
     },
     {
       id: "22IT048",
-      name: "Krish kakadiya",
-      image: "/assets/student3.jpg", // Update with actual path
+      name: "Krish Kakadiya",
+      image: "/krish.jpg",
+      role: "Frontend Developer",
+      github: "https://github.com",
+      linkedin: "https://linkedin.com",
+      email: "chrome://settings/handlers",
     },
     {
       id: "22IT116",
-      name: "Trushangkumar patel ",
-      image: "/assets/student4.jpg", // Update with actual path
+      name: "Trushangkumar Patel",
+      image: "/trushang.jpg",
+      role: "UI/UX Designer",
+      github: "https://github.com",
+      linkedin: "https://linkedin.com",
+      email: "chrome://settings/handlers",
     },
     {
       id: "22IT011",
-      name: "Jeet billimoriya",
-      image: "/assets/student5.jpg", // Update with actual path
+      name: "Jeet Billimoriya",
+      image: "/jeet.jpg",
+      role: "Database Engineer",
+      github: "https://github.com",
+      linkedin: "https://linkedin.com",
+      email: "chrome://settings/handlers",
     },
   ];
 
   return (
-    <div className="relative min-h-screen bg-gray-100 text-gray-900">
-      <div className="pt-20 p-4">
-        <div className="text-center  lg:text-left mb-8">
-          <h5 className="text-3xl flex justify-center font-inter font-bold mb-12 sm:text-3xl md:text-4xl lg:text-5xl">
-            CDPC-KDPIT
-          </h5>
-          <p className="text-[#505050] sm:mt-0   mx-auto text-justify px-4 sm:px-6 lg:px-0 text-lg font-poppins font-medium">
-            Welcome to the Developers' Corner! We are a passionate team of IT
-            enthusiasts dedicated to crafting this platform for the Career
-            Development and Placement Cell (CDPC). Our goal is to create an
-            intuitive, user-friendly website that serves as a bridge between
-            students and their career aspirations. From seamless navigation to
-            dynamic features, we've strived to ensure this website meets the
-            needs of IT branch students. This project reflects our commitment to
-            innovation, teamwork, and leveraging technology to empower our
-            peers. Thank you for visiting, and we hope this platform helps you
-            achieve your career goals!
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+      {/* Hero Section */}
+      <div className="relative bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
+            Meet Our Development Team
+          </h1>
+          <p className="text-lg text-gray-600 leading-relaxed max-w-3xl mx-auto">
+            We are the passionate minds behind CDPC-KDPIT. Our diverse team
+            brings together expertise in full-stack development, design, and
+            database management to create an innovative platform that bridges
+            students with their dream careers.
           </p>
         </div>
-        <div className="min-h-screen bg-gray-100 text-gray-900 flex flex-col items-center py-8">
-          {/* Grid Section */}
-          <div className="grid xs:grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-4">
-            {/* First row with 2 cards and logo */}
-            <div className="bg-white shadow-lg rounded-lg p-8 flex flex-col items-center space-y-6 w-64 h-80">
-              <img
-                src={studentsData[0].image}
-                alt={studentsData[0].name}
-                className="w-40 h-60 object-cover rounded-2xl"
-              />
-              <h2 className="text-xl font-semibold">{studentsData[0].name}</h2>
-              <p className="text-gray-500">ID: {studentsData[0].id}</p>
-            </div>
-            {/* Logo in the center */}
-            <div className="flex items-center justify-center w-64 h-64 bg-gray-200 rounded-lg shadow-inner">
-              <img src="/cspit.jpg" alt="" />
-            </div>
-            <div className="bg-white shadow-lg rounded-lg p-8 flex flex-col items-center space-y-6 w-64 h-80">
-              <img
-                src={studentsData[1].image}
-                alt={studentsData[1].name}
-                className="w-40 h-60 object-cover rounded-2xl"
-              />
-              <h2 className="text-xl font-semibold">{studentsData[1].name}</h2>
-              <p className="text-gray-500">ID: {studentsData[1].id}</p>
-            </div>
+      </div>
 
-            {/* Second row with remaining cards */}
-            {studentsData.slice(2).map((student, index) => (
-              <div
-                key={index}
-                className="bg-white shadow-lg rounded-lg p-8 flex flex-col items-center space-y-6 w-64 h-80"
-              >
+      {/* Team Grid */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {studentsData.map((student) => (
+            <div
+              key={student.id}
+              className="group bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
+            >
+              <div className="relative">
                 <img
                   src={student.image}
                   alt={student.name}
-                  className="w-32 h-40 object-cover rounded-full"
+                  className="w-full h-[400px] object-cover"
                 />
-                <h2 className="text-xl font-semibold">{student.name}</h2>
-                <p className="text-gray-500">ID: {student.id}</p>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
-            ))}
-          </div>
+
+              <div className="p-6 text-center">
+                <h3 className="text-xl font-semibold text-gray-900">
+                  {student.name}
+                </h3>
+                <p className="text-sm text-gray-500">{student.id}</p>
+                <p className="text-md font-medium text-blue-600">
+                  {student.role}
+                </p>
+
+                {/* Social Links */}
+                <div className="mt-4 flex justify-center space-x-4">
+                  <a
+                    href={student.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-600 hover:text-gray-900 transition-colors"
+                  >
+                    <Github className="w-5 h-5" />
+                  </a>
+                  <a
+                    href={student.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-600 hover:text-gray-900 transition-colors"
+                  >
+                    <Linkedin className="w-5 h-5" />
+                  </a>
+                  <a
+                    href={student.email}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-600 hover:text-gray-900 transition-colors"
+                  >
+                    <Mail className="w-5 h-5" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Footer Section */}
+      <div className="bg-white border-t border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
+          <img
+            src="/cspit.jpg"
+            alt="CSPIT Logo"
+            className="h-16 mx-auto mb-6"
+          />
+          <p className="text-gray-600">
+            Career Development and Placement Cell (CDPC) - KDPIT
+          </p>
+          <a
+            href="https://www.charusat.ac.in"
+            target="_blank"
+            className="inline-flex items-center mt-4 text-blue-600 hover:text-blue-800"
+          >
+            Visit CHARUSAT <ExternalLink className="ml-2 w-4 h-4" />
+          </a>
         </div>
       </div>
     </div>

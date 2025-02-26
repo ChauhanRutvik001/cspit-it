@@ -262,9 +262,8 @@ export const getAllStudents = async (req, res) => {
 
     const students = await User.find({
       role: "student",
-      profile: { $exists: true, $ne: null },
     })
-      .select("name id profile certificates resume")
+      .select("name id profile certificates resume passwordChanged")
       .skip(skip)
       .limit(limitNumber)
       .lean(); // Convert MongoDB documents to plain JavaScript objects
@@ -275,13 +274,15 @@ export const getAllStudents = async (req, res) => {
         .json({ success: false, message: "No students with profiles found" });
     }
 
-    // Send only certificates length
+    // Modify student data based on password change and handle missing data
     const studentsWithCertLength = students.map((student) => ({
-      name: student.name,
-      id: student.id,
-      _id : student._id,
-      profile: student.profile,
-      certificatesLength: student.certificates ? student.certificates.length : 0,
+      name: student.name || "-",
+      id: student.id || "-",
+      _id: student._id || "-",
+      profile: student.profile || "-",
+      certificatesLength: student.certificates
+        ? student.certificates.length
+        : 0,
       resume: student.resume && student.resume.length > 0,
     }));
 
@@ -310,7 +311,3 @@ export const getAllStudents = async (req, res) => {
     });
   }
 };
-
-
-
-

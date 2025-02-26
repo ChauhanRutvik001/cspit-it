@@ -78,14 +78,14 @@ const StudentData = () => {
     const tableData = filteredSelections.map((student) => [
       student.id || "",
       student.name || "",
-      student.profile?.batch || "N/A",
-      student.profile?.semester || "N/A",
-      student.profile?.counsellor || "N/A",
-      student.profile?.mobileNo || "N/A",
+      student.profile?.batch || "-",
+      student.profile?.semester || "-",
+      student.profile?.counsellor || "-",
+      student.profile?.mobileNo || "-",
       student.profile?.birthDate
         ? new Date(student.profile.birthDate).toLocaleDateString()
-        : "N/A", // Format the birthdate
-      student.profile?.github || "N/A",
+        : "-", // Format the birthdate
+      student.profile?.github || "-",
       student?.certificatesLength || "0",
     ]);
 
@@ -138,14 +138,14 @@ const StudentData = () => {
     const tableData = filteredSelections.map((student) => [
       student.id || "",
       student.name || "",
-      student.profile?.batch || "N/A",
-      student.profile?.semester || "N/A",
-      student.profile?.counsellor || "N/A",
-      student.profile?.mobileNo || "N/A",
+      student.profile?.batch || "-",
+      student.profile?.semester || "-",
+      student.profile?.counsellor || "-",
+      student.profile?.mobileNo || "-",
       student.profile?.birthDate
         ? new Date(student.profile.birthDate).toLocaleDateString()
-        : "N/A", // Format the birthdate
-      student.profile?.github || "N/A",
+        : "-", // Format the birthdate
+      student.profile?.github || "-",
       student?.certificatesLength || "0",
     ]);
 
@@ -177,7 +177,7 @@ const StudentData = () => {
         setTotalDocuments(response.data.meta.totalStudents);
         setTotalPages(response.data.meta.totalPages);
       } catch (err) {
-        setError("Error fetching student data");
+        setError(err.response?.data?.message || "An error occurred");
       } finally {
         setLoading(false);
       }
@@ -190,10 +190,6 @@ const StudentData = () => {
     setRecordsPerPage(Number(e.target.value));
     setCurrentPage(1);
   };
-
-  if (error) {
-    return <div className="text-center text-red-500">{error}</div>;
-  }
 
   return (
     <div className="mx-auto min-h-screen">
@@ -268,13 +264,18 @@ const StudentData = () => {
               </tr>
             </thead>
             <tbody>
+              {error && (
+                <td colSpan="12" className="text-red-600 py-4 text-center">
+                  {error}
+                </td>
+              )}
               {loading ? (
                 <tr>
-                  <td colSpan="10" className="text-center py-4 text-gray-500">
+                  <td colSpan="12" className="text-center py-4 text-gray-500">
                     <ClipLoader size={40} color="#1D4ED8" />
                   </td>
                 </tr>
-              ) : filteredSelections.length > 0 ? (
+              ) : (
                 filteredSelections.map((student) => (
                   <tr
                     key={student._id}
@@ -288,27 +289,27 @@ const StudentData = () => {
                     </td>
                     <td className="border p-2">
                       {highlightText(
-                        student.profile?.batch?.toUpperCase() || "N/A"
+                        student.profile?.batch?.toUpperCase() || "-"
                       )}
                     </td>
                     <td className="border p-2">
-                      {highlightText(student.profile?.semester || "N/A")}
+                      {highlightText(student.profile?.semester || "-")}
                     </td>
                     <td className="border p-2">
-                      {highlightText(student.profile?.mobileNo || "N/A")}
+                      {highlightText(student.profile?.mobileNo || "-")}
                     </td>
                     <td className="border p-2">
-                      {highlightText(student.profile?.gender || "N/A")}
+                      {highlightText(student.profile?.gender || "-")}
                     </td>
                     <td className="border p-2">
                       {student.profile?.birthDate
                         ? new Date(
                             student.profile.birthDate
                           ).toLocaleDateString()
-                        : "N/A"}
+                        : "-"}
                     </td>
                     <td className="border p-2 capitalize">
-                      {highlightText(student.profile?.counsellor || "N/A")}
+                      {highlightText(student.profile?.counsellor || "-")}
                     </td>
                     <td className="border p-2">
                       {student.profile?.github ? (
@@ -321,7 +322,7 @@ const StudentData = () => {
                           {highlightText(student.profile.github)}
                         </a>
                       ) : (
-                        "N/A"
+                        "-"
                       )}
                     </td>
                     <td className="border p-2">
@@ -336,7 +337,7 @@ const StudentData = () => {
                           LinkedIn
                         </a>
                       ) : (
-                        "N/A"
+                        "-"
                       )}
                     </td>
                     <td
@@ -365,12 +366,6 @@ const StudentData = () => {
                     </td>
                   </tr>
                 ))
-              ) : (
-                <tr>
-                  <td colSpan="10" className="text-center py-4 text-gray-500">
-                    No records found
-                  </td>
-                </tr>
               )}
             </tbody>
           </table>

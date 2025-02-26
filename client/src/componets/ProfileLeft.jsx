@@ -1,7 +1,16 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { FaUser, FaGithub, FaLinkedin } from "react-icons/fa";
+import {
+  User,
+  Github,
+  Linkedin,
+  Camera,
+  X,
+  Award,
+  FileText,
+  Briefcase,
+  Loader2,
+} from "lucide-react";
 import axiosInstance from "../utils/axiosInstance";
-import { ClipLoader } from "react-spinners";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -23,9 +32,7 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
       const response = await axiosInstance.get("/user/profile/upload-avatar", {
         responseType: "blob",
       });
-      console.log("Response:", response.data);
       const imageUrl = URL.createObjectURL(response.data);
-      console.log("Image URL:", imageUrl);
       setProfilePic(imageUrl);
     } catch (error) {
       console.error("Error fetching profile picture:", error);
@@ -97,116 +104,159 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
       setLoading(false);
     }
   };
+
   return (
-    <div className="flex flex-col items-center sticky top-20 bg-white text-black rounded-lg shadow-lg p-6">
-      {/* Profile Image */}
-      {loading ? (
-        <ClipLoader size={150} color={"#000000"} loading={loading} />
-      ) : (
-        <img
-          src={selectedFile ? imagePreview : profilePic || ""}
-          alt="Profile"
-          className={`w-48 h-48 rounded-full mb-3 ${
-            profilePic || selectedFile ? "" : "hidden"
-          }`}
-        />
-      )}
+    <div className="bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col items-center sticky top-20 text-black">
+      {/* Header/Banner */}
+      <div className="h-32 w-full bg-gradient-to-r from-blue-500 to-purple-600">
+        {isEditing && (
+          <>
+            <input
+              type="file"
+              id="fileInput"
+              accept="image/*"
+              className="hidden"
+            />
 
-      {!profilePic && !selectedFile && !loading && (
-        <FaUser size={200} className="text-primary mb-3" />
-      )}
-
-      <p className="text-xl font-semibold pb-5">{formData.id}</p>
-
-      <div className="flex items-center space-x-2">
-        <a
-          href={githubURL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`transition-all ${
-            githubURL ? "text-black" : "text-gray-400"
-          } hover:text-gray-700`}
-        >
-          <FaGithub size={30} />
-        </a>
-        <a
-          href={linkedInURL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`transition-all ${
-            linkedInURL ? "text-black" : "text-gray-400"
-          } hover:text-gray-700`}
-        >
-          <FaLinkedin size={30} />
-        </a>
+            <label
+              onClick={() => document.getElementById("fileInput")?.click()}
+              className=" absolute right-4 top-4 p-3 bg-white rounded-full text-blue-500 cursor-pointer hover:bg-gray-50 transition-colors shadow-lg"
+            >
+              <Camera size={24} />
+            </label>
+          </>
+        )}
       </div>
 
-      <button
-        onClick={toggleEdit}
-        className={`px-4 py-2 rounded-md mt-4 transition ${
-          isEditing
-            ? "bg-red-500 hover:bg-red-700"
-            : "bg-blue-500 hover:bg-blue-700"
-        } text-white`}
-      >
-        {isEditing ? "Cancel Edit" : "Edit Details"}
-      </button>
-      <div>
-        <button
-          className={`px-4 py-2 rounded-md mt-4 transition text-black`}
-          onClick={() => navigate("/StudentSelectionPage")}
-        >
-          Domain
-        </button>
-        <button
-          className={`px-4 py-2 rounded-md mt-4 transition text-black`}
-          onClick={() => navigate("/Certificate")}
-        >
-          Certificate
-        </button>
-        <button
-          className={`px-4 py-2 rounded-md mt-4 transition text-black`}
-          onClick={() => navigate("/resume")}
-        >
-         Resume 
-        </button>
-      </div>
+      <div className="px-6 pb-8">
+        {/* Profile Picture */}
+        <div className="relative -mt-16 mb-6 flex justify-center">
+          <div className="relative">
+            {loading ? (
+              <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+              </div>
+            ) : (
+              <div className="relative">
+                {profilePic || selectedFile ? (
+                  <img
+                    src={selectedFile ? imagePreview : profilePic}
+                    alt="Profile"
+                    className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
+                  />
+                ) : (
+                  <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center border-4 border-white shadow-lg">
+                    <User size={64} className="text-gray-400" />
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
 
-      {isEditing && (
-        <div className="w-full mt-4 space-y-4">
+        {/* User Info */}
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            {formData.id}
+          </h2>
+
+          {/* Social Links */}
+          <div className="flex items-center justify-center space-x-4 mb-6">
+            <a
+              href={githubURL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`p-2 rounded-full transition-all ${
+                githubURL
+                  ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  : "bg-gray-50 text-gray-400 cursor-not-allowed"
+              }`}
+            >
+              <Github size={24} />
+            </a>
+            <a
+              href={linkedInURL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`p-2 rounded-full transition-all ${
+                linkedInURL
+                  ? "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  : "bg-gray-50 text-gray-400 cursor-not-allowed"
+              }`}
+            >
+              <Linkedin size={24} />
+            </a>
+          </div>
+
+          {/* Edit Button */}
           <button
-            onClick={() => document.getElementById("fileInput").click()}
-            className="w-full bg-blue-500 text-white rounded px-4 py-2 shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 transition-all"
+            onClick={toggleEdit}
+            className={`w-full px-4 py-2 rounded-lg transition-all ${
+              isEditing
+                ? "bg-red-500 hover:bg-red-600 text-white"
+                : "bg-blue-500 hover:bg-blue-600 text-white"
+            }`}
           >
-            Select Image
+            {isEditing ? "Cancel Edit" : "Edit Profile"}
           </button>
-          <input
-            id="fileInput"
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleFileChange}
-          />
 
-          {selectedFile && (
+          {/* Quick Actions */}
+          <div className="grid grid-cols-1 gap-3 mt-6">
             <button
-              onClick={handleUpdateProfilePic}
-              className="w-full bg-green-500 text-white rounded px-4 py-2 shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 transition-all"
+              onClick={() => navigate("/StudentSelectionPage")}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
             >
-              Upload Profile Picture
+              <Briefcase className="text-blue-500" size={20} />
+              <span className="font-medium">Domain</span>
             </button>
-          )}
+            <button
+              onClick={() => navigate("/Certificate")}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <Award className="text-blue-500" size={20} />
+              <span className="font-medium">Certificate</span>
+            </button>
+            <button
+              onClick={() => navigate("/resume")}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <FileText className="text-blue-500" size={20} />
+              <span className="font-medium">Resume</span>
+            </button>
+          </div>
 
-          {profilePic && !selectedFile && (
-            <button
-              onClick={handleRemoveImage}
-              className="w-full bg-red-500 text-white rounded px-4 py-2 shadow-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 transition-all"
-            >
-              Remove Profile Picture
-            </button>
+          {/* Edit Mode Actions */}
+          {isEditing && (
+            <div className="mt-6 space-y-3">
+              <input
+                id="fileInput"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+
+              {selectedFile && (
+                <button
+                  onClick={handleUpdateProfilePic}
+                  className="w-full bg-green-500 text-white rounded-lg px-4 py-2 hover:bg-green-600 transition-colors"
+                >
+                  Upload Profile Picture
+                </button>
+              )}
+
+              {profilePic && !selectedFile && (
+                <button
+                  onClick={handleRemoveImage}
+                  className="w-full bg-red-500 text-white rounded-lg px-4 py-2 hover:bg-red-600 transition-colors"
+                >
+                  Remove Profile Picture
+                </button>
+              )}
+            </div>
           )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

@@ -71,12 +71,12 @@ const Login = () => {
           return; // Do not reset the form
         }
 
-        if (firstTimeData) {
-          console.log(id);
-          setIsFirstTimeData(true);
-          toast.success("Welcome to your first login! Please enter your data.");
-          return; // Do not reset the form
-        }
+        // if (firstTimeData) {
+        //   console.log(id);
+        //   setIsFirstTimeData(true);
+        //   toast.success("Welcome to your first login! Please enter your data.");
+        //   return; // Do not reset the form
+        // }
 
         toast.success(message || "Login successful!");
         // localStorage.setItem("UserToken", token);
@@ -126,8 +126,6 @@ const Login = () => {
           <div className="w-full max-w-2xl sm:max-w-lg bg-opacity-90">
             {isFirstTimeLogin ? (
               <PasswordChange id={idValue} />
-            ) : isFirstTimeData ? (
-              <EnterDataForm id={idValue} />
             ) : (
               <form onSubmit={handleLogin} className="w-full bg-white p-6 sm:p-8 rounded-lg shadow-md">
                 <div className="mb-6 text-center">
