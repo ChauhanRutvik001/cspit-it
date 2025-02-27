@@ -23,8 +23,8 @@ const ProfileRight = ({
             <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">
               Personal Information
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="col-span-2">
+            <div className="flex flex-col space-y-4">
+              <div className="">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Name<span className="text-red-500">*</span>
                 </label>
@@ -40,7 +40,8 @@ const ProfileRight = ({
                 />
               </div>
 
-              <div>
+              <div className="space-y-4 sm:space-y-0 sm:space-x-6 flex flex-col sm:flex-row sm:place-content-between w-full">
+                <div className="w-full">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Email<span className="text-red-500">*</span>
                 </label>
@@ -52,9 +53,9 @@ const ProfileRight = ({
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-gray-50 text-gray-500"
                   readOnly
                 />
-              </div>
+                </div>
 
-              <div>
+                <div className="w-full"> 
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   ID<span className="text-red-500">*</span>
                 </label>
@@ -66,6 +67,7 @@ const ProfileRight = ({
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-gray-50 text-gray-500"
                   readOnly
                 />
+                </div>
               </div>
             </div>
           </div>
