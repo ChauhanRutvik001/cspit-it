@@ -1,10 +1,19 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../utils/axiosInstance";
-import { ClipLoader } from "react-spinners";
 import { jsPDF } from "jspdf";
 import * as XLSX from "xlsx";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import {
+  FileCheck,
+  Award,
+  Users,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+  FileDown,
+  Download,
+} from "lucide-react";
 
 const StudentData = () => {
   const user = useSelector((store) => store.app.user);
@@ -171,10 +180,9 @@ const StudentData = () => {
         const response = await axiosInstance.get(
           `/user/profile/getAllstudent?page=${currentPage}&limit=${recordsPerPage}`
         );
-
         setStudents(response.data.data);
         console.log(response.data);
-        setTotalDocuments(response.data.meta.totalStudents);
+        setTotalDocuments(response.data.data.length);
         setTotalPages(response.data.meta.totalPages);
       } catch (err) {
         setError(err.response?.data?.message || "An error occurred");
@@ -191,204 +199,399 @@ const StudentData = () => {
     setCurrentPage(1);
   };
 
+  const defaultImage = "default-img.png";
+
   return (
-    <div className="mx-auto min-h-screen">
-      <div className="p-4 pt-20">
-        <h2 className="text-3xl font-semibold text-center mb-6 font-serif">
-          Student Data
-        </h2>
-        <div className="mb-4">
-          <div className="text-lg text-gray-700 font-serif">
-            <span className="font-medium">Total Student Data:</span>{" "}
-            {totalDocuments}
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+      <div className="max-full mx-auto pt-20 p-4">
+        <div className="bg-white rounded-xl shadow-xl overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+              <div className="flex items-center space-x-3 mb-4 md:mb-0">
+                <Users className="h-8 w-8 text-white" />
+                <h2 className="text-3xl font-bold text-white font-['Poppins']">
+                  Student Database
+                </h2>
+              </div>
+              <div className="flex items-center space-x-2 text-white">
+                <span className="bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm">
+                  <span className="font-medium">Total Students:</span>{" "}
+                  <span className="font-bold">{totalDocuments}</span>
+                </span>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="mb-4 flex flex-col md:flex-row justify-between items-center md:space-x-4">
-          <input
-            type="text"
-            placeholder="Search by ID, Name, Batch, Semester, Counsellor, Mobile, Github"
-            className="p-3 w-full md:w-1/2 lg:w-1/3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4 md:mb-0"
-            onChange={handleSearch}
-            value={searchTerm}
-          />
-          <div className="flex space-x-2 w-full md:w-auto justify-start md:justify-normal">
-            <button
-              onClick={exportToPDF}
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition"
-            >
-              Download as PDF
-            </button>
-            <button
-              onClick={exportToExcel}
-              className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition"
-            >
-              Download as Excel
-            </button>
+
+          {/* Search and Export Controls */}
+          <div className="px-6 py-5 border-b border-gray-200 bg-gray-50">
+            <div className="flex flex-col md:flex-row justify-between items-stretch gap-4">
+              <div className="relative flex-grow">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search by ID, Name, Batch, Semester, Counsellor..."
+                  className="pl-10 p-3 w-full border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                  onChange={handleSearch}
+                  value={searchTerm}
+                />
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  onClick={exportToPDF}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2 shadow-sm"
+                >
+                  <FileDown className="h-5 w-5" />
+                  <span>PDF</span>
+                </button>
+                <button
+                  onClick={exportToExcel}
+                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-200 flex items-center gap-2 shadow-sm"
+                >
+                  <Download className="h-5 w-5" />
+                  <span>Excel</span>
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div className="mb-4">
-          <label htmlFor="recordsPerPage" className="mr-2">
-            Items per page:
-          </label>
-          <select
-            id="recordsPerPage"
-            value={recordsPerPage}
-            onChange={handleLimitChange}
-            className="border border-gray-300 rounded-md p-1"
-          >
-            {[10, 50, 100, 500, 1000].map((value) => (
-              <option key={value} value={value}>
-                {value}
-              </option>
-            ))}
-          </select>
-        </div>
+          {/* Records per page selector */}
+          <div className="px-6 py-3 bg-white border-b border-gray-200">
+            <div className="flex items-center">
+              <label
+                htmlFor="recordsPerPage"
+                className="text-sm font-medium text-gray-700 mr-2"
+              >
+                Show:
+              </label>
+              <select
+                id="recordsPerPage"
+                value={recordsPerPage}
+                onChange={handleLimitChange}
+                className="border border-gray-300 rounded-md p-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                {[10, 50, 100, 500, 1000].map((value) => (
+                  <option key={value} value={value}>
+                    {value} entries
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-        <div className="overflow-x-auto">
-          <table className="table-auto w-full border-collapse border border-gray-300">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="border p-2 text-left">ID</th>
-                <th className="border p-2 text-left">Name</th>
-                <th className="border p-2 text-left">Batch</th>
-                <th className="border p-2 text-left">Semester</th>
-                <th className="border p-2 text-left">Mobile No</th>
-                <th className="border p-2 text-left">Gender</th>
-                <th className="border p-2 text-left">BirthDate</th>
-                <th className="border p-2 text-left">Counsellor</th>
-                <th className="border p-2 text-left">GitHub</th>
-                <th className="border p-2 text-left">LinkedIn</th>
-                <th className="border p-2 text-left">Certificates</th>
-                <th className="border p-2 text-left">Resume</th>
-              </tr>
-            </thead>
-            <tbody>
-              {error && (
-                <td colSpan="12" className="text-red-600 py-4 text-center">
-                  {error}
-                </td>
-              )}
-              {loading ? (
+          {/* Table */}
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-100">
                 <tr>
-                  <td colSpan="12" className="text-center py-4 text-gray-500">
-                    <ClipLoader size={40} color="#1D4ED8" />
-                  </td>
-                </tr>
-              ) : (
-                filteredSelections.map((student) => (
-                  <tr
-                    key={student._id}
-                    className="odd:bg-white even:bg-gray-50 hover:bg-gray-100"
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
                   >
-                    <td className="border p-2">
-                      {highlightText(student.id?.toUpperCase())}
-                    </td>
-                    <td className="border p-2 capitalize">
-                      {highlightText(student.name)}
-                    </td>
-                    <td className="border p-2">
-                      {highlightText(
-                        student.profile?.batch?.toUpperCase() || "-"
-                      )}
-                    </td>
-                    <td className="border p-2">
-                      {highlightText(student.profile?.semester || "-")}
-                    </td>
-                    <td className="border p-2">
-                      {highlightText(student.profile?.mobileNo || "-")}
-                    </td>
-                    <td className="border p-2">
-                      {highlightText(student.profile?.gender || "-")}
-                    </td>
-                    <td className="border p-2">
-                      {student.profile?.birthDate
-                        ? new Date(
-                            student.profile.birthDate
-                          ).toLocaleDateString()
-                        : "-"}
-                    </td>
-                    <td className="border p-2 capitalize">
-                      {highlightText(student.profile?.counsellor || "-")}
-                    </td>
-                    <td className="border p-2">
-                      {student.profile?.github ? (
-                        <a
-                          href={`https://github.com/${student.profile.github}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 underline"
-                        >
-                          {highlightText(student.profile.github)}
-                        </a>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
-                    <td className="border p-2">
-                      {student.profile?.linkedIn ? (
-                        <a
-                          href={student.profile.linkedIn}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-500 underline"
-                          title={student.profile.linkedIn}
-                        >
-                          LinkedIn
-                        </a>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
-                    <td
-                      className="border p-2 hover:cursor-pointer"
-                      onClick={() =>
-                        navigate(`/adminCertificate/${student._id}`, {
-                          state: { id: student.id, name: student.name },
-                        })
-                      }
-                    >
-                      {highlightText(student?.certificatesLength || "0")}
-                    </td>
-                    <td className="border p-2 hover:cursor-pointer">
-                      <span
-                        className={
-                          student?.resume ? "text-green-500" : "text-red-500"
-                        }
-                        onClick={() =>
-                          navigate(`/adminResume/${student._id}`, {
-                            state: { id: student.id, name: student.name },
-                          })
-                        }
-                      >
-                        {highlightText(student?.resume ? "✅" : "❌")}
-                      </span>
+                    Photo
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                  >
+                    ID
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                  >
+                    Name
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                  >
+                    Batch
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                  >
+                    Semester
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                  >
+                    Mobile No
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                  >
+                    Gender
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                  >
+                    Birth Date
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                  >
+                    Counsellor
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                  >
+                    GitHub
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                  >
+                    LinkedIn
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                  >
+                    Certificates
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                  >
+                    Resume
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {error && (
+                  <tr>
+                    <td colSpan={13} className="px-6 py-4 text-center">
+                      <div className="bg-red-50 text-red-600 p-3 rounded-lg">
+                        {error}
+                      </div>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+                )}
+                {loading ? (
+                  <tr>
+                    <td colSpan={13} className="px-6 py-10 text-center">
+                      <div className="flex justify-center">
+                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+                      </div>
+                      <p className="mt-2 text-sm text-gray-500">
+                        Loading student data...
+                      </p>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredSelections.map((student) => {
+                    const hasCertificates = student?.certificatesLength > 0;
+                    const hasResume = !!student?.resume;
 
-        <div className="flex justify-center items-center space-x-4 mt-6">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="px-4 py-2 border bg-gray-200 hover:bg-gray-300 rounded-lg disabled:opacity-50"
-          >
-            Previous
-          </button>
-          <span className="px-4 py-2 text-lg">{`Page ${currentPage} of ${totalPages}`}</span>
-          <button
-            onClick={() =>
-              setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-            }
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 border bg-gray-200 hover:bg-gray-300 rounded-lg disabled:opacity-50"
-          >
-            Next
-          </button>
+                    return (
+                      <tr
+                        key={student._id}
+                        className="hover:bg-gray-50 transition-colors duration-150"
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex-shrink-0 h-16 w-16">
+                            <img
+                              src={
+                                student.profile?.avatar
+                                  ? `http://localhost:3100/api/v1/user/profile/getProfilePicByAdmin/${student.profile?.avatar}`
+                                  : defaultImage
+                              }
+                              alt="Profile"
+                              className="h-16 w-16 rounded-full object-cover border-2 border-gray-200 shadow-sm hover:border-blue-500 transition-all duration-200"
+                            />
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900 font-mono bg-gray-100 px-2 py-1 rounded">
+                            {highlightText(student.id?.toUpperCase())}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900 capitalize">
+                            {highlightText(student.name)}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">
+                            {highlightText(
+                              student.profile?.batch?.toUpperCase() || "-"
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">
+                            {highlightText(student.profile?.semester || "-")}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900 font-mono">
+                            {highlightText(student.profile?.mobileNo || "-")}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">
+                            {highlightText(student.profile?.gender || "-")}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">
+                            {student.profile?.birthDate
+                              ? new Date(
+                                  student.profile.birthDate
+                                ).toLocaleDateString()
+                              : "-"}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900 capitalize">
+                            {highlightText(student.profile?.counsellor || "-")}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {student.profile?.github ? (
+                            <a
+                              href={`https://github.com/${student.profile.github}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800 hover:underline text-sm flex items-center gap-1"
+                            >
+                              <svg
+                                className="h-4 w-4"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                              </svg>
+                              {highlightText(student.profile.github)}
+                            </a>
+                          ) : (
+                            <span className="text-gray-400 text-sm">-</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {student.profile?.linkedIn ? (
+                            <a
+                              href={student.profile.linkedIn}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800 hover:underline text-sm flex items-center gap-1"
+                            >
+                              <svg
+                                className="h-4 w-4"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                              </svg>
+                              <span>Profile</span>
+                            </a>
+                          ) : (
+                            <span className="text-gray-400 text-sm">-</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <button
+                            onClick={() =>
+                              hasCertificates &&
+                              navigate(`/adminCertificate/${student._id}`, {
+                                state: { id: student.id, name: student.name },
+                              })
+                            }
+                            className={`inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded 
+                              ${
+                                hasCertificates
+                                  ? "text-indigo-700 bg-indigo-100 hover:bg-indigo-200"
+                                  : "text-gray-500 bg-gray-100 cursor-not-allowed"
+                              } 
+                              transition-colors duration-200`}
+                            disabled={!hasCertificates}
+                          >
+                            <Award className="h-4 w-4 mr-1" />
+                            {highlightText(student?.certificatesLength || "0")}
+                          </button>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <button
+                            className={`inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded 
+                              ${
+                                hasResume
+                                  ? "text-green-700 bg-green-100 hover:bg-green-200"
+                                  : "text-gray-500 bg-gray-100 cursor-not-allowed"
+                              } 
+                              transition-colors duration-200`}
+                            onClick={() =>
+                              hasResume &&
+                              navigate(`/adminResume/${student._id}`, {
+                                state: { id: student.id, name: student.name },
+                              })
+                            }
+                            disabled={!hasResume}
+                          >
+                            <FileCheck className="h-4 w-4 mr-1" />
+                            {hasResume ? "View" : "None"}
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Pagination */}
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
+              <div className="text-sm text-gray-700">
+                Showing{" "}
+                <span className="font-medium">
+                  {Math.min(
+                    1 + (currentPage - 1) * recordsPerPage,
+                    totalDocuments
+                  )}
+                </span>{" "}
+                to{" "}
+                <span className="font-medium">
+                  {Math.min(currentPage * recordsPerPage, totalDocuments)}
+                </span>{" "}
+                of <span className="font-medium">{totalDocuments}</span> results
+              </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Previous
+                </button>
+                <div className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md">
+                  Page {currentPage} of {totalPages}
+                </div>
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -85,22 +85,19 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
   const handleRemoveImage = async () => {
     try {
       setLoading(true);
-      toast.success("Remove successfully");
-      setSelectedFile(null);
-      setProfilePic(null);
-      setLoading(false);
       const response = await axiosInstance.delete(
         "/user/profile/remove-profile-pic"
       );
       if (response.status === 200) {
-        setSelectedFile(null);
+        toast.success("Profile picture removed successfully");
         setProfilePic(null);
-        setLoading(false);
+        setSelectedFile(null);
+        setImagePreview(null);
       }
-      setLoading(false);
     } catch (error) {
-      toast.error("Remove Error");
+      toast.error("Error removing profile picture");
       console.error("Remove Error:", error);
+    } finally {
       setLoading(false);
     }
   };
@@ -116,11 +113,12 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
               id="fileInput"
               accept="image/*"
               className="hidden"
+              onChange={handleFileChange}
             />
 
             <label
-              onClick={() => document.getElementById("fileInput")?.click()}
-              className=" absolute right-4 top-4 p-3 bg-white rounded-full text-blue-500 cursor-pointer hover:bg-gray-50 transition-colors shadow-lg"
+              onClick={() => document.getElementById("fileInput").click()}
+              className="absolute right-4 top-4 p-3 bg-white rounded-full text-blue-500 cursor-pointer hover:bg-gray-50 transition-colors shadow-lg"
             >
               <Camera size={24} />
             </label>
