@@ -107,7 +107,7 @@ export const getAllSelections = async (req, res) => {
     // Fetch all data with population
     const allSelections = await StudentSelection.find().populate(
       "studentId",
-      "name id"
+      "name id profile.avatar"
     );
 
     // Debugging: Log fetched data

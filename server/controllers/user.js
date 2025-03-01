@@ -3,19 +3,19 @@ import { GridFSBucket } from "mongodb";
 import { mongoose } from "../app.js";
 
 export const getUserDetails = async (req, res) => {
-  const { id } = req.params; // Updated to match :id in the route
+  const id = req.user.id; // Updated to match :id in the route
   console.log("User ID:", id);
 
   try {
     // Find user by ID
-    const user = await User.findOne({ id }).select("name id email profile");
+    const user = await User.findById(id).select("name id email profile");
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
     // Send response
-    console.log("hello");
+    console.log("User details fetched successfully");
     res.status(200).json({
       success: true,
       data: user,
@@ -309,5 +309,27 @@ export const getAllStudents = async (req, res) => {
       success: false,
       message: "An error occurred while retrieving student details",
     });
+  }
+};
+
+export const getProfilePicByAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid file ID" });
+    }
+
+    const bucket = new GridFSBucket(mongoose.connection.db, {
+      bucketName: "uploads",
+    });
+
+    const stream = bucket.openDownloadStream(new mongoose.Types.ObjectId(id));
+    stream.on("error", () => res.status(404).json({ error: "File not found" }));
+
+    res.set("Content-Type", "application/octet-stream");
+    stream.pipe(res);
+  } catch (error) {
+    res.status(500).json({ error: "Error retrieving file" });
   }
 };

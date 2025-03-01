@@ -12,10 +12,8 @@ import {
   MapPin,
   Calendar,
   ExternalLink,
-  TrendingUp,
   Rocket,
-  Star,
-  Target,
+  X,
 } from "lucide-react";
 
 const CIDAC_industry_visit = "/CIDAC_industry_visit.jpg";
@@ -75,7 +73,7 @@ const HeroSection = () => {
     <section className="relative min-h-screen overflow-hidden py-20 px-4 sm:px-6 lg:px-8 flex justify-center items-center bg-white">
       <div className="absolute inset-0 bg-white opacity-75"></div>
 
-      <div className="max-w-5xl mx-auto relative z-10 flex flex-col md:flex-row items-center">
+      <div className="max-w-6xl mx-auto relative z-10 flex flex-col md:flex-row items-center">
         {/* Left Content */}
         <div className="md:w-1/2">
           <motion.div
@@ -105,7 +103,7 @@ const HeroSection = () => {
             >
               Unlock Your Future with <br className="hidden sm:inline" />
               <span className="relative text-black">
-                Career Development & Placement
+                Career Development & Placement Cell
                 <motion.span
                   className="absolute -bottom-1 left-0 w-full h-1 bg-gradient-to-r from-orange-400 to-amber-500 rounded-full"
                   initial={{ scaleX: 0 }}
@@ -132,7 +130,7 @@ const HeroSection = () => {
         {/* Right Image Section */}
         <div className="md:w-1/2 mt-10 md:mt-0">
           <motion.img
-            src="/img2-removebg-preview.png"
+            src="/home-header-isagebrum.svg"
             alt="Career Development"
             className="bg-transparent"
             initial={{ opacity: 0, x: 100 }}
@@ -275,8 +273,13 @@ const CDPCDetails = () => {
 };
 
 const ImageCarousel = () => {
-  const images = [CIDAC_industry_visit, TechMahindra_industry_visit, Imegica];
+  const images = [
+    "CIDAC_industry_visit.jpg",
+    "TechMahindra_industry_visit.jpg",
+    "Imegica.jpg",
+  ]; // Replace with actual image URLs or imports
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -293,6 +296,14 @@ const ImageCarousel = () => {
     setCurrentIndex(
       (prevIndex) => (prevIndex - 1 + images.length) % images.length
     );
+  };
+
+  const handleImageClick = (image) => {
+    setSelectedImage(image);
+  };
+
+  const handleClosePreview = () => {
+    setSelectedImage(null);
   };
 
   return (
@@ -315,12 +326,14 @@ const ImageCarousel = () => {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
             className="relative h-[500px] rounded-xl overflow-hidden shadow-2xl"
+            onClick={() => handleImageClick(images[currentIndex])}
           >
             <img
               src={images[currentIndex]}
               alt={`Slide ${currentIndex + 1}`}
               className="w-full h-full object-cover"
             />
+
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
               <div className="p-8 text-white">
                 <h3 className="text-2xl font-bold mb-2">Industry Exposure</h3>
@@ -330,6 +343,24 @@ const ImageCarousel = () => {
               </div>
             </div>
           </motion.div>
+
+          {selectedImage && (
+            <div className="fixed inset-0 backdrop-blur-md bg-black/70 flex items-center justify-center z-50">
+              <div className="relative max-w-4xl w-full p-4">
+                <button
+                  className="absolute top-4 right-4 text-white bg-gray-800 hover:bg-gray-700 rounded-full p-2"
+                  onClick={handleClosePreview}
+                >
+                  <X className="w-6 h-6" />
+                </button>
+                <img
+                  src={selectedImage}
+                  alt="Preview"
+                  className="w-full max-h-[90vh] object-contain rounded-lg"
+                />
+              </div>
+            </div>
+          )}
 
           <button
             onClick={prevSlide}
@@ -370,16 +401,12 @@ const RecruitersGrid = () => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="py-12 ">
-        <div className="flex justify-center">
-          <div className="bg-white   rounded-md p-6 m-2  flex items-center justify-center">
-            <img
-              src={recruiters[0].logo}
-              alt={recruiters[0].name}
-              className="h-full w-auto object-contain"
-            />
-          </div>
-        </div>
+      <div className="mt-5 mb-5">
+        <img
+          src={recruiters[0].logo}
+          alt={recruiters[0].name}
+          className="h-full w-full object-fit"
+        />
       </div>
     </motion.div>
   );
@@ -400,13 +427,13 @@ const Description = () => {
             <h2 className="text-4xl font-bold text-gray-800 mb-6">
               About CDPC
             </h2>
-            <p className="text-lg text-gray-700 mb-6 leading-relaxed">
+            <p className="text-lg text-gray-700 mb-6 leading-relaxed text-justify">
               The Career Development and Placement Cell (CDPC) at CHARUSAT
               University is dedicated to bridging the gap between academia and
               industry. We prepare students for bright futures by connecting
               them with top recruiters and providing industry-relevant training.
             </p>
-            <p className="text-lg text-gray-700 mb-6 leading-relaxed">
+            <p className="text-lg text-gray-700 mb-6 leading-relaxed text-justify">
               Our mission is to empower students with the skills, knowledge, and
               opportunities they need to excel in their chosen careers. Through
               a comprehensive approach to career development, we ensure that our

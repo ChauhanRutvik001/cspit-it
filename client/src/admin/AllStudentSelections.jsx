@@ -3,13 +3,20 @@ import axiosInstance from "../utils/axiosInstance";
 import { jsPDF } from "jspdf"; // Import jsPDF for PDF generation
 import * as XLSX from "xlsx"; // Import xlsx for Excel generation
 import "jspdf-autotable"; // Import the autoTable plugin
-import { ClipLoader } from "react-spinners";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import {
+  Search,
+  FileDown,
+  Download,
+  ChevronLeft,
+  ChevronRight,
+  Layers,
+} from "lucide-react";
 
 const AllStudentSelections = () => {
   const user = useSelector((store) => store.app.user);
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const [selections, setSelections] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -22,8 +29,8 @@ const AllStudentSelections = () => {
   const [searchTerm, setSearchTerm] = useState(""); // New state for search term
 
   useEffect(() => {
-      if (user?.role !== "admin") navigate("/browse");
-    }, [user, navigate]);
+    if (user?.role !== "admin") navigate("/browse");
+  }, [user, navigate]);
 
   useEffect(() => {
     const fetchSelections = async () => {
@@ -40,6 +47,7 @@ const AllStudentSelections = () => {
             },
           }
         );
+        console.log("response", response.data);
         const { data, pagination } = response.data;
         setTotalDocuments(pagination.totalDocuments);
         setSelections(data || []);
@@ -198,7 +206,7 @@ const AllStudentSelections = () => {
     }));
 
     // Combine summaryRow, headers, and tableData into a single array
-    const data = [summaryRow[0],  ...tableData];
+    const data = [summaryRow[0], ...tableData];
 
     // Create Excel sheet
     const ws = XLSX.utils.json_to_sheet(data, { header: headers });
@@ -212,166 +220,287 @@ const AllStudentSelections = () => {
     XLSX.writeFile(wb, filename);
   };
 
+  const defaultImage = "default-img.png";
+
   return (
-    <div className="mx-auto min-h-screen p-4">
-  <div className="pt-20">
-    <h1 className="text-2xl sm:text-3xl font-semibold text-center mb-6 font-serif">
-      All Student Domain Selections
-    </h1>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+      <div className="max-full pt-20 p-4">
+        <div className="bg-white rounded-xl shadow-xl overflow-hidden">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-purple-600 to-indigo-700 px-6 py-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+              <div className="flex items-center space-x-3 mb-4 md:mb-0">
+                <Layers className="h-8 w-8 text-white" />
+                <h2 className="text-3xl font-bold text-white font-['Poppins']">
+                  Student Domain Selections
+                </h2>
+              </div>
+              <div className="flex items-center space-x-2 text-white">
+                <span className="bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm">
+                  <span className="font-medium">Total Selections:</span>{" "}
+                  <span className="font-bold">{totalDocuments}</span>
+                </span>
+              </div>
+            </div>
+          </div>
 
-    {/* Total Students Info */}
-    <div className="mb-4 text-lg text-gray-700 font-serif">
-      <span className="text-black font-medium">Total Student Select Domain:</span>{" "}
-      {totalDocuments}
-    </div>
+          {/* Search and Export Controls */}
+          <div className="px-6 py-5 border-b border-gray-200 bg-gray-50">
+            <div className="flex flex-col md:flex-row justify-between items-stretch gap-4">
+              <div className="relative flex-grow">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Search by ID, Name, Domain, Subdomain, or Topic..."
+                  className="pl-10 p-3 w-full border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
+                  onChange={handleSearch}
+                  value={searchTerm}
+                />
+              </div>
+              <div className="flex space-x-2">
+                <button
+                  onClick={exportToPDF}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center gap-2 shadow-sm"
+                >
+                  <FileDown className="h-5 w-5" />
+                  <span>PDF</span>
+                </button>
+                <button
+                  onClick={exportToExcel}
+                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-200 flex items-center gap-2 shadow-sm"
+                >
+                  <Download className="h-5 w-5" />
+                  <span>Excel</span>
+                </button>
+              </div>
+            </div>
+          </div>
 
-    
+          {/* Records per page selector */}
+          <div className="px-6 py-3 bg-white border-b border-gray-200">
+            <div className="flex items-center">
+              <label
+                htmlFor="recordsPerPage"
+                className="text-sm font-medium text-gray-700 mr-2"
+              >
+                Show:
+              </label>
+              <select
+                id="recordsPerPage"
+                value={limit}
+                onChange={handleLimitChange}
+                className="border border-gray-300 rounded-md p-1 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              >
+                {[10, 50, 100, 500, 1000].map((value) => (
+                  <option key={value} value={value}>
+                    {value} entries
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-    {/* Search & Download Section */}
-    <div className="mb-4 flex flex-col sm:flex-row justify-between space-y-3 sm:space-y-0 sm:space-x-4">
-      <input
-        type="text"
-        placeholder="Search by ID, Name, Domain, Subdomain, or Topic"
-        className="p-3 w-full sm:w-1/2 lg:w-1/3 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        onChange={handleSearch}
-        value={searchTerm}
-      />
-
-      <div className="flex space-x-2">
-        <button
-          onClick={exportToPDF}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md"
-        >
-          Download PDF
-        </button>
-        <button
-          onClick={exportToExcel}
-          className="px-4 py-2 bg-green-500 text-white rounded-md"
-        >
-          Download Excel
-        </button>
-      </div>
-    </div>
-
-    {/* Items Per Page */}
-    <div className="mb-4 flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0">
-      <label htmlFor="limit" className="mr-2 text-gray-700">
-        Items per page:
-      </label>
-      <select
-        id="limit"
-        value={limit}
-        onChange={handleLimitChange}
-        className="border border-gray-300 rounded-md p-2 sm:p-1"
-      >
-        {[10, 50, 100, 500, 1000].map((value) => (
-          <option key={value} value={value}>
-            {value}
-          </option>
-        ))}
-      </select>
-    </div>
-
-    {/* Responsive Table */}
-    <div className="overflow-x-auto">
-      <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-lg">
-        <thead className="bg-gray-200">
-          <tr className="text-sm sm:text-base">
+          {/* Table */}
+          <div className="container mx-auto px-4">
+  <div className="overflow-x-auto xl:overflow-x-visible max-w-full">
+    <div className="w-full min-w-[1200px] xl:min-w-0">
+      <table className="min-w-full divide-y divide-gray-200">
+        <thead className="bg-gray-100">
+          <tr>
             <th
-              className="px-4 py-3 border-b text-left font-medium text-gray-700 cursor-pointer"
+              scope="col"
+              className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer"
               onClick={() => handleSort("studentId.id")}
             >
-              Student ID {sortBy === "studentId.id" && (order === "asc" ? "↑" : "↓")}
+              <div className="flex items-center">
+                Student ID
+                {sortBy === "studentId.id" && (
+                  <span className="ml-1">{order === "asc" ? "↑" : "↓"}</span>
+                )}
+              </div>
             </th>
-            <th className="px-4 py-3 border-b text-left font-medium text-gray-700">
+            <th
+              scope="col"
+              className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+            >
+              Photo
+            </th>
+            <th
+              scope="col"
+              className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+            >
               Name
             </th>
-            <th className="px-4 py-3 border-b text-left font-medium text-gray-700">
+            <th
+              scope="col"
+              className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+            >
               Domain
             </th>
-            <th className="px-4 py-3 border-b text-left font-medium text-gray-700">
+            <th
+              scope="col"
+              className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+            >
               Subdomains
             </th>
-            <th className="px-4 py-3 border-b text-left font-medium text-gray-700">
+            <th
+              scope="col"
+              className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+            >
               Topics
             </th>
           </tr>
         </thead>
-        <tbody>
-        {error && <td colSpan="6" className="text-red-600 py-4 text-center">{error}</td>}
-          {loading ? (
+        <tbody className="bg-white divide-y divide-gray-200">
+          {error && (
             <tr>
-              <td colSpan="6" className="text-center py-4 text-gray-500">
-                <div className="flex justify-center items-center h-16">
-                  <ClipLoader size={40} color="#1D4ED8" />
+              <td colSpan={5} className="px-6 py-4 text-center">
+                <div className="bg-red-50 text-red-600 p-3 rounded-lg">
+                  {error}
                 </div>
               </td>
             </tr>
+          )}
+          {loading ? (
+            <tr>
+              <td colSpan={5} className="px-6 py-10 text-center">
+                <div className="flex justify-center">
+                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600"></div>
+                </div>
+                <p className="mt-2 text-sm text-gray-500">
+                  Loading selection data...
+                </p>
+              </td>
+            </tr>
           ) : (
-            sortedSelections.map((student, index) => (
-              <tr key={index} className="text-sm sm:text-base">
-                <td className="px-4 py-3 border-b text-left text-gray-700">
-                  {highlightText(student.studentId?.id)}
+            filteredSelections.map((student, index) => (
+              <tr
+                key={index}
+                className="hover:bg-gray-50 transition-colors duration-150"
+              >
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="flex-shrink-0 h-16 w-16">
+                    <img
+                      src={
+                        student?.studentId?.profile?.avatar
+                          ? `http://localhost:3100/api/v1/user/profile/getProfilePicByAdmin/${student?.studentId?.profile?.avatar}`
+                          : defaultImage
+                      }
+                      alt="Profile"
+                      className="h-16 w-16 rounded-full object-cover border-2 border-gray-200 shadow-sm hover:border-blue-500 transition-all duration-200"
+                    />
+                  </div>
                 </td>
-                <td className="px-4 py-3 border-b text-left text-gray-700">
-                  {highlightText(student.studentId?.name)}
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm font-medium text-gray-900 font-mono bg-gray-100 px-2 py-1 rounded">
+                    {highlightText(student.studentId?.id)}
+                  </div>
                 </td>
-                <td className="px-4 py-3 border-b text-left text-gray-700">
-                  {highlightText(
-                    student.selections.map((selection) => selection.domain).join(", ")
-                  )}
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm font-medium text-gray-900 capitalize">
+                    {highlightText(student.studentId?.name)}
+                  </div>
                 </td>
-                <td className="px-4 py-3 border-b text-left text-gray-700">
-                  {highlightText(
-                    student.selections
-                      .flatMap((selection) =>
-                        selection.subdomains.map((subdomain) => subdomain.subdomain)
-                      )
-                      .join(", ")
-                  )}
+                <td className="px-6 py-4">
+                  <div className="text-sm text-gray-900">
+                    {highlightText(
+                      student.selections
+                        .map((selection) => selection.domain)
+                        .join(", ")
+                    )}
+                  </div>
                 </td>
-                <td className="px-4 py-3 border-b text-left text-gray-700">
-                  {highlightText(
-                    student.selections
-                      .flatMap((selection) =>
-                        selection.subdomains.flatMap((subdomain) => subdomain.topics)
-                      )
-                      .join(", ")
-                  )}
+                <td className="px-6 py-4">
+                  <div className="text-sm text-gray-900">
+                    {highlightText(
+                      student.selections
+                        .flatMap((selection) =>
+                          selection.subdomains.map(
+                            (subdomain) => subdomain.subdomain
+                          )
+                        )
+                        .join(", ")
+                    )}
+                  </div>
+                </td>
+                <td className="px-6 py-4">
+                  <div className="text-sm text-gray-900">
+                    {highlightText(
+                      student.selections
+                        .flatMap((selection) =>
+                          selection.subdomains.flatMap(
+                            (subdomain) => subdomain.topics
+                          )
+                        )
+                        .join(", ")
+                    )}
+                  </div>
                 </td>
               </tr>
             ))
           )}
-          
+          {!loading && filteredSelections.length === 0 && (
+            <tr>
+              <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                No matching records found
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
-    </div>
-
-    {/* Pagination */}
-    <div className="flex justify-center items-center mt-6">
-      <div className="flex space-x-2">
-        <button
-          className="px-4 py-2 bg-gray-200 rounded-md disabled:opacity-50"
-          disabled={currentPage === 1}
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-        >
-          Previous
-        </button>
-        <span className="px-4 py-2">
-          Page {currentPage} of {totalPages}
-        </span>
-        <button
-          className="px-4 py-2 bg-gray-200 rounded-md disabled:opacity-50"
-          disabled={currentPage >= totalPages}
-          onClick={() => setCurrentPage((prev) => prev + 1)}
-        >
-          Next
-        </button>
-      </div>
     </div>
   </div>
 </div>
 
+
+          
+
+          {/* Pagination */}
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-700">
+                Showing{" "}
+                <span className="font-medium">
+                  {Math.min(1 + (currentPage - 1) * limit, totalDocuments)}
+                </span>{" "}
+                to{" "}
+                <span className="font-medium">
+                  {Math.min(currentPage * limit, totalDocuments)}
+                </span>{" "}
+                of <span className="font-medium">{totalDocuments}</span> results
+              </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" />
+                  Previous
+                </button>
+                <div className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md">
+                  Page {currentPage} of {totalPages}
+                </div>
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4 ml-1" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
