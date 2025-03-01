@@ -16,7 +16,16 @@ const storage = new GridFsStorage({
   }
 });
 
-const upload = multer({ storage });
-
+// Set file size limit to 1MB (1024 * 1024 bytes)
+const upload = multer({ 
+  storage,
+  limits: { fileSize: 3 * 1024 * 1024 }, // 1MB limit
+  fileFilter: (req, file, cb) => {
+    if (file.size > 3 * 1024 * 1024) {
+      return cb(new Error("File size must be less than 3MB"), false);
+    }
+    cb(null, true);
+  }
+});
+  
 export { upload };
-

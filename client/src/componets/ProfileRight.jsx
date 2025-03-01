@@ -4,7 +4,6 @@ const ProfileRight = ({
   formData,
   handleInputChange,
   handleSubmit,
-  toggleEdit,
   isEditing,
 }) => {
   return (
@@ -42,31 +41,31 @@ const ProfileRight = ({
 
               <div className="space-y-4 sm:space-y-0 sm:space-x-6 flex flex-col sm:flex-row sm:place-content-between w-full">
                 <div className="w-full">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-gray-50 text-gray-500"
-                  readOnly
-                />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email<span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-gray-50 text-gray-500"
+                    readOnly
+                  />
                 </div>
 
-                <div className="w-full"> 
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  ID<span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="id"
-                  value={formData.id}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-gray-50 text-gray-500"
-                  readOnly
-                />
+                <div className="w-full">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    ID<span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="id"
+                    value={formData.id}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-gray-50 text-gray-500"
+                    readOnly
+                  />
                 </div>
               </div>
             </div>

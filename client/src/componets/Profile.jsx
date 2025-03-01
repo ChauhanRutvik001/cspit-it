@@ -1,122 +1,82 @@
-import React, { useState, useEffect } from "react";
-import Header from "./Header";
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 import ProfileLeft from "./ProfileLeft";
 import ProfileRight from "./ProfileRight";
-import { useSelector } from "react-redux";
 import axiosInstance from "../utils/axiosInstance";
+import { updateUser } from "../redux/userSlice";
 
 const Profile = () => {
-  const [user, setUser] = useState(null);
-  const userId = useSelector((state) => state.app.user.id);
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.app.user); // Access Redux user state
+  console.log("User data from Redux:", user);
 
+  // State for form data
   const [formData, setFormData] = useState({
-    gender: "",
-    permanentAddress: "",
-    birthDate: "",
-    counsellor: "",
-    batch: "",
-    name: "",
-    email: "",
-    mobileNo: "",
-    semester: "",
-    github: "",
-    linkedIn: "",
-    id: "",
+    avatar: user?.profile?.avatar || "",
+    gender: user?.profile?.gender || "",
+    permanentAddress: user?.profile?.permanentAddress || "",
+    birthDate: user?.profile?.birthDate ? user.profile.birthDate.slice(0, 10) : "",
+    counsellor: user?.profile?.counsellor || "",
+    batch: user?.profile?.batch || "",
+    name: user?.name || "",
+    email: user?.email || "",
+    mobileNo: user?.profile?.mobileNo || "",
+    semester: user?.profile?.semester || "",
+    github: user?.profile?.github || "",
+    linkedIn: user?.profile?.linkedIn || "",
+    id: user?.id || "",
+    role: user?.role || "",
   });
 
   const [isEditing, setIsEditing] = useState(false);
 
-  // Fetch user data
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const response = await axiosInstance.get(
-          `user/getStudentData/${userId}`
-        );
-
-        console.log(response.data);
-
-        const userData = response.data.data || {}; // Ensure response.data is at least an empty object
-        const userProfile = userData.profile || {}; // This will always be empty since it's not in the response
-
-        setUser(userData);
-
-        // Update formData with only available data
-        setFormData({
-          name: userData.name || "",
-          gender: userProfile.gender || "", // Defaults to empty since `profile` is missing
-          permanentAddress: userProfile.permanentAddress || "",
-          birthDate: userProfile.birthDate
-            ? userProfile.birthDate.slice(0, 10)
-            : "",
-          counsellor: userProfile.counsellor || "",
-          batch: userProfile.batch || "",
-          email: userData.email || "",
-          mobileNo: userProfile.mobileNo || "",
-          semester: userProfile.semester || "",
-          github: userProfile.github || "",
-          linkedIn: userProfile.linkedIn || "",
-          id: userData.id || "",
-        });
-      } catch (error) {
-        toast.error("Error fetching user data");
-        console.error("Error fetching user data:", error);
-      }
-    };
-    fetchUserData();
-  }, [userId]);
-
+  // Handle form input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({ ...prevState, [name]: value }));
   };
+
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if any required field in formData is empty
+    // Required fields validation
     const requiredFields = [
-      "gender",
-      "permanentAddress",
-      "birthDate",
-      "counsellor",
-      "batch",
-      "name",
-      "mobileNo",
-      "semester",
-      "github",
-      "linkedIn",
-      "id",
+      "gender", "permanentAddress", "birthDate", "counsellor",
+      "batch", "name", "mobileNo", "semester", "github", "linkedIn", "id"
     ];
 
     const missingFields = requiredFields.filter((field) => !formData[field]);
 
     if (missingFields.length > 0) {
-      toast.error(
-        `Please fill in the following fields: ${missingFields.join(", ")}`
-      );
+      toast.error(`Please fill in: ${missingFields.join(", ")}`);
       return;
     }
 
     try {
       const response = await axiosInstance.put("user/update", {
         ...formData,
-        userId,
+        userId: user.id,
       });
-      console.log(response.data);
 
       if (response.data.success) {
         toast.success("Profile updated successfully");
-        setUser(response.data.user);
+
+        // Update Redux store
+        dispatch(updateUser({
+          profile: { ...formData },
+          id: user.id,
+          email: user.email,
+          role: user.role,
+        }));
+
         setIsEditing(false);
       } else {
         toast.error(response.data.message || "Profile update failed");
       }
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        "Unexpected error occurred. Please try again.";
-      toast.error(errorMessage);
+      toast.error("Unexpected error occurred. Please try again.");
       console.error("Error updating profile:", error);
     }
   };
@@ -131,13 +91,8 @@ const Profile = () => {
         <section className="pt-16">
           <div className="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-6 p-4">
             <div className="md:col-span-1">
-              <ProfileLeft
-                formData={formData}
-                toggleEdit={toggleEdit}
-                isEditing={isEditing}
-              />
+              <ProfileLeft formData={formData} toggleEdit={toggleEdit} isEditing={isEditing} />
             </div>
-
             <div className="md:col-span-3">
               <ProfileRight
                 formData={formData}

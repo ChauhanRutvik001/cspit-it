@@ -55,11 +55,11 @@ const Login = () => {
           firstTimeLogin,
           firstTimeData,
           user: loggedInUser,
-          token,
           message,
         } = res.data;
-        console.log("First time login:", user);
-        console.log(id);
+
+        console.log("First time login:", firstTimeLogin);
+        console.log("User ID:", id);
 
         setIdValue(id);
 
@@ -68,19 +68,13 @@ const Login = () => {
           toast.success(
             "Welcome to your first login! Please change your password."
           );
-          return; // Do not reset the form
+          return;
         }
 
-        // if (firstTimeData) {
-        //   console.log(id);
-        //   setIsFirstTimeData(true);
-        //   toast.success("Welcome to your first login! Please enter your data.");
-        //   return; // Do not reset the form
-        // }
-
         toast.success(message || "Login successful!");
-        // localStorage.setItem("UserToken", token);
 
+        // Store user data in Redux (without password)
+        console.log("Logged in user:", loggedInUser);
         dispatch(setUser(loggedInUser));
         navigate("/browse");
       } else {
@@ -94,8 +88,7 @@ const Login = () => {
       dispatch(setLoading(false));
       setAssignLoading(false);
 
-      // Reset form only if no first-time actions are required
-      if (!isFirstTimeLogin && !isFirstTimeData) {
+      if (!isFirstTimeLogin) {
         resetForm();
       }
     }
@@ -127,7 +120,10 @@ const Login = () => {
             {isFirstTimeLogin ? (
               <PasswordChange id={idValue} />
             ) : (
-              <form onSubmit={handleLogin} className="w-full bg-white p-6 sm:p-8 rounded-lg shadow-md">
+              <form
+                onSubmit={handleLogin}
+                className="w-full bg-white p-6 sm:p-8 rounded-lg shadow-md"
+              >
                 <div className="mb-6 text-center">
                   <img
                     src="/logo2.jpg"

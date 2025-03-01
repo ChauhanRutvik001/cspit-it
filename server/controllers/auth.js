@@ -13,17 +13,15 @@ export const login = async (req, res) => {
   }
 
   try {
-    // Check if there are any users in the database
     const userCount = await User.countDocuments();
 
-    // If no users found, create the first user and assign them as admin
     if (userCount === 0) {
       const firstUser = new User({
         id,
-        name: id, // You can customize the name or take it from the request body
-        email: `${id}@charusat.edu.in`, // Customize or take email from the request
+        name: id,
+        email: `${id}@charusat.edu.in`,
         password,
-        role: "admin", // Assign first user as admin
+        role: "admin",
         firstTimeLogin: false,
         firstTimeData: false,
       });
@@ -34,10 +32,8 @@ export const login = async (req, res) => {
         .json({ message: "First user created and assigned as Admin" });
     }
 
-    // Find the user by ID
     let user = await User.findOne({ id });
 
-    // If user not found
     if (!user) {
       return res.status(401).json({
         message: "Invalid ID or Password!",
@@ -45,7 +41,6 @@ export const login = async (req, res) => {
       });
     }
 
-    // Check if the password is valid
     const isPasswordValid = await user.comparePassword(password, user.password);
 
     if (!isPasswordValid) {
@@ -55,46 +50,31 @@ export const login = async (req, res) => {
       });
     }
 
-    // If it's the user's first time login, inform the frontend to show password change form
     if (user.firstTimeLogin) {
       return res.status(200).json({
         message: "Please change your password.",
-        firstTimeLogin: true, // This will trigger the frontend to show the password change form
+        firstTimeLogin: true,
         success: true,
       });
     }
 
-    // if (user.firstTimeData) {
-    //   return res.status(200).json({
-    //     message: "Enter your data.",
-    //     firstTimeData: true, // This will trigger the frontend to show the password change form
-    //     success: true,
-    //   });
-    // }
-
-    // Create a JWT token
     const token = await createToken({ id: user._id });
-
     const oneDay = 1000 * 60 * 60 * 24;
 
-    // Set the token in a cookie and send the response
+    // Exclude password from the response
+    const { password: _, ...userData } = user.toObject();
+
     return res
       .status(200)
       .cookie("token", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production", // Only secure cookies in production
-        expires: new Date(Date.now() + oneDay), // Expire the cookie in one day
+        secure: process.env.NODE_ENV === "production",
+        expires: new Date(Date.now() + oneDay),
       })
       .json({
         message: "Welcome back!",
         firstTimeLogin: user.firstTimeLogin,
-        firstTime: user.firstTime,
-        user: {
-          _id: user._id,
-          name: user.name,
-          id: user.id,
-          role: user.role,
-        },
+        user: userData,  // Send user data without password
         success: true,
       });
   } catch (error) {
@@ -105,6 +85,7 @@ export const login = async (req, res) => {
     });
   }
 };
+
 
 export const changePassword = async (req, res) => {
   try {
@@ -220,7 +201,9 @@ export const getCurrentUser = async (req, res) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    const user = await User.findById(decoded.id);
+    
+    // Fetch user without password
+    const user = await User.findById(decoded.id).select("-password");
 
     if (!user) {
       return res.status(401).json({
@@ -231,27 +214,20 @@ export const getCurrentUser = async (req, res) => {
 
     if (user.sessionId !== decoded.sessionId) {
       return res.status(401).json({
-        message: "Already authorised",
+        message: "Already authorized",
         success: false,
       });
     }
 
     return res.status(200).json({
-      user: {
-        profile: user.profile,
-        _id: user._id,
-        username: user.username,
-        id: user.id,
-        email: user.email,
-        role: user.role,
-        branch: user.branch,
-        semester: user.semester,
-        batch: user.batch,
-      },
       success: true,
+      message: "User authenticated successfully",
+      data: {
+        user, // Directly sending the user object
+      },
     });
   } catch (error) {
-    console.log("error found");
+    console.log("Error found");
     console.error(error);
     res.status(500).json({
       message: "Internal Server Error",
@@ -259,6 +235,7 @@ export const getCurrentUser = async (req, res) => {
     });
   }
 };
+
 
 export const updateUser = async (req, res) => {
   const { id } = req.body; // Assuming `id` is a custom string, not ObjectId
@@ -281,25 +258,38 @@ export const updateUser = async (req, res) => {
     // Ensure all required fields are provided
     for (const field of allowedUpdates) {
       const key = field.replace("profile.", ""); // Normalize key
-      if (!(key in updates) || updates[key] === undefined || updates[key] === "") {
+      if (
+        !(key in updates) ||
+        updates[key] === undefined ||
+        updates[key] === ""
+      ) {
         return res.status(400).json({ message: `Field '${key}' is required.` });
       }
     }
 
     // Validate `semester` (must be between 1 and 8)
-    if (updates.semester && (isNaN(updates.semester) || updates.semester < 1 || updates.semester > 8)) {
-      return res.status(400).json({ message: "Semester must be between 1 and 8." });
+    if (
+      updates.semester &&
+      (isNaN(updates.semester) || updates.semester < 1 || updates.semester > 8)
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Semester must be between 1 and 8." });
     }
 
     // Validate `batch` (must be A1-D1 or A2-D2)
     const validBatches = ["a1", "b1", "c1", "d1", "a2", "b2", "c2", "d2"];
     if (updates.batch && !validBatches.includes(updates.batch)) {
-      return res.status(400).json({ message: "Batch must be A1 to D1 or A2 to D2." });
+      return res
+        .status(400)
+        .json({ message: "Batch must be A1 to D1 or A2 to D2." });
     }
 
     // Validate `mobileNo` (must be exactly 10 digits)
     if (updates.mobileNo && !/^\d{10}$/.test(updates.mobileNo)) {
-      return res.status(400).json({ message: "Mobile number must be exactly 10 digits." });
+      return res
+        .status(400)
+        .json({ message: "Mobile number must be exactly 10 digits." });
     }
 
     // Normalize keys by mapping flat keys to nested keys
@@ -314,7 +304,9 @@ export const updateUser = async (req, res) => {
 
     // Validate allowed updates
     const keysToUpdate = Object.keys(normalizedUpdates);
-    const isValidOperation = keysToUpdate.every((key) => allowedUpdates.includes(key));
+    const isValidOperation = keysToUpdate.every((key) =>
+      allowedUpdates.includes(key)
+    );
 
     if (!isValidOperation) {
       return res.status(400).json({ message: "Invalid updates provided." });
@@ -336,7 +328,8 @@ export const updateUser = async (req, res) => {
     });
 
     // Only set `firstTimeData` to false if any of the data has actually changed
-    user.firstTimeData = user.firstTimeData !== false ? false : user.firstTimeData;
+    user.firstTimeData =
+      user.firstTimeData !== false ? false : user.firstTimeData;
 
     await user.save();
     console.log("User updated successfully:", user);
@@ -344,10 +337,10 @@ export const updateUser = async (req, res) => {
     return res.status(200).json({
       message: "User updated successfully.",
       user: {
-          _id: user._id,
-          name: user.name,
-          id: user.id,
-          role: user.role,
+        _id: user._id,
+        name: user.name,
+        id: user.id,
+        role: user.role,
       },
       success: true,
     });
@@ -356,5 +349,3 @@ export const updateUser = async (req, res) => {
     return res.status(500).json({ message: "Server error." });
   }
 };
-
-
