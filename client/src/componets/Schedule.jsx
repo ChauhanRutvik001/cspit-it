@@ -25,6 +25,7 @@ const Schedule = () => {
     const fetchSchedules = async () => {
       try {
         const { data } = await axiosInstance.get("/schedules");
+        console.log("data" , data);
         setSchedules(data);
       } catch (error) {
         console.error("Error fetching schedules:", error);

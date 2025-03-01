@@ -7,6 +7,7 @@ class Auth {
         const response = await axiosInstance.get("auth/get-current-user");
   
         const data = response.data;
+        console.log(data)
   
         if (data.success) {
           return { data, authStatus: true };

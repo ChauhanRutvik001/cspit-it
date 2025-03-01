@@ -4,15 +4,16 @@ import {
   Github,
   Linkedin,
   Camera,
-  X,
+  Loader2,
+  Briefcase,
   Award,
   FileText,
-  Briefcase,
-  Loader2,
 } from "lucide-react";
 import axiosInstance from "../utils/axiosInstance";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { updateAvatar, removeAvatar } from "../redux/userSlice";
 
 const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
   const navigate = useNavigate();
@@ -20,6 +21,10 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
   const [imagePreview, setImagePreview] = useState(null);
   const [profilePic, setProfilePic] = useState(null);
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.app.user);
+  const avatarId = useSelector((state) => state.app?.user?.profile?.avatar);
+  console.log("Avatar ID:", avatarId);
 
   const githubURL = formData.github
     ? `https://github.com/${formData.github}`
@@ -27,6 +32,7 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
   const linkedInURL = formData.linkedIn || null;
 
   const fetchProfilePic = useCallback(async () => {
+    if (!avatarId) return;
     setLoading(true);
     try {
       const response = await axiosInstance.get("/user/profile/upload-avatar", {
@@ -39,19 +45,34 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [avatarId]);
 
   useEffect(() => {
     fetchProfilePic();
   }, [fetchProfilePic]);
 
+  // const handleFileChange = (event) => {
+  //   const file = event.target.files[0];
+  //   if (file) {
+  //     setSelectedFile(file);
+  //     setImagePreview(URL.createObjectURL(file));
+  //   }
+  // };
+
   const handleFileChange = (event) => {
     const file = event.target.files[0];
+  
     if (file) {
+      if (file.size > 3 * 1024 * 1024) { // 1MB limit
+        toast.error("File size should be less than 3MB");
+        return;
+      }
+  
       setSelectedFile(file);
       setImagePreview(URL.createObjectURL(file));
     }
   };
+  
 
   const handleUpdateProfilePic = async () => {
     if (!selectedFile) return;
@@ -68,11 +89,13 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
           headers: { "Content-Type": "multipart/form-data" },
         }
       );
+      console.log("Upload Response:", response.data);
       if (response.status === 200) {
         toast.success(response.data.message);
         setProfilePic(URL.createObjectURL(selectedFile));
         setSelectedFile(null);
         setImagePreview(null);
+        dispatch(updateAvatar(response.data.fileId)); // Update avatar in Redux
       }
     } catch (error) {
       toast.error("Error uploading image");
@@ -85,15 +108,15 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
   const handleRemoveImage = async () => {
     try {
       setLoading(true);
+      toast.success("Profile picture removed successfully");
+      setProfilePic(null);
+      setSelectedFile(null);
+      setImagePreview(null);
+      dispatch(removeAvatar()); // Remove avatar from Redux
+      setLoading(false);
       const response = await axiosInstance.delete(
         "/user/profile/remove-profile-pic"
       );
-      if (response.status === 200) {
-        toast.success("Profile picture removed successfully");
-        setProfilePic(null);
-        setSelectedFile(null);
-        setImagePreview(null);
-      }
     } catch (error) {
       toast.error("Error removing profile picture");
       console.error("Remove Error:", error);

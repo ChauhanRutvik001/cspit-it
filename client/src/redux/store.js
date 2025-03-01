@@ -1,10 +1,8 @@
-// store.js
 import { configureStore } from "@reduxjs/toolkit";
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { combineReducers } from 'redux';
 import userReducer from "./userSlice";
-
 
 // Persist configuration
 const persistConfig = {
@@ -26,7 +24,6 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        // Ignore specific actions and paths
         ignoredActions: [
           'persist/PERSIST',
           'persist/REHYDRATE',

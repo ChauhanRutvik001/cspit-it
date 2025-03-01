@@ -14,9 +14,10 @@ function App() {
     const checkAuth = async () => {
       try {
         const authStatus = await AuthService.getCurrentUser();
+        console.log(authStatus);
         setIsAuthenticated(authStatus.authStatus);
         if (authStatus.authStatus) {
-          dispatch(setUser(authStatus.data.user));
+          dispatch(setUser(authStatus.data.data.user));
           // console.log(authStatus.data.user);
           console.log("User is authenticated");
         } else {

@@ -23,6 +23,8 @@ function classNames(...classes) {
 const Header = () => {
   const authStatus = useSelector((store) => store.app.authStatus);
   const user = useSelector((store) => store.app.user);
+  const avatarId = user?.profile?.avatar;
+  console.log("User data from Redux:", avatarId);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -57,19 +59,30 @@ const Header = () => {
   };
 
   const fetchProfilePic = useCallback(async () => {
-    setLoading(true);
+    if (!avatarId) {
+      setImagePreview(null);
+      setUrl(null);
+      setLoading(false); // Ensure loading is stopped if there's no avatarId
+      return;
+    }
     try {
+      setLoading(true);
       const response = await axiosInstance.get("/user/profile/upload-avatar", {
         responseType: "blob",
       });
+
+      if (!response || !response.data) {
+        throw new Error("Invalid response from server");
+      }
+
       const imageUrl = URL.createObjectURL(response.data);
       setUrl(imageUrl);
     } catch (error) {
       console.error("Error fetching profile picture:", error);
     } finally {
-      setLoading(false);
+      setLoading(false); // Ensure loading stops even if the request fails
     }
-  }, []);
+  }, [avatarId]);
 
   useEffect(() => {
     fetchProfilePic();
@@ -134,12 +147,16 @@ const Header = () => {
                     <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-600 hover:bg-blue-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
                       <span className="sr-only">Open main menu</span>
                       {open ? (
-                        <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
+                        <XMarkIcon
+                          className="block h-6 w-6"
+                          aria-hidden="true"
+                        />
                       ) : (
-                        <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-                        
+                        <Bars3Icon
+                          className="block h-6 w-6"
+                          aria-hidden="true"
+                        />
                       )}
-                      
                     </Disclosure.Button>
                   </div>
                   <button
@@ -213,22 +230,21 @@ const Header = () => {
                   >
                     {item.name}
                   </Disclosure.Button>
-                  
                 ))}
                 {user?.role === "admin" && (
-                        <Link
-                          to="/admin"
-                          className={classNames(
-                            isActive("/admin")
-                              ? "bg-blue-200 text-blue-700"
-                              : "text-gray-600 hover:bg-blue-100 hover:text-blue-600",
-                            "block rounded-md px-3 py-2 text-base font-medium"
-                          )}
-                          aria-current={isActive("/admin") ? "page" : undefined}
-                        >
-                          Registration
-                        </Link>
-                      )}
+                  <Link
+                    to="/admin"
+                    className={classNames(
+                      isActive("/admin")
+                        ? "bg-blue-200 text-blue-700"
+                        : "text-gray-600 hover:bg-blue-100 hover:text-blue-600",
+                      "block rounded-md px-3 py-2 text-base font-medium"
+                    )}
+                    aria-current={isActive("/admin") ? "page" : undefined}
+                  >
+                    Registration
+                  </Link>
+                )}
               </div>
             </Disclosure.Panel>
           </>
