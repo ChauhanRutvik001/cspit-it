@@ -30,22 +30,15 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
   const avatarId = useSelector((state) => state.app?.user?.profile?.avatar);
   const avatarUrl = useSelector((state) => state.app?.user?.profile?.avatarUrl);
 
-  const githubURL = formData.github
-    ? `https://github.com/${formData.github}`
-    : null;
+  const githubURL = formData.github ? `https://github.com/${formData.github}` : null;
   const linkedInURL = formData.linkedIn || null;
 
-  // Clear stored blob URL on component mount (on reload)
+  // Always fetch a fresh blob URL if an avatar ID exists and no valid URL is stored.
   useEffect(() => {
-    dispatch(setAvatarBlobUrl(null));
-  }, [dispatch]);
-
-  // Always fetch a fresh blob URL if an avatar ID exists.
-  useEffect(() => {
-    if (avatarId) {
+    if (avatarId && !avatarUrl) {
       dispatch(fetchAvatarBlob());
     }
-  }, [avatarId, dispatch]);
+  }, [avatarId, avatarUrl, dispatch]);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -64,7 +57,7 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
     const data = new FormData();
     data.append("avatar", selectedFile);
     try {
-      // Clear any stored blob URL before uploading.
+      // Clear any stored blob URL before uploading
       dispatch(setAvatarBlobUrl(null));
       const response = await axiosInstance.post("/user/upload-avatar", data, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -85,13 +78,12 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
 
   const handleRemoveImage = async () => {
     try {
-      toast.success("Profile picture removed successfully");
-
       dispatch(removeAvatar());
       setSelectedFile(null);
       setImagePreview(null);
+      toast.success("Profile picture removed successfully");
       const response = await axiosInstance.delete("/user/profile/remove-profile-pic");
-            
+         
     } catch (error) {
       toast.error("Error removing profile picture");
       console.error("Remove Error:", error);
@@ -150,9 +142,7 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
           </div>
         </div>
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            {formData.id}
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{formData.id}</h2>
           <div className="flex items-center justify-center space-x-4 mb-6">
             <a
               href={githubURL}

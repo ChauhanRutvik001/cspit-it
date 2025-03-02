@@ -1,12 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import {
-  logout,
-  setUser,
-  setAvatarBlobUrl,
-  fetchAvatarBlob,
-} from "../redux/userSlice";
+import { logout, setUser, setAvatarBlobUrl, fetchAvatarBlob } from "../redux/userSlice";
 import toast from "react-hot-toast";
 import { Disclosure, Menu } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -36,12 +31,10 @@ const Header = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const loading = useSelector((state) => state.app.isLoading);
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      setImagePreview(URL.createObjectURL(file));
-    }
-  };
+  // Clear stored blob URL on mount to ensure a fresh fetch
+  useEffect(() => {
+    dispatch(setAvatarBlobUrl(null));
+  }, [dispatch]);
 
   useEffect(() => {
     if (!authStatus) {
@@ -66,10 +59,8 @@ const Header = () => {
       dispatch(setAvatarBlobUrl(null));
       return;
     }
-    if (!avatarBlobUrl) {
-      dispatch(fetchAvatarBlob());
-    }
-  }, [avatarId, avatarBlobUrl, dispatch]);
+    dispatch(fetchAvatarBlob());
+  }, [avatarId, dispatch]);
 
   useEffect(() => {
     fetchProfilePic();
@@ -134,15 +125,9 @@ const Header = () => {
                     <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray-600 hover:bg-blue-100 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500">
                       <span className="sr-only">Open main menu</span>
                       {open ? (
-                        <XMarkIcon
-                          className="block h-6 w-6"
-                          aria-hidden="true"
-                        />
+                        <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
                       ) : (
-                        <Bars3Icon
-                          className="block h-6 w-6"
-                          aria-hidden="true"
-                        />
+                        <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
                       )}
                     </Disclosure.Button>
                   </div>
@@ -162,11 +147,7 @@ const Header = () => {
                         ) : (
                           <img
                             className="h-10 w-10 rounded-full border-2 border-blue-300 shadow-md"
-                            src={
-                              imagePreview ||
-                              avatarBlobUrl ||
-                              "/default-img.png"
-                            }
+                            src={imagePreview || avatarBlobUrl || "/default-img.png"}
                             alt={user?.name || "Default Profile"}
                           />
                         )}

@@ -16,7 +16,9 @@ const Profile = () => {
     avatar: user?.profile?.avatar || "",
     gender: user?.profile?.gender || "",
     permanentAddress: user?.profile?.permanentAddress || "",
-    birthDate: user?.profile?.birthDate ? user.profile.birthDate.slice(0, 10) : "",
+    birthDate: user?.profile?.birthDate
+      ? user.profile.birthDate.slice(0, 10)
+      : "",
     counsellor: user?.profile?.counsellor || "",
     batch: user?.profile?.batch || "",
     name: user?.name || "",
@@ -43,8 +45,17 @@ const Profile = () => {
 
     // Required fields validation
     const requiredFields = [
-      "gender", "permanentAddress", "birthDate", "counsellor",
-      "batch", "name", "mobileNo", "semester", "github", "linkedIn", "id"
+      "gender",
+      "permanentAddress",
+      "birthDate",
+      "counsellor",
+      "batch",
+      "name",
+      "mobileNo",
+      "semester",
+      "github",
+      "linkedIn",
+      "id",
     ];
 
     const missingFields = requiredFields.filter((field) => !formData[field]);
@@ -64,12 +75,14 @@ const Profile = () => {
         toast.success("Profile updated successfully");
 
         // Update Redux store
-        dispatch(updateUser({
-          profile: { ...formData },
-          id: user.id,
-          email: user.email,
-          role: user.role,
-        }));
+        dispatch(
+          updateUser({
+            profile: { ...formData },
+            id: user.id,
+            email: user.email,
+            role: user.role,
+          })
+        );
 
         setIsEditing(false);
       } else {
@@ -91,7 +104,11 @@ const Profile = () => {
         <section className="pt-16">
           <div className="container mx-auto grid grid-cols-1 md:grid-cols-4 gap-6 p-4">
             <div className="md:col-span-1">
-              <ProfileLeft formData={formData} toggleEdit={toggleEdit} isEditing={isEditing} />
+              <ProfileLeft
+                formData={formData}
+                toggleEdit={toggleEdit}
+                isEditing={isEditing}
+              />
             </div>
             <div className="md:col-span-3">
               <ProfileRight
