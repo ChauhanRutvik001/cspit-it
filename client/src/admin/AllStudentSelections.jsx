@@ -304,158 +304,160 @@ const AllStudentSelections = () => {
 
           {/* Table */}
           <div className="container mx-auto px-4">
-  <div className="overflow-x-auto xl:overflow-x-visible max-w-full">
-    <div className="w-full min-w-[1200px] xl:min-w-0">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-100">
-          <tr>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer"
-              onClick={() => handleSort("studentId.id")}
-            >
-              <div className="flex items-center">
-                Student ID
-                {sortBy === "studentId.id" && (
-                  <span className="ml-1">{order === "asc" ? "↑" : "↓"}</span>
-                )}
+            <div className="overflow-x-auto xl:overflow-x-visible max-w-full">
+              <div className="w-full min-w-[1200px] xl:min-w-0">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer"
+                        onClick={() => handleSort("studentId.id")}
+                      >
+                        <div className="flex items-center">
+                          Student ID
+                          {sortBy === "studentId.id" && (
+                            <span className="ml-1">
+                              {order === "asc" ? "↑" : "↓"}
+                            </span>
+                          )}
+                        </div>
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                      >
+                        Photo
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                      >
+                        Name
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                      >
+                        Domain
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                      >
+                        Subdomains
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                      >
+                        Topics
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {error && (
+                      <tr>
+                        <td colSpan={5} className="px-6 py-4 text-center">
+                          <div className="bg-red-50 text-red-600 p-3 rounded-lg">
+                            {error}
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                    {loading ? (
+                      <tr>
+                        <td colSpan={5} className="px-6 py-10 text-center">
+                          <div className="flex justify-center">
+                            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600"></div>
+                          </div>
+                          <p className="mt-2 text-sm text-gray-500">
+                            Loading selection data...
+                          </p>
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredSelections.map((student, index) => (
+                        <tr
+                          key={index}
+                          className="hover:bg-gray-50 transition-colors duration-150"
+                        >
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex-shrink-0 h-16 w-16">
+                              <img
+                                src={
+                                  student?.studentId?.profile?.avatar
+                                    ? `http://localhost:3100/api/v1/user/profile/getProfilePicByAdmin/${student?.studentId?.profile?.avatar}`
+                                    : defaultImage
+                                }
+                                alt="Profile"
+                                className="h-16 w-16 rounded-full object-cover border-2 border-gray-200 shadow-sm hover:border-blue-500 transition-all duration-200"
+                              />
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-gray-900 font-mono bg-gray-100 px-2 py-1 rounded">
+                              {highlightText(student.studentId?.id)}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-gray-900 capitalize">
+                              {highlightText(student.studentId?.name)}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-gray-900">
+                              {highlightText(
+                                student.selections
+                                  .map((selection) => selection.domain)
+                                  .join(", ")
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-gray-900">
+                              {highlightText(
+                                student.selections
+                                  .flatMap((selection) =>
+                                    selection.subdomains.map(
+                                      (subdomain) => subdomain.subdomain
+                                    )
+                                  )
+                                  .join(", ")
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-gray-900">
+                              {highlightText(
+                                student.selections
+                                  .flatMap((selection) =>
+                                    selection.subdomains.flatMap(
+                                      (subdomain) => subdomain.topics
+                                    )
+                                  )
+                                  .join(", ")
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                    {!loading && filteredSelections.length === 0 && (
+                      <tr>
+                        <td
+                          colSpan={5}
+                          className="px-6 py-4 text-center text-gray-500"
+                        >
+                          No matching records found
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
-            >
-              Photo
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
-            >
-              Name
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
-            >
-              Domain
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
-            >
-              Subdomains
-            </th>
-            <th
-              scope="col"
-              className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
-            >
-              Topics
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {error && (
-            <tr>
-              <td colSpan={5} className="px-6 py-4 text-center">
-                <div className="bg-red-50 text-red-600 p-3 rounded-lg">
-                  {error}
-                </div>
-              </td>
-            </tr>
-          )}
-          {loading ? (
-            <tr>
-              <td colSpan={5} className="px-6 py-10 text-center">
-                <div className="flex justify-center">
-                  <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600"></div>
-                </div>
-                <p className="mt-2 text-sm text-gray-500">
-                  Loading selection data...
-                </p>
-              </td>
-            </tr>
-          ) : (
-            filteredSelections.map((student, index) => (
-              <tr
-                key={index}
-                className="hover:bg-gray-50 transition-colors duration-150"
-              >
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex-shrink-0 h-16 w-16">
-                    <img
-                      src={
-                        student?.studentId?.profile?.avatar
-                          ? `http://localhost:3100/api/v1/user/profile/getProfilePicByAdmin/${student?.studentId?.profile?.avatar}`
-                          : defaultImage
-                      }
-                      alt="Profile"
-                      className="h-16 w-16 rounded-full object-cover border-2 border-gray-200 shadow-sm hover:border-blue-500 transition-all duration-200"
-                    />
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900 font-mono bg-gray-100 px-2 py-1 rounded">
-                    {highlightText(student.studentId?.id)}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900 capitalize">
-                    {highlightText(student.studentId?.name)}
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="text-sm text-gray-900">
-                    {highlightText(
-                      student.selections
-                        .map((selection) => selection.domain)
-                        .join(", ")
-                    )}
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="text-sm text-gray-900">
-                    {highlightText(
-                      student.selections
-                        .flatMap((selection) =>
-                          selection.subdomains.map(
-                            (subdomain) => subdomain.subdomain
-                          )
-                        )
-                        .join(", ")
-                    )}
-                  </div>
-                </td>
-                <td className="px-6 py-4">
-                  <div className="text-sm text-gray-900">
-                    {highlightText(
-                      student.selections
-                        .flatMap((selection) =>
-                          selection.subdomains.flatMap(
-                            (subdomain) => subdomain.topics
-                          )
-                        )
-                        .join(", ")
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))
-          )}
-          {!loading && filteredSelections.length === 0 && (
-            <tr>
-              <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
-                No matching records found
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-
-          
+            </div>
+          </div>
 
           {/* Pagination */}
           <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">

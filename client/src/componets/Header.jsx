@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { logout, setUser } from "../redux/userSlice";
+import {
+  logout,
+  setUser,
+  setAvatarBlobUrl,
+  fetchAvatarBlob,
+} from "../redux/userSlice";
 import toast from "react-hot-toast";
 import { Disclosure, Menu } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -24,13 +29,12 @@ const Header = () => {
   const authStatus = useSelector((store) => store.app.authStatus);
   const user = useSelector((store) => store.app.user);
   const avatarId = user?.profile?.avatar;
-  console.log("User data from Redux:", avatarId);
+  const avatarBlobUrl = user?.profile?.avatarUrl;
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const [url, setUrl] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [imagePreview, setImagePreview] = useState(null);
+  const loading = useSelector((state) => state.app.isLoading);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -49,7 +53,6 @@ const Header = () => {
     try {
       await axiosInstance.get("/auth/logout");
       dispatch(setUser(null));
-      // localStorage.removeItem("authToken");
       dispatch(logout());
       toast.success("Logged out successfully");
       navigate("/");
@@ -58,31 +61,15 @@ const Header = () => {
     }
   };
 
-  const fetchProfilePic = useCallback(async () => {
+  const fetchProfilePic = useCallback(() => {
     if (!avatarId) {
-      setImagePreview(null);
-      setUrl(null);
-      setLoading(false); // Ensure loading is stopped if there's no avatarId
+      dispatch(setAvatarBlobUrl(null));
       return;
     }
-    try {
-      setLoading(true);
-      const response = await axiosInstance.get("/user/profile/upload-avatar", {
-        responseType: "blob",
-      });
-
-      if (!response || !response.data) {
-        throw new Error("Invalid response from server");
-      }
-
-      const imageUrl = URL.createObjectURL(response.data);
-      setUrl(imageUrl);
-    } catch (error) {
-      console.error("Error fetching profile picture:", error);
-    } finally {
-      setLoading(false); // Ensure loading stops even if the request fails
+    if (!avatarBlobUrl) {
+      dispatch(fetchAvatarBlob());
     }
-  }, [avatarId]);
+  }, [avatarId, avatarBlobUrl, dispatch]);
 
   useEffect(() => {
     fetchProfilePic();
@@ -175,7 +162,11 @@ const Header = () => {
                         ) : (
                           <img
                             className="h-10 w-10 rounded-full border-2 border-blue-300 shadow-md"
-                            src={imagePreview || url || "/default-img.png"}
+                            src={
+                              imagePreview ||
+                              avatarBlobUrl ||
+                              "/default-img.png"
+                            }
                             alt={user?.name || "Default Profile"}
                           />
                         )}
@@ -188,7 +179,7 @@ const Header = () => {
                             to="/profile"
                             className={classNames(
                               active ? "bg-gray-100" : "",
-                              "block px-4 py-2 text-sm text-gray-700  hover:bg-blue-100 hover:text-blue-600"
+                              "block px-4 py-2 text-sm text-gray-700 hover:bg-blue-100 hover:text-blue-600"
                             )}
                           >
                             Your Profile
@@ -253,4 +244,5 @@ const Header = () => {
     </header>
   );
 };
+
 export default Header;
