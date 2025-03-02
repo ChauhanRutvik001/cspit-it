@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   User,
   Github,
@@ -13,121 +13,93 @@ import axiosInstance from "../utils/axiosInstance";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { updateAvatar, removeAvatar } from "../redux/userSlice";
+import {
+  updateAvatar,
+  removeAvatar,
+  setAvatarBlobUrl,
+  fetchAvatarBlob,
+} from "../redux/userSlice";
 
 const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [selectedFile, setSelectedFile] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
-  const [profilePic, setProfilePic] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const dispatch = useDispatch();
-  const user = useSelector((state) => state.app.user);
+
+  const loading = useSelector((state) => state.app.isLoading);
   const avatarId = useSelector((state) => state.app?.user?.profile?.avatar);
-  console.log("Avatar ID:", avatarId);
+  const avatarUrl = useSelector((state) => state.app?.user?.profile?.avatarUrl);
 
   const githubURL = formData.github
     ? `https://github.com/${formData.github}`
     : null;
   const linkedInURL = formData.linkedIn || null;
 
-  const fetchProfilePic = useCallback(async () => {
-    if (!avatarId) return;
-    setLoading(true);
-    try {
-      const response = await axiosInstance.get("/user/profile/upload-avatar", {
-        responseType: "blob",
-      });
-      const imageUrl = URL.createObjectURL(response.data);
-      setProfilePic(imageUrl);
-    } catch (error) {
-      console.error("Error fetching profile picture:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [avatarId]);
-
+  // Clear stored blob URL on component mount (on reload)
   useEffect(() => {
-    fetchProfilePic();
-  }, [fetchProfilePic]);
+    dispatch(setAvatarBlobUrl(null));
+  }, [dispatch]);
 
-  // const handleFileChange = (event) => {
-  //   const file = event.target.files[0];
-  //   if (file) {
-  //     setSelectedFile(file);
-  //     setImagePreview(URL.createObjectURL(file));
-  //   }
-  // };
+  // Always fetch a fresh blob URL if an avatar ID exists.
+  useEffect(() => {
+    if (avatarId) {
+      dispatch(fetchAvatarBlob());
+    }
+  }, [avatarId, dispatch]);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-  
     if (file) {
-      if (file.size > 3 * 1024 * 1024) { // 1MB limit
+      if (file.size > 3 * 1024 * 1024) {
         toast.error("File size should be less than 3MB");
         return;
       }
-  
       setSelectedFile(file);
       setImagePreview(URL.createObjectURL(file));
     }
   };
-  
 
   const handleUpdateProfilePic = async () => {
     if (!selectedFile) return;
-
-    const formData = new FormData();
-    formData.append("avatar", selectedFile);
-
+    const data = new FormData();
+    data.append("avatar", selectedFile);
     try {
-      setLoading(true);
-      const response = await axiosInstance.post(
-        "/user/upload-avatar",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
-      console.log("Upload Response:", response.data);
+      // Clear any stored blob URL before uploading.
+      dispatch(setAvatarBlobUrl(null));
+      const response = await axiosInstance.post("/user/upload-avatar", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       if (response.status === 200) {
         toast.success(response.data.message);
-        setProfilePic(URL.createObjectURL(selectedFile));
+        const newBlobUrl = URL.createObjectURL(selectedFile);
+        dispatch(updateAvatar(response.data.fileId));
+        dispatch(setAvatarBlobUrl(newBlobUrl));
         setSelectedFile(null);
         setImagePreview(null);
-        dispatch(updateAvatar(response.data.fileId)); // Update avatar in Redux
       }
     } catch (error) {
       toast.error("Error uploading image");
       console.error("Upload Error:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
   const handleRemoveImage = async () => {
     try {
-      setLoading(true);
       toast.success("Profile picture removed successfully");
-      setProfilePic(null);
+
+      dispatch(removeAvatar());
       setSelectedFile(null);
       setImagePreview(null);
-      dispatch(removeAvatar()); // Remove avatar from Redux
-      setLoading(false);
-      const response = await axiosInstance.delete(
-        "/user/profile/remove-profile-pic"
-      );
+      const response = await axiosInstance.delete("/user/profile/remove-profile-pic");
+            
     } catch (error) {
       toast.error("Error removing profile picture");
       console.error("Remove Error:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
     <div className="bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col items-center sticky top-20 text-black">
-      {/* Header/Banner */}
       <div className="h-32 w-full bg-gradient-to-r from-blue-500 to-purple-600">
         {isEditing && (
           <>
@@ -138,9 +110,8 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
               className="hidden"
               onChange={handleFileChange}
             />
-
             <label
-              onClick={() => document.getElementById("fileInput").click()}
+              htmlFor="fileInput"
               className="absolute right-4 top-4 p-3 bg-white rounded-full text-blue-500 cursor-pointer hover:bg-gray-50 transition-colors shadow-lg"
             >
               <Camera size={24} />
@@ -148,9 +119,7 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
           </>
         )}
       </div>
-
       <div className="px-6 pb-8">
-        {/* Profile Picture */}
         <div className="relative -mt-16 mb-6 flex justify-center">
           <div className="relative">
             {loading ? (
@@ -159,9 +128,15 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
               </div>
             ) : (
               <div className="relative">
-                {profilePic || selectedFile ? (
+                {selectedFile ? (
                   <img
-                    src={selectedFile ? imagePreview : profilePic}
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
+                  />
+                ) : avatarUrl ? (
+                  <img
+                    src={avatarUrl}
                     alt="Profile"
                     className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover"
                   />
@@ -174,14 +149,10 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
             )}
           </div>
         </div>
-
-        {/* User Info */}
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             {formData.id}
           </h2>
-
-          {/* Social Links */}
           <div className="flex items-center justify-center space-x-4 mb-6">
             <a
               href={githubURL}
@@ -208,8 +179,6 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
               <Linkedin size={24} />
             </a>
           </div>
-
-          {/* Edit Button */}
           <button
             onClick={toggleEdit}
             className={`w-full px-4 py-2 rounded-lg transition-all ${
@@ -220,8 +189,6 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
           >
             {isEditing ? "Cancel Edit" : "Edit Profile"}
           </button>
-
-          {/* Quick Actions */}
           <div className="grid grid-cols-1 gap-3 mt-6">
             <button
               onClick={() => navigate("/StudentSelectionPage")}
@@ -245,8 +212,6 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
               <span className="font-medium">Resume</span>
             </button>
           </div>
-
-          {/* Edit Mode Actions */}
           {isEditing && (
             <div className="mt-6 space-y-3">
               <input
@@ -256,7 +221,6 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
                 className="hidden"
                 onChange={handleFileChange}
               />
-
               {selectedFile && (
                 <button
                   onClick={handleUpdateProfilePic}
@@ -265,8 +229,7 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
                   Upload Profile Picture
                 </button>
               )}
-
-              {profilePic && !selectedFile && (
+              {avatarUrl && !selectedFile && (
                 <button
                   onClick={handleRemoveImage}
                   className="w-full bg-red-500 text-white rounded-lg px-4 py-2 hover:bg-red-600 transition-colors"
