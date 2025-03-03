@@ -43,3 +43,17 @@ export const isAdmin = (req, res, next) => {
     .status(403)
     .json({ error: "You are not allowed to access this route" });
 };
+
+export const isCounsellor = (req, res, next) => {
+  // console.log("Checking counsellor access for user:", req.user);
+
+  if (req.user && req.user.role === "counsellor") {
+    console.log("User is counsellor. Access granted.");
+    return next();
+  }
+
+  // console.log("User is not counsellor. Access denied.");
+  return res
+    .status(403)
+    .json({ error: "You are not allowed to access this route" });
+};

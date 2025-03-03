@@ -20,6 +20,9 @@ import Certificate from "./Certificate";
 import StudentCertificate from "../admin/StudentCertificate";
 import ResumeViewer from "./ResumeViewer";
 import StudentResume from "../admin/StudentResume";
+import CounsellorRegistation from "../admin/CounsellorRegistation";
+import CounsellorPage from "../counsellor/CounsellorPage";
+
 
 const Body = () => {
   const appRouter = createBrowserRouter([
@@ -41,6 +44,9 @@ const Body = () => {
     { path: "/resume", element: <Layout><ResumeViewer /></Layout> },
     { path: "/adminCertificate/:id", element: <Layout><StudentCertificate /></Layout> },
     { path: "/adminResume/:id", element: <Layout><StudentResume/></Layout> },
+    { path: "/registationCounsellor", element: <Layout><CounsellorRegistation/></Layout> },
+    { path: "/counsellor", element: <Layout><CounsellorPage/></Layout> },
+  
   ]);
 
   return (

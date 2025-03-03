@@ -108,6 +108,7 @@ const Profile = () => {
                 formData={formData}
                 toggleEdit={toggleEdit}
                 isEditing={isEditing}
+                
               />
             </div>
             <div className="md:col-span-3">
@@ -118,6 +119,7 @@ const Profile = () => {
                 user={user}
                 toggleEdit={toggleEdit}
                 isEditing={isEditing}
+                setIsEditing={setIsEditing}
               />
             </div>
           </div>

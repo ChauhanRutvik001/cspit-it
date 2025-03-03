@@ -23,6 +23,8 @@ function classNames(...classes) {
 const Header = () => {
   const authStatus = useSelector((store) => store.app.authStatus);
   const user = useSelector((store) => store.app.user);
+  console.log(user);
+  console.log("user:", user?.role);
   const avatarId = user?.profile?.avatar;
   const avatarBlobUrl = user?.profile?.avatarUrl;
   const dispatch = useDispatch();
@@ -103,7 +105,7 @@ const Header = () => {
                           {item.name}
                         </Link>
                       ))}
-                      {user?.role === "admin" && (
+                      {user?.role === "admin"  && (
                         <Link
                           to="/admin"
                           className={classNames(
@@ -113,6 +115,20 @@ const Header = () => {
                             "rounded-md px-3 py-2 text-sm font-medium"
                           )}
                           aria-current={isActive("/admin") ? "page" : undefined}
+                        >
+                          Registration
+                        </Link>
+                      )}
+                      {user?.role === "counsellor"  && (
+                        <Link
+                          to="/counsellor"
+                          className={classNames(
+                            isActive("/counsellor")
+                              ? "bg-blue-200 text-blue-700"
+                              : "text-gray-600 hover:bg-blue-100 hover:text-blue-600",
+                            "rounded-md px-3 py-2 text-sm font-medium"
+                          )}
+                          aria-current={isActive("/counsellor") ? "page" : undefined}
                         >
                           Registration
                         </Link>
@@ -206,6 +222,20 @@ const Header = () => {
                 {user?.role === "admin" && (
                   <Link
                     to="/admin"
+                    className={classNames(
+                      isActive("/admin")
+                        ? "bg-blue-200 text-blue-700"
+                        : "text-gray-600 hover:bg-blue-100 hover:text-blue-600",
+                      "block rounded-md px-3 py-2 text-base font-medium"
+                    )}
+                    aria-current={isActive("/admin") ? "page" : undefined}
+                  >
+                    Registration
+                  </Link>
+                )}
+                {user?.role === "counsellor" && (
+                  <Link
+                    to="/counsellor"
                     className={classNames(
                       isActive("/admin")
                         ? "bg-blue-200 text-blue-700"

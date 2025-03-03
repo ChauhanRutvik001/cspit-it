@@ -7,8 +7,10 @@ import {
   updateUser,
   getAllStudents,
   getProfilePicByAdmin,
+  getProfileCounsellor,
+  getCounsellorStudents
 } from "../controllers/user.js";
-import { isAdmin, isAuthorized } from "../middlewares/auth.js";
+import { isAdmin, isAuthorized, isCounsellor } from "../middlewares/auth.js";
 
 import { upload } from "../utils/multer.utils.js";
 
@@ -24,9 +26,13 @@ router.get("/profile/upload-avatar", isAuthorized, getProfilePic); //ProfileLeft
 
 router.delete("/profile/remove-profile-pic", isAuthorized, removeProfilePic); //ProfileLeft.jsx
 
-router.get("/profile/getAllstudent", isAuthorized, isAdmin, getAllStudents); //StudentData.jsx
+router.get("/profile/getAllstudent", isAuthorized, isAdmin, getAllStudents); //StudentData.jsx for admin
+
+router.get("/profile/getCounsellorStudents", isAuthorized,isCounsellor, getCounsellorStudents); //StudentData.jsx for counseller
 
 router.get("/profile/getProfilePicByAdmin/:id",isAuthorized,getProfilePicByAdmin); //StudentData.jsx
+
+router.get("/profile/counsellor",isAuthorized,getProfileCounsellor); //ProfileLeft.jsx
 
 
 export default router;

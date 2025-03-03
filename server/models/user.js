@@ -69,7 +69,8 @@ const userSchema = new Schema(
         match: [/^\d{10}$/, "Mobile Number must be a valid 10-digit number"],
       },
       counsellor: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User", // Assuming counsellor is also stored in the User collection
       },
       batch: {
         type: String,
@@ -96,15 +97,15 @@ const userSchema = new Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Certificate",
-      }
+      },
     ],
 
-    resume:[
+    resume: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Resume",
-      }
-    ]
+      },
+    ],
   },
   { timestamps: true }
 );
@@ -127,5 +128,25 @@ userSchema.pre("save", async function (next) {
 userSchema.methods.comparePassword = async function (password, DBpassword) {
   return await bcrypt.compare(password, DBpassword);
 };
+
+// Middleware to restrict counsellor changes after initial set
+userSchema.pre("save", function (next) {
+  if (!this.profile) {
+    this.profile = {}; // Ensure profile exists
+  }
+
+  console.log("isModified:", this.isModified("profile.counsellor"));
+  console.log("isNew:", this.isNew);
+
+  if (this.isModified("profile.counsellor") && this.isNew) {
+    return next(
+      new Error(
+        "Counsellor can only be changed by admin after the initial selection"
+      )
+    );
+  }
+
+  next();
+});
 
 export default mongoose.model("User", userSchema);

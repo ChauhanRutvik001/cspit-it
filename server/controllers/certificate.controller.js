@@ -1,18 +1,36 @@
 import mongoose from "mongoose";
 import Certificate from "../models/certificateSchema.js";
+import PendingRequest from "../models/pendingRequestSchema.js";
 import { GridFSBucket } from "mongodb";
 import User from "../models/user.js";
 
+// Delete declined certificates after 20 seconds
+const DECLINE_EXPIRATION_SECONDS = 1;
+
 export const uploadCertificate = async (req, res) => {
   try {
-    console.log("Certificate upload API hit");
     const userId = req.user.id;
     const file = req.file;
+    console.log("Certificate upload API hit by user:", userId);
 
     if (!userId || !file) {
       return res
         .status(400)
         .json({ error: "User ID and image file are required" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Check if user has a counsellor assigned
+    if (!user.profile || !user.profile.counsellor) {
+      return res.status(403).json({
+        error:
+          "You must have a counsellor assigned before uploading certificates",
+        status: "COUNSELLOR_REQUIRED",
+      });
     }
 
     // Check if file type is an image
@@ -38,59 +56,255 @@ export const uploadCertificate = async (req, res) => {
 
     await newCertificate.save();
 
+    // Create a pending request
+    const pendingRequest = new PendingRequest({
+      certificateId: newCertificate._id,
+      studentId: userId,
+      counsellorId: user.profile.counsellor,
+    });
 
-    await User.findByIdAndUpdate(
-      userId,
-      { $push: { certificates: newCertificate._id } },
-      { new: true }
-    );
+    await pendingRequest.save();
+
+    // Update the user's certificates array
+    await User.findByIdAndUpdate(userId, {
+      $push: { certificates: newCertificate._id },
+    });
 
     res.status(201).json({
-      message: "Image uploaded successfully",
+      message:
+        "Certificate uploaded successfully and pending counsellor's approval",
       certificate: newCertificate,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Certificate upload error:", error);
+    res
+      .status(500)
+      .json({ error: "Failed to upload certificate. Please try again." });
   }
 };
 
-export const getCertificate = async (req, res) => {
+export const updateCertificate = async (req, res) => {
+  try {
+    const { certificateId } = req.params;
+    const file = req.file;
+
+    if (!mongoose.Types.ObjectId.isValid(certificateId) || !file) {
+      return res
+        .status(400)
+        .json({ error: "Invalid certificate ID or missing file" });
+    }
+
+    const certificate = await Certificate.findById(certificateId);
+    if (!certificate) {
+      return res.status(404).json({ error: "Certificate not found" });
+    }
+
+    // Check if file type is an image
+    const allowedMimeTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+    ];
+    if (!allowedMimeTypes.includes(file.mimetype)) {
+      return res
+        .status(400)
+        .json({ error: "Only image files (JPEG, PNG, GIF, WEBP) are allowed" });
+    }
+
+    // Delete the old file from the storage
+    const bucket = new GridFSBucket(mongoose.connection.db, {
+      bucketName: "certificates",
+    });
+    await bucket.delete(new mongoose.Types.ObjectId(certificate.fileId));
+
+    // Update certificate details
+    certificate.filename = file.filename;
+    certificate.fileId = new mongoose.Types.ObjectId(file.id);
+    certificate.fileType = file.mimetype;
+    certificate.description = req.body.description || certificate.description;
+
+    await certificate.save();
+
+    res.status(200).json({
+      message: "Certificate updated successfully",
+      certificate,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Error updating certificate" });
+  }
+};
+
+export const deleteCertificate = async (req, res) => {
+  try {
+    const { certificateId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(certificateId)) {
+      return res.status(400).json({ error: "Invalid certificate ID" });
+    }
+
+    const certificate = await Certificate.findById(certificateId);
+    if (!certificate) {
+      return res.status(404).json({ error: "Certificate not found" });
+    }
+
+    const userId = certificate.uploadedBy;
+
+    const bucket = new GridFSBucket(mongoose.connection.db, {
+      bucketName: "certificates",
+    });
+    await bucket.delete(new mongoose.Types.ObjectId(certificate.fileId));
+    await Certificate.findByIdAndDelete(certificateId);
+    await PendingRequest.findOneAndDelete({ certificateId });
+
+    await User.findByIdAndUpdate(
+      userId,
+      { $pull: { certificates: certificateId } },
+      { new: true }
+    );
+
+    res.status(200).json({ message: "Certificate deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Error deleting certificate" });
+  }
+};
+
+export const approveCertificate = async (req, res) => {
+  try {
+    const { requestId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(requestId)) {
+      return res.status(400).json({ error: "Invalid request ID" });
+    }
+
+    const request = await PendingRequest.findById(requestId);
+    if (!request) {
+      return res.status(404).json({ error: "Request not found" });
+    }
+
+    request.status = "approved";
+    await request.save();
+
+    // Move the certificate to the student's profile
+    await User.findByIdAndUpdate(
+      request.studentId,
+      { $push: { certificates: request.certificateId } },
+      { new: true }
+    );
+
+    res.status(200).json({ message: "Certificate approved" });
+  } catch (error) {
+    res.status(500).json({ error: "Error approving certificate" });
+  }
+};
+
+export const declineCertificate = async (req, res) => {
+  try {
+    const { requestId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(requestId)) {
+      return res.status(400).json({ error: "Invalid request ID" });
+    }
+
+    const request = await PendingRequest.findById(requestId);
+    if (!request) {
+      return res.status(404).json({ error: "Request not found" });
+    }
+
+    request.status = "declined";
+    await request.save();
+
+    // Schedule deletion of the certificate after 20 seconds
+    setTimeout(async () => {
+      const certificate = await Certificate.findById(request.certificateId);
+      if (certificate) {
+        const userId = certificate.uploadedBy;
+
+        const bucket = new GridFSBucket(mongoose.connection.db, {
+          bucketName: "certificates",
+        });
+        await bucket.delete(new mongoose.Types.ObjectId(certificate.fileId));
+        await Certificate.findByIdAndDelete(request.certificateId);
+        await PendingRequest.findByIdAndDelete(requestId);
+        await User.findByIdAndUpdate(
+          userId,
+          { $pull: { certificates: request.certificateId } },
+          { new: true }
+        );
+      }
+    }, DECLINE_EXPIRATION_SECONDS * 1000);
+
+    res.status(200).json({
+      message: "Certificate declined and will be deleted after 20 seconds",
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Error declining certificate" });
+  }
+};
+
+export const getCertificates = async (req, res) => {
   try {
     const userId = req.user.id;
-    console.log("user-->" + userId);
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({ error: "Invalid user ID" });
-    }
+    const pendingRequests = await PendingRequest.find({
+      studentId: userId,
+    }).populate("certificateId");
 
     const certificates = await Certificate.find({ uploadedBy: userId });
 
-    if (!certificates.length) {
-      return res.status(404).json({ error: "No certificates found" });
-    }
-
-    res.status(200).json(certificates);
+    res.status(200).json(
+      certificates.map((cert) => ({
+        ...cert.toObject(),
+        status:
+          pendingRequests.find((req) => req.certificateId.equals(cert._id))
+            ?.status || "approved",
+      }))
+    );
   } catch (error) {
     res.status(500).json({ error: "Failed to retrieve certificates" });
   }
 };
 
-export const getUserCertificate = async (req, res) => {
+export const getPendingRequests = async (req, res) => {
   try {
-    const userId = req.params.id;
-    console.log("user-->" + userId);
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({ error: "Invalid user ID" });
-    }
+    const { page = 1, limit = 10 } = req.query;
+    const counsellorId = req.user.id;
+    console.log("Counsellor ID:", counsellorId);
 
-    const certificates = await Certificate.find({ uploadedBy: userId });
+    const pendingRequests = await PendingRequest.find({
+      counsellorId,
+      status: "pending",
+    })
+      .populate("studentId certificateId")
+      .skip((page - 1) * limit)
+      .limit(parseInt(limit));
 
-    if (!certificates.length) {
-      return res.status(404).json({ error: "No certificates found" });
-    }
+    const total = await PendingRequest.countDocuments({
+      counsellorId,
+      status: "pending",
+    });
 
-    res.status(200).json(certificates);
+    const students = await Promise.all(
+      pendingRequests.map(async (request) => {
+        const student = await User.findById(request.studentId);
+        const certificates = await Certificate.find({
+          _id: request.certificateId,
+        });
+
+        return {
+          _id: student._id,
+          name: student.name,
+          id: student.id,
+          certificates,
+          pendingRequests: [request],
+        };
+      })
+    );
+
+    res.json({ students, total });
   } catch (error) {
-    res.status(500).json({ error: "Failed to retrieve certificates" });
+    res
+      .status(500)
+      .json({ error: "Failed to fetch students with pending requests" });
   }
 };
 
@@ -115,40 +329,5 @@ export const getCertificateFile = async (req, res) => {
     stream.pipe(res);
   } catch (error) {
     res.status(500).json({ error: "Error retrieving file" });
-  }
-};
-
-export const deleteCertificate = async (req, res) => {
-  try {
-    const { certificateId } = req.params;
-    console.log("Certificate ID:", certificateId);
-
-    if (!mongoose.Types.ObjectId.isValid(certificateId)) {
-      return res.status(400).json({ error: "Invalid certificate ID" });
-    }
-
-    const certificate = await Certificate.findById(certificateId);
-    console.log(certificate);
-    const userId = certificate.uploadedBy;
-    if (!certificate) {
-      return res.status(404).json({ error: "Certificate not found" });
-    }
-
-    const bucket = new GridFSBucket(mongoose.connection.db, {
-      bucketName: "certificates",
-    });
-
-    await bucket.delete(new mongoose.Types.ObjectId(certificate.fileId));
-    await Certificate.findByIdAndDelete(certificateId);
-
-    await User.findByIdAndUpdate(
-      userId,
-      { $pull: { certificates: certificateId } },
-      { new: true }
-    );
-
-    res.status(200).json({ message: "Certificate deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ error: "Error deleting certificate" });
   }
 };

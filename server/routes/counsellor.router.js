@@ -11,14 +11,14 @@ router
 router
   .route("/get-students-by-admin")
   .post(isAuthorized, isAdmin, adminController.getStudents); //AdminPage.jsx
-  router
+router
   .route("/remove-user/:userId")
   .delete(isAuthorized, isAdmin, adminController.removeUser); //AdminPage.jsx
-  router
+router
   .route("/bulk-register-counsellor")
   .post(isAuthorized, isAdmin, adminController.BulkRequestsCounsellor); //StudentRegistration.jsx
-  router
-    .route("/get-counsellor-by-admin")
-    .post(isAuthorized, isAdmin, adminController.getCounsellor); //AdminPage.jsx
+router
+  .route("/get-faculty-by-admin")
+  .post(isAuthorized, isAdmin, adminController.BulkRequestsCounsellor); //StudentRegistration.jsx
 
 export default router;
