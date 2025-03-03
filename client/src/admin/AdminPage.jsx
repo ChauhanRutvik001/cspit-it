@@ -18,17 +18,18 @@ const AdminPage = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userId, setuserId] = useState(null);
+  const [isStudent, setIsStudent] = useState(true); // New state to track student or counsellor
 
-  const fetchStudents = async (page) => {
+  const fetchData = async (page) => {
     try {
       setLoading(true);
-      const response = await axiosInstance.post(
-        "/admin/get-students-by-admin",
-        {
-          page,
-          limit: studentsPerPage,
-        }
-      );
+      const endpoint = isStudent
+        ? "/admin/get-students-by-admin"
+        : "/admin/get-counsellor-by-admin";
+      const response = await axiosInstance.post(endpoint, {
+        page,
+        limit: studentsPerPage,
+      });
       console.log(response.data);
 
       if (response.data.success) {
@@ -36,15 +37,17 @@ const AdminPage = () => {
         setTotalStudents(response.data.totalStudents);
         setTotalPages(response.data.totalPages);
 
-        if (response.data.students == 0) {
-          setError("No Students Found");
+        if (response.data.students.length === 0) {
+          setError("No Records Found");
         }
       } else {
-        setError(response.data.message || "Failed to fetch students.");
+        setError(response.data.message || "Failed to fetch records.");
       }
     } catch (err) {
-      setError(response.data.message || "Failed to fetch students.");
-      setError("An error occurred while fetching students.");
+      setError(
+        err.response?.data?.message ||
+          "An error occurred while fetching records."
+      );
     } finally {
       setLoading(false);
     }
@@ -55,8 +58,8 @@ const AdminPage = () => {
   }, [user, navigate]);
 
   useEffect(() => {
-    fetchStudents(currentPage);
-  }, [currentPage]);
+    fetchData(currentPage);
+  }, [currentPage, isStudent]);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
@@ -94,7 +97,7 @@ const AdminPage = () => {
 
       if (response.data.success) {
         toast.success(response.data.message);
-        fetchStudents(currentPage);
+        fetchData(currentPage);
       } else {
         toast.error(response.data.message || "Failed to remove the user.");
       }
@@ -108,17 +111,26 @@ const AdminPage = () => {
   return (
     <div className="relative min-h-screen bg-white text-black">
       <div className="flex justify-center sm:justify-center pt-24">
-        <h1 className="text-3xl font-bold mb-4 font-serif">Student Register</h1>
+        <h1 className="text-3xl font-bold mb-4 font-serif">Admin Dashboard</h1>
       </div>
 
+      {/* Option Buttons */}
+
       {/* Action Buttons */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-2 p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-2 p-4">
         <button
           onClick={() => navigate("/registation")}
           className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
         >
           <FileSpreadsheet className="h-5 w-5" />
           <span>Add Student Using File</span>
+        </button>
+        <button
+          onClick={() => navigate("/registationCounsellor")}
+          className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
+        >
+          <FileSpreadsheet className="h-5 w-5" />
+          <span>Add Counsellor Using File</span>
         </button>
         <button
           onClick={() => navigate("/studentsDomain")}
@@ -136,10 +148,29 @@ const AdminPage = () => {
         </button>
       </div>
 
+      <div className="flex p-2 mb-4">
+        <button
+          onClick={() => setIsStudent(true)}
+          className={`px-4 py-2 mx-2 ${
+            isStudent ? "bg-blue-600 text-white" : "bg-gray-200 text-black"
+          } rounded`}
+        >
+          Students
+        </button>
+        <button
+          onClick={() => setIsStudent(false)}
+          className={`px-4 py-2 mx-2 ${
+            !isStudent ? "bg-blue-600 text-white" : "bg-gray-200 text-black"
+          } rounded`}
+        >
+          Counsellors
+        </button>
+      </div>
+
       <div className="bg-white rounded-lg shadow-sm p-4 mb-2">
         <div className="flex items-center">
           <h2 className="text-lg font-semibold text-gray-700">
-            Total Students
+            Total {isStudent ? "Students" : "Counsellors"}
           </h2>
           <span className="ml-2 text-3xl font-bold text-blue-600">
             {totalStudents}
@@ -263,8 +294,8 @@ const AdminPage = () => {
               Confirm Deletion
             </h3>
             <p className="text-gray-700 mb-4 text-sm sm:text-base text-center">
-              Are you sure you want to delete this student? This action cannot
-              be undone.
+              Are you sure you want to delete this user? This action cannot be
+              undone.
             </p>
             <div className="flex justify-center gap-4">
               <button

@@ -172,7 +172,7 @@ export const removeProfilePic = async (req, res, next) => {
 };
 
 export const updateUser = async (req, res) => {
-  const { id } = req.user; // Assuming `req.user` contains the authenticated user's details
+  const { id } = req.user; // Authenticated user's ID
   const allowedUpdates = [
     "name",
     "profile.gender",
@@ -188,12 +188,12 @@ export const updateUser = async (req, res) => {
 
   try {
     const updates = req.body;
-    console.log("Updates received:", updates);
 
     // Normalize keys by mapping flat keys to nested keys
     const normalizedUpdates = {};
     Object.keys(updates).forEach((key) => {
       if (allowedUpdates.includes(`profile.${key}`)) {
+        console.log("Key:", key);
         normalizedUpdates[`profile.${key}`] = updates[key];
       } else if (allowedUpdates.includes(key)) {
         normalizedUpdates[key] = updates[key];
@@ -216,12 +216,17 @@ export const updateUser = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
+    user.profile = user.profile || {};
+
+    // ✅ Update fields correctly
     keysToUpdate.forEach((key) => {
       const keys = key.split(".");
       if (keys.length === 1) {
+        console.log("hello", keys);
         user[keys[0]] = normalizedUpdates[key];
       } else {
-        user[keys[0]][keys[1]] = normalizedUpdates[key];
+        console.log("helol" + keys);
+        user.profile[keys[1]] = normalizedUpdates[key]; // Correctly updating profile fields
       }
     });
 
@@ -331,5 +336,101 @@ export const getProfilePicByAdmin = async (req, res) => {
     stream.pipe(res);
   } catch (error) {
     res.status(500).json({ error: "Error retrieving file" });
+  }
+};
+
+export const getProfileCounsellor = async (req, res) => {
+  try {
+    const counsellors = await User.find({ role: "counsellor" }).select(
+      "id name _id"
+    );
+
+    if (!counsellors || counsellors.length === 0) {
+      return res.status(404).json({ message: "No counsellors found" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: counsellors,
+    });
+  } catch (error) {
+    console.error("Error fetching counsellors:", error);
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getCounsellorStudents = async (req, res) => {
+  try {
+    const { page = 1, limit = 10 } = req.query;
+    const counsellorId = req.user.id; // Assuming req.user contains the authenticated user info
+
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+
+    if (
+      isNaN(pageNumber) ||
+      isNaN(limitNumber) ||
+      pageNumber <= 0 ||
+      limitNumber <= 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid page or limit parameter",
+      });
+    }
+
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const students = await User.find({
+      role: "student",
+      "profile.counsellor": counsellorId, // Filter by counsellor ID
+    })
+      .select("name id profile certificates resume passwordChanged")
+      .skip(skip)
+      .limit(limitNumber)
+      .lean(); // Convert MongoDB documents to plain JavaScript objects
+
+    if (!students || students.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No students with profiles found" });
+    }
+
+    // Modify student data based on password change and handle missing data
+    const studentsWithCertLength = students.map((student) => ({
+      name: student.name || "-",
+      id: student.id || "-",
+      _id: student._id || "-",
+      profile: student.profile || "-",
+      certificatesLength: student.certificates
+        ? student.certificates.length
+        : 0,
+      resume: student.resume && student.resume.length > 0,
+    }));
+
+    // Get the total count of students
+    const totalStudents = await User.countDocuments({
+      role: "student",
+      "profile.counsellor": counsellorId, // Filter by counsellor ID
+      profile: { $exists: true, $ne: null },
+    });
+
+    // Send response with paginated data and metadata
+    res.status(200).json({
+      success: true,
+      data: studentsWithCertLength,
+      meta: {
+        totalStudents,
+        currentPage: pageNumber,
+        totalPages: Math.ceil(totalStudents / limitNumber),
+        limit: limitNumber,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching students data:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while retrieving student details",
+    });
   }
 };

@@ -1,11 +1,68 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import axiosInstance from "../utils/axiosInstance";
 
 const ProfileRight = ({
   formData,
   handleInputChange,
   handleSubmit,
+  setIsEditing,
   isEditing,
 }) => {
+  const [counsellors, setCounsellors] = useState([]);
+  const [filteredCounsellors, setFilteredCounsellors] = useState([]);
+  const [isFirstSave, setIsFirstSave] = useState(!formData.counsellor);
+
+  useEffect(() => {
+    const fetchCounsellors = async () => {
+      try {
+        const response = await axiosInstance.get("/user/profile/counsellor");
+        if (response.data.success) {
+          setCounsellors(response.data.data);
+          setFilteredCounsellors(response.data.data);
+        } else {
+          console.error("Failed to fetch counsellors.");
+        }
+      } catch (error) {
+        console.error("Error fetching counsellors:", error);
+      }
+    };
+
+    fetchCounsellors();
+  }, []);
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    const requiredFields = [
+      "name",
+      "email",
+      "id",
+      "gender",
+      "permanentAddress",
+      "birthDate",
+      "counsellor",
+      "batch",
+      "mobileNo",
+      "semester",
+      "github",
+      "linkedIn",
+    ];
+
+    const missingFields = requiredFields.filter((field) => !formData[field]);
+
+    if (missingFields.length > 0) {
+      alert(`Please fill in: ${missingFields.join(", ")}`);
+      return;
+    }
+
+    try {
+      await handleSubmit(e);
+      setIsFirstSave(false);
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error saving profile:", error);
+    }
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
       {/* Header */}
@@ -16,7 +73,7 @@ const ProfileRight = ({
       </div>
 
       <div className="p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSave} className="space-y-6">
           {/* Personal Information Section */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-700 border-b pb-2">
@@ -125,15 +182,33 @@ const ProfileRight = ({
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Counsellor<span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  name="counsellor"
-                  value={formData.counsellor}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
-                  placeholder="Enter your counsellor's name"
-                  disabled={!isEditing}
-                />
+                {isEditing && (!formData.counsellor || isFirstSave) ? (
+                  <select
+                    name="counsellor"
+                    value={formData.counsellor}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    required
+                  >
+                    <option value="">Select a counsellor</option>
+                    {filteredCounsellors.map((counsellor) => (
+                      <option key={counsellor._id} value={counsellor._id}>
+                        {counsellor.name}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    type="text"
+                    name="counsellor"
+                    value={
+                      counsellors.find((c) => c._id === formData.counsellor)
+                        ?.name || ""
+                    }
+                    readOnly
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-gray-50 text-gray-500"
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -156,6 +231,7 @@ const ProfileRight = ({
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Enter your mobile number"
                   pattern="[0-9]{10}"
+                  required
                   disabled={!isEditing}
                 />
               </div>
@@ -170,6 +246,7 @@ const ProfileRight = ({
                   onChange={handleInputChange}
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Enter your GitHub profile name"
+                  required
                   disabled={!isEditing}
                 />
               </div>
@@ -184,6 +261,7 @@ const ProfileRight = ({
                   onChange={handleInputChange}
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Enter your LinkedIn profile URL"
+                  required
                   disabled={!isEditing}
                 />
               </div>
@@ -206,6 +284,7 @@ const ProfileRight = ({
                   value={formData.birthDate}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
+                  required
                   disabled={!isEditing}
                 />
               </div>
@@ -219,6 +298,7 @@ const ProfileRight = ({
                   value={formData.gender}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
+                  required
                   disabled={!isEditing}
                 >
                   <option value="">Select Gender</option>
@@ -239,6 +319,7 @@ const ProfileRight = ({
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
                   placeholder="Enter your address"
                   rows={3}
+                  required
                   disabled={!isEditing}
                 />
               </div>

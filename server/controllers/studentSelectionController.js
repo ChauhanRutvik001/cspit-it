@@ -1,4 +1,5 @@
 import StudentSelection from "../models/StudentSelection.js"; // Import the model using ES6 import
+import user from "../models/user.js";
 
 // Save Student Selections
 const saveSelections = async (req, res) => {
@@ -97,7 +98,7 @@ const getSelections = async (req, res) => {
 export const getAllSelections = async (req, res) => {
   try {
     const { page = 1, limit = 10, order = "asc" } = req.query;
-    console.log("hello")
+    console.log("hello");
 
     // Removed the search filter
     const pageNumber = parseInt(page, 10);
@@ -335,5 +336,64 @@ const getDomains = (req, res) => {
 
   res.status(200).json(staticData);
 };
+
+export const getCounsellorStudentSelections = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, order = "asc" } = req.query;
+    const counsellorId = req.user.id; // Get counsellor ID from authenticated user
+    console.log("Counsellor ID:", counsellorId);
+
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    if (isNaN(pageNumber) || isNaN(limitNumber) || pageNumber <= 0 || limitNumber <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid page or limit parameter",
+      });
+    }
+
+    // Find students associated with the counsellor
+    const students = await user.find({
+      role: "student",
+      "profile.counsellor": counsellorId,
+    }).select("_id");
+
+    const studentIds = students.map(student => student._id);
+
+    // Fetch selections only for these students
+    const allSelections = await StudentSelection.find({ studentId: { $in: studentIds } })
+      .populate("studentId", "name id profile.avatar");
+
+    // Sort selections based on student ID
+    const sortedSelections = allSelections.sort((a, b) => {
+      const nameA = a.studentId.id.toLowerCase();
+      const nameB = b.studentId.id.toLowerCase();
+      return order === "asc" ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+    });
+
+    // Paginate sorted selections
+    const paginatedSelections = sortedSelections.slice(skip, skip + limitNumber);
+    const totalDocuments = allSelections.length;
+
+    if (!paginatedSelections.length) {
+      return res.status(404).json({ message: "No selections found." });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: paginatedSelections,
+      pagination: {
+        totalDocuments,
+        currentPage: pageNumber,
+        totalPages: Math.ceil(totalDocuments / limitNumber),
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: `Error fetching selections: ${error.message}` });
+  }
+};
+
 
 export { saveSelections, getSelections, getDomains }; // Export using ES6 export

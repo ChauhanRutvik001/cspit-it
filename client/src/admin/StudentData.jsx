@@ -31,7 +31,9 @@ const StudentData = () => {
     setSearchTerm(e.target.value.toLowerCase());
   };
   useEffect(() => {
-    if (user?.role !== "admin") navigate("/browse");
+    if (user?.role !== "admin" && user?.role !== "counsellor") {
+      navigate("/browse");
+    }
   }, [user, navigate]);
 
   const filteredSelections = students.filter((student) => {
@@ -177,11 +179,14 @@ const StudentData = () => {
     const fetchStudents = async () => {
       try {
         setLoading(true);
+        const endpoint =
+          user?.role === "admin"
+            ? "/user/profile/getAllstudent"
+            : "/user/profile/getCounsellorStudents";
         const response = await axiosInstance.get(
-          `/user/profile/getAllstudent?page=${currentPage}&limit=${recordsPerPage}`
+          `${endpoint}?page=${currentPage}&limit=${recordsPerPage}`
         );
         setStudents(response.data.data);
-        console.log(response.data);
         setTotalDocuments(response.data.data.length);
         setTotalPages(response.data.meta.totalPages);
       } catch (err) {
@@ -192,7 +197,8 @@ const StudentData = () => {
     };
 
     fetchStudents();
-  }, [currentPage, recordsPerPage]);
+  }, [user, currentPage, recordsPerPage]);
+
 
   const handleLimitChange = (e) => {
     setRecordsPerPage(Number(e.target.value));

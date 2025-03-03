@@ -29,7 +29,9 @@ const AllStudentSelections = () => {
   const [searchTerm, setSearchTerm] = useState(""); // New state for search term
 
   useEffect(() => {
-    if (user?.role !== "admin") navigate("/browse");
+    if (user?.role !== "admin" && user?.role !== "counsellor") {
+      navigate("/browse");
+    }
   }, [user, navigate]);
 
   useEffect(() => {
@@ -37,16 +39,19 @@ const AllStudentSelections = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axiosInstance.get(
-          "/studentSelection/ALLselections",
-          {
-            params: {
-              page: currentPage,
-              limit,
-              order,
-            },
-          }
-        );
+        let endpoint =
+        user?.role === "admin"
+            ? "/studentSelection/ALLselections"
+            : "/studentSelection/getCounsellorStudentSelections";
+
+        const response = await axiosInstance.get(endpoint, {
+          params: {
+            page: currentPage,
+            limit,
+            order,
+          },
+        });
+
         console.log("response", response.data);
         const { data, pagination } = response.data;
         setTotalDocuments(pagination.totalDocuments);
@@ -303,7 +308,7 @@ const AllStudentSelections = () => {
           </div>
 
           {/* Table */}
-          <div className="container mx-auto px-4">
+          <div className="container max-w-full">
             <div className="overflow-x-auto xl:overflow-x-visible max-w-full">
               <div className="w-full min-w-[1200px] xl:min-w-0">
                 <table className="min-w-full divide-y divide-gray-200">
