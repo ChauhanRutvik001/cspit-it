@@ -22,6 +22,8 @@ import ResumeViewer from "./ResumeViewer";
 import StudentResume from "../admin/StudentResume";
 import CounsellorRegistation from "../admin/CounsellorRegistation";
 import CounsellorPage from "../counsellor/CounsellorPage";
+import Tests from "./Tests";
+import TestView from "./TestView";
 
 
 const Body = () => {
@@ -46,6 +48,8 @@ const Body = () => {
     { path: "/adminResume/:id", element: <Layout><StudentResume/></Layout> },
     { path: "/registationCounsellor", element: <Layout><CounsellorRegistation/></Layout> },
     { path: "/counsellor", element: <Layout><CounsellorPage/></Layout> },
+    { path: "/tests", element: <Layout><Tests /></Layout> },
+    { path: "/tests/:testId", element: <Layout><TestView /></Layout> },
   
   ]);
 

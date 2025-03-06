@@ -17,6 +17,7 @@
     "@react-pdf-viewer/toolbar": "^3.12.0",
     "@reduxjs/toolkit": "^2.5.0",
     "axios": "^1.7.9",
+    "date-fns": "^4.1.0",
     "framer-motion": "^12.4.7",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
