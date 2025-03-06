@@ -192,120 +192,112 @@ const CertificateManager = () => {
 
   return (
     <div className="pt-20">
-      <div className="p-6 mx-auto bg-white shadow-lg rounded-lg">
-        <h2 className="text-2xl font-bold text-center text-gray-800 mb-5 font-serif">
-          🎓 Your Certificates
-        </h2>
+      <div className="p-8 mx-auto bg-white shadow-xl rounded-xl">
+  <div className="mb-16">
+    <h2 className="text-3xl font-bold text-center text-gray-900 mb-6 font-serif">
+      🎓 Your Certificates
+    </h2>
 
-        {/* Upload Section */}
-        <div className="w-full flex flex-col sm:flex-row justify-center items-center gap-6">
-          <div className="w-full sm:w-1/2 p-4 border rounded-lg bg-gray-50">
-            <label className="block mb-2 font-semibold text-gray-700">
-              Upload Certificate (Images Only):
-            </label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="w-full border p-2 rounded bg-white"
-              disabled={uploading}
-            />
+    {/* Upload Section */}
+    <div className="w-full flex flex-col sm:flex-row justify-center items-center gap-8">
+      <div className="w-full sm:w-1/2 p-6 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 hover:border-gray-400 transition">
+        <label className="block mb-3 font-semibold text-gray-700">
+          Upload Certificate (Images Only):
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="w-full border border-gray-300 p-3 rounded bg-white shadow-sm"
+          disabled={uploading}
+        />
 
-            <button
-              onClick={handleUpload}
-              disabled={uploading}
-              className={`mt-3 w-full px-4 py-2 rounded flex items-center justify-center gap-2 ${
-                uploading
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
-              } text-white`}
-            >
-              <AiOutlineCloudUpload size={20} />
-              {uploading ? "Uploading..." : "Upload"}
-            </button>
-          </div>
-        </div>
-
-        {/* Loading State */}
-        {loading ? (
-          <p className="text-center text-gray-500 mt-5">
-            Loading certificates...
-          </p>
-        ) : null}
-
-        {/* Certificate List */}
-        <h3 className="text-lg font-semibold text-gray-800 mb-3 mt-5">
-          📜 Your Certificates ({certificates.length} Total)
-        </h3>
-        {certificates.length === 0 && !loading ? (
-          <p className="text-gray-500 text-center p-4 bg-gray-50 rounded-lg">
-            No certificates uploaded yet.
-          </p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white">
-              <thead>
-                <tr>
-                  <th className="py-2 px-4 border-b">#</th>
-                  <th className="py-2 px-4 border-b">Certificate Name</th>
-                  <th className="py-2 px-4 border-b">Status</th>
-                  <th className="py-2 px-4 border-b">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {certificates.map((cert, index) => (
-                  <tr key={cert._id}>
-                    <td className="py-2 px-4 border-b text-center">
-                      {index + 1}
-                    </td>
-                    <td className="py-2 px-4 border-b">{cert.filename}</td>
-                    <td className="py-2 px-4 border-b text-center">
-                      <span
-                        className={`inline-block px-2 py-1 rounded-full text-xs font-semibold
-                          ${
-                            cert.status === "approved"
-                              ? "bg-green-100 text-green-800"
-                              : cert.status === "rejected"
-                              ? "bg-red-100 text-red-800"
-                              : "bg-yellow-100 text-yellow-800"
-                          }`}
-                      >
-                        {cert.status.charAt(0).toUpperCase() +
-                          cert.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="py-2 px-4 border-b text-center">
-                      <button
-                        onClick={() => handleViewCertificate(cert.fileId)}
-                        className="bg-blue-500 text-white p-2 rounded-full shadow-md hover:bg-blue-600 transition duration-200"
-                        title="View Certificate"
-                      >
-                        <MdVisibility size={20} />
-                      </button>
-                      {cert.status !== "approved" && (
-                        <button
-                          onClick={() => handleEditConfirmation(cert._id)}
-                          className="bg-yellow-500 text-white p-2 rounded-full shadow-md hover:bg-yellow-600 transition duration-200 ml-2"
-                          title="Edit Certificate"
-                        >
-                          <MdEdit size={20} />
-                        </button>
-                      )}
-                      <button
-                        onClick={() => handleDeleteConfirmation(cert._id)}
-                        className="bg-red-500 text-white p-2 rounded-full shadow-md hover:bg-red-600 transition duration-200 ml-2"
-                        title="Delete Certificate"
-                      >
-                        <MdDelete size={20} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <button
+          onClick={handleUpload}
+          disabled={uploading}
+          className={`mt-4 w-full px-5 py-3 rounded-lg flex items-center justify-center gap-2 text-lg transition 
+            ${uploading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"} text-white shadow-md`}
+        >
+          <AiOutlineCloudUpload size={22} />
+          {uploading ? "Uploading..." : "Upload"}
+        </button>
       </div>
+    </div>
+  </div>
+
+  {/* Loading State */}
+  {loading && (
+    <p className="text-center text-gray-500 mt-5 animate-pulse">
+      Loading certificates...
+    </p>
+  )}
+
+  {/* Certificate List */}
+  <h3 className="text-lg font-semibold p-3 mb-5 mt-6 bg-gradient-to-r from-blue-700 to-indigo-800 text-white rounded-md shadow-lg">
+    📜 Your Certificates ({certificates.length} Total)
+  </h3>
+
+  {certificates.length === 0 && !loading ? (
+    <p className="text-gray-500 text-center p-6 bg-gray-50 rounded-lg text-lg shadow">
+      No certificates uploaded yet.
+    </p>
+  ) : (
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white rounded-lg shadow-lg">
+        <thead className="bg-gray-200">
+          <tr>
+            <th className="px-6 py-4 text-center font-semibold text-gray-700 tracking-wider">#</th>
+            <th className="px-6 py-4 text-center font-semibold text-gray-700 tracking-wider">Certificate Name</th>
+            <th className="px-6 py-4 text-center font-semibold text-gray-700 tracking-wider">Status</th>
+            <th className="px-6 py-4 text-center font-semibold text-gray-700 tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {certificates.map((cert, index) => (
+            <tr key={cert._id} className="odd:bg-white even:bg-gray-100 transition hover:bg-gray-200">
+              <td className="py-3 px-5 border-b text-center">{index + 1}</td>
+              <td className="py-3 px-5 border-b">{cert.filename}</td>
+              <td className="py-3 px-5 border-b text-center">
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold shadow-md 
+                  ${cert.status === "approved" ? "bg-green-100 text-green-800" 
+                  : cert.status === "rejected" ? "bg-red-100 text-red-800" 
+                  : "bg-yellow-100 text-yellow-800"}`}>
+                  {cert.status.charAt(0).toUpperCase() + cert.status.slice(1)}
+                </span>
+              </td>
+              <td className="py-3 px-5 border-b text-center space-x-2">
+                <button
+                  onClick={() => handleViewCertificate(cert.fileId)}
+                  className="bg-blue-500 text-white p-2 rounded-lg shadow-md hover:bg-blue-600 transition"
+                  title="View Certificate"
+                >
+                  <MdVisibility size={22} />
+                </button>
+                {cert.status !== "approved" && (
+                  <button
+                    onClick={() => handleEditConfirmation(cert._id)}
+                    className="bg-yellow-500 text-white p-2 rounded-lg shadow-md hover:bg-yellow-600 transition"
+                    title="Edit Certificate"
+                  >
+                    <MdEdit size={22} />
+                  </button>
+                )}
+                <button
+                  onClick={() => handleDeleteConfirmation(cert._id)}
+                  className="bg-red-500 text-white p-2 rounded-lg shadow-md hover:bg-red-600 transition"
+                  title="Delete Certificate"
+                >
+                  <MdDelete size={22} />
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+</div>
+
 
       {/* Delete Confirmation Modal */}
       {showDeletePopup && (
