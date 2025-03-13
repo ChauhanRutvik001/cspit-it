@@ -1,10 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import axiosInstance from '../utils/axiosInstance';
-import { format } from 'date-fns';
-import { FaExternalLinkAlt, FaCog, FaClock, FaBook, FaCalendarAlt, FaClipboardList } from 'react-icons/fa';
-import ManageTests from './ManageTests';
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import axiosInstance from "../utils/axiosInstance";
+import { format } from "date-fns";
+import {
+  FaExternalLinkAlt,
+  FaCog,
+  FaClock,
+  FaBook,
+  FaCalendarAlt,
+  FaClipboardList,
+} from "react-icons/fa";
+import ManageTests from "./ManageTests";
 
 const Tests = () => {
   const [tests, setTests] = useState([]);
@@ -13,33 +20,34 @@ const Tests = () => {
   const [showManagement, setShowManagement] = useState(false);
   const navigate = useNavigate();
   const user = useSelector((store) => store.app.user);
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.role === "admin";
 
   useEffect(() => {
     const fetchTests = async () => {
       try {
-        console.log('Fetching tests...');
-        const response = await axiosInstance.get('/tests');
-        console.log('Response:', response);
-        
+        console.log("Fetching tests...");
+        const response = await axiosInstance.get("/tests");
+        console.log("Response:", response);
+
         if (response.data && Array.isArray(response.data)) {
-          console.log('Tests data:', response.data);
-          setTests(response.data.filter(test => test.isActive));
+          console.log("Tests data:", response.data);
+          setTests(response.data.filter((test) => test.isActive));
         } else {
-          console.log('Invalid response format:', response.data);
+          console.log("Invalid response format:", response.data);
           setTests([]);
-          setError('No tests available - Invalid response format');
+          setError("No tests available - Invalid response format");
         }
         setLoading(false);
       } catch (err) {
-        console.error('Error details:', {
+        console.error("Error details:", {
           message: err.message,
           response: err.response,
           status: err.response?.status,
-          data: err.response?.data
+          data: err.response?.data,
         });
-        
-        const errorMessage = err.response?.data?.message || err.message || 'Failed to load tests';
+
+        const errorMessage =
+          err.response?.data?.message || err.message || "Failed to load tests";
         setError(`${errorMessage}. Please try again later.`);
         setTests([]);
         setLoading(false);
@@ -75,6 +83,7 @@ const Tests = () => {
           <div className="text-red-500 text-xl mb-2">⚠️ Error</div>
           <div className="text-gray-600">{error}</div>
         </div>
+        zz
       </div>
     );
   }
@@ -100,7 +109,9 @@ const Tests = () => {
                 className="group flex items-center gap-3 bg-white/10 backdrop-blur-sm text-white px-6 py-3 rounded-xl border border-white/20 shadow-lg hover:bg-white hover:text-blue-600 transition-all duration-300 ease-in-out transform hover:-translate-y-0.5"
               >
                 <FaCog className="h-5 w-5 group-hover:rotate-90 transition-transform duration-300" />
-                <span className="font-medium">{showManagement ? 'Hide Quiz Management' : 'Manage Quizzes'}</span>
+                <span className="font-medium">
+                  {showManagement ? "Hide Quiz Management" : "Manage Quizzes"}
+                </span>
               </button>
             )}
           </div>
@@ -113,7 +124,9 @@ const Tests = () => {
           {isAdmin && showManagement && (
             <div className="mb-12 bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
               <div className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-gray-100/50 px-8 py-4">
-                <h2 className="text-xl font-bold text-gray-800">Quiz Management</h2>
+                <h2 className="text-xl font-bold text-gray-800">
+                  Quiz Management
+                </h2>
               </div>
               <div className="p-8">
                 <ManageTests />
@@ -123,8 +136,12 @@ const Tests = () => {
 
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
             <div className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-gray-100/50 px-8 py-4">
-              <h2 className="text-xl font-bold text-gray-800">Available Tests</h2>
-              <p className="text-gray-600 mt-1">Select a test to begin your assessment</p>
+              <h2 className="text-xl font-bold text-gray-800">
+                Available Tests
+              </h2>
+              <p className="text-gray-600 mt-1">
+                Select a test to begin your assessment
+              </p>
             </div>
 
             <div className="p-8">
@@ -138,9 +155,13 @@ const Tests = () => {
                       <div className="bg-blue-50 w-12 h-12 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                         <FaBook className="w-6 h-6 text-blue-600" />
                       </div>
-                      <h2 className="text-xl font-bold text-gray-800 mb-3">{test.title}</h2>
-                      <p className="text-gray-600 mb-6 line-clamp-2">{test.description}</p>
-                      
+                      <h2 className="text-xl font-bold text-gray-800 mb-3">
+                        {test.title}
+                      </h2>
+                      <p className="text-gray-600 mb-6 line-clamp-2">
+                        {test.description}
+                      </p>
+
                       <div className="space-y-4 mb-6">
                         <div className="flex items-center text-gray-600 bg-gray-50 p-3 rounded-xl">
                           <FaBook className="w-4 h-4 mr-3 text-blue-600" />
@@ -155,7 +176,9 @@ const Tests = () => {
                         <div className="flex items-center text-gray-600 bg-gray-50 p-3 rounded-xl">
                           <FaCalendarAlt className="w-4 h-4 mr-3 text-blue-600" />
                           <span className="font-medium">Available Until:</span>
-                          <span className="ml-2">{format(new Date(test.availableUntil), 'PPP')}</span>
+                          <span className="ml-2">
+                            {format(new Date(test.availableUntil), "PPP")}
+                          </span>
                         </div>
                       </div>
 
@@ -175,8 +198,12 @@ const Tests = () => {
                     <div className="bg-gray-50 w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6">
                       <span className="text-4xl">📚</span>
                     </div>
-                    <h3 className="text-xl font-medium text-gray-800 mb-2">No Tests Available</h3>
-                    <p className="text-gray-600">Check back later for new tests.</p>
+                    <h3 className="text-xl font-medium text-gray-800 mb-2">
+                      No Tests Available
+                    </h3>
+                    <p className="text-gray-600">
+                      Check back later for new tests.
+                    </p>
                   </div>
                 )}
               </div>
@@ -188,4 +215,4 @@ const Tests = () => {
   );
 };
 
-export default Tests; 
+export default Tests;

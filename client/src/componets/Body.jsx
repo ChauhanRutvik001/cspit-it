@@ -24,7 +24,7 @@ import CounsellorRegistation from "../admin/CounsellorRegistation";
 import CounsellorPage from "../counsellor/CounsellorPage";
 import Tests from "./Tests";
 import TestView from "./TestView";
-
+import CompanyPage from "../admin/CompanyDetails";
 
 const Body = () => {
   const appRouter = createBrowserRouter([
@@ -50,6 +50,7 @@ const Body = () => {
     { path: "/counsellor", element: <Layout><CounsellorPage/></Layout> },
     { path: "/tests", element: <Layout><Tests /></Layout> },
     { path: "/tests/:testId", element: <Layout><TestView /></Layout> },
+    { path: "/companypage", element: <Layout><CompanyPage /></Layout> }, 
   
   ]);
 

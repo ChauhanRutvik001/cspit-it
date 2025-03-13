@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axiosInstance from "../utils/axiosInstance";
 import { ClipLoader } from "react-spinners";
-import { Users, FileSpreadsheet, Layout, Trash2 } from "lucide-react";
+import { Users, FileSpreadsheet, Layout, Trash2, Briefcase } from "lucide-react";
 
 const AdminPage = () => {
   const user = useSelector((store) => store.app.user);
@@ -117,7 +117,7 @@ const AdminPage = () => {
       {/* Option Buttons */}
 
       {/* Action Buttons */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-2 p-4">
+      <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 mb-2 p-4">
         <button
           onClick={() => navigate("/registation")}
           className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
@@ -145,6 +145,13 @@ const AdminPage = () => {
         >
           <Users className="h-5 w-5" />
           <span>Student</span>
+        </button>
+        <button
+          onClick={() => navigate("/companypage")}
+          className="flex items-center justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-purple-300 transition"
+        >
+          <Briefcase className="h-5 w-5" /> {/* Added icon here */}
+          <span>Company</span>
         </button>
       </div>
 

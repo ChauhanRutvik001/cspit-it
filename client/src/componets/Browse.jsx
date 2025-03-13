@@ -84,22 +84,21 @@ const HeroSection = () => {
           >
             {/* Icon Section */}
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="flex justify-center md:justify-start mb-6"
-            >
-              <div className="bg-gray-200/10 flex backdrop-blur-sm rounded-full">
-                <Rocket size={40} className="text--500" />
-              </div>
-            </motion.div>
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="inline-flex items-center gap-2 mb-2 px-4 py-2 rounded-full bg-blue-100 text-blue-600"
+              >
+                <Rocket size={20} />
+                <span className="font-medium">Welcome to CDPC</span>
+              </motion.div>
 
             {/* Main Heading */}
             <motion.h1
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.6 }}
-              className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-amber-600 mb-4 leading-tight tracking-tight"
+              className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-600 mb-4 leading-tight tracking-tight"
             >
               Unlock Your Future with <br className="hidden sm:inline" />
               <span className="relative text-black">
@@ -130,7 +129,7 @@ const HeroSection = () => {
         {/* Right Image Section */}
         <div className="md:w-1/2 mt-10 md:mt-0">
           <motion.img
-            src="/home-header-isagebrum.svg"
+            src="/img2-removebg-preview.png"
             alt="Career Development"
             className="bg-transparent"
             initial={{ opacity: 0, x: 100 }}
