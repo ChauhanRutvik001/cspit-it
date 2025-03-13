@@ -14,6 +14,7 @@ import studentSelectionRoutes from "./routes/studentSelectionRoutes.js";
 import certificateRoutes from "./routes/certificate.routes.js"; // Add this import
 import resumeRoutes from "./routes/resume.routes.js";
 import testRoutes from "./routes/test.routes.js";
+import companyRoutes from "./routes/company.routes.js"; // ✅ Company Routes
 
 // Load environment variables
 config();
@@ -42,6 +43,7 @@ app.use("/api/v1/studentSelection", studentSelectionRoutes);
 app.use("/api/v1/certificates", certificateRoutes);
 app.use("/api/v1/resumes", resumeRoutes);
 app.use("/api/v1/tests", testRoutes);
+app.use("/api/v1/company", companyRoutes); // ✅ Added Company Routes
 
 // Database connection and server initialization
 const PORT = process.env.PORT || 3100;
