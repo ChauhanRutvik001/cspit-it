@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../utils/axiosInstance";
+import toast from "react-hot-toast";
 
 const ProfileRight = ({
   formData,
@@ -50,7 +51,7 @@ const ProfileRight = ({
     const missingFields = requiredFields.filter((field) => !formData[field]);
 
     if (missingFields.length > 0) {
-      alert(`Please fill in: ${missingFields.join(", ")}`);
+      toast.error(`Please fill in: ${missingFields.join(", ")}`);
       return;
     }
 
@@ -144,6 +145,7 @@ const ProfileRight = ({
                   onChange={handleInputChange}
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
                   disabled={!isEditing}
+                  required
                 >
                   <option value="" disabled>
                     Select semester
@@ -162,6 +164,7 @@ const ProfileRight = ({
                 </label>
                 <select
                   name="batch"
+                  required
                   value={formData.batch}
                   onChange={handleInputChange}
                   className="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:bg-gray-50 disabled:text-gray-500"
