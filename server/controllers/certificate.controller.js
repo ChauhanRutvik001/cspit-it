@@ -65,11 +65,6 @@ export const uploadCertificate = async (req, res) => {
 
     await pendingRequest.save();
 
-    // Update the user's certificates array
-    await User.findByIdAndUpdate(userId, {
-      $push: { certificates: newCertificate._id },
-    });
-
     res.status(201).json({
       message:
         "Certificate uploaded successfully and pending counsellor's approval",
@@ -214,28 +209,35 @@ export const declineCertificate = async (req, res) => {
     request.status = "declined";
     await request.save();
 
-    // Schedule deletion of the certificate after 20 seconds
+    // Schedule deletion of the certificate after specified seconds
     setTimeout(async () => {
-      const certificate = await Certificate.findById(request.certificateId);
-      if (certificate) {
-        const userId = certificate.uploadedBy;
+      try {
+        const certificate = await Certificate.findById(request.certificateId);
+        if (certificate) {
+          const userId = certificate.uploadedBy;
 
-        const bucket = new GridFSBucket(mongoose.connection.db, {
-          bucketName: "certificates",
-        });
-        await bucket.delete(new mongoose.Types.ObjectId(certificate.fileId));
-        await Certificate.findByIdAndDelete(request.certificateId);
-        await PendingRequest.findByIdAndDelete(requestId);
-        await User.findByIdAndUpdate(
-          userId,
-          { $pull: { certificates: request.certificateId } },
-          { new: true }
-        );
+          const bucket = new GridFSBucket(mongoose.connection.db, {
+            bucketName: "certificates",
+          });
+          await bucket.delete(new mongoose.Types.ObjectId(certificate.fileId));
+          await Certificate.findByIdAndDelete(request.certificateId);
+          
+          await User.findByIdAndUpdate(
+            userId,
+            { $pull: { certificates: request.certificateId } },
+            { new: true }
+          );
+          
+          // Delete the pending request after certificate deletion
+          await PendingRequest.findByIdAndDelete(requestId);
+        }
+      } catch (err) {
+        console.error("Error during scheduled deletion:", err);
       }
     }, DECLINE_EXPIRATION_SECONDS * 1000);
 
     res.status(200).json({
-      message: "Certificate declined and will be deleted after 20 seconds",
+      message: `Certificate declined and will be deleted after ${DECLINE_EXPIRATION_SECONDS} seconds`,
     });
   } catch (error) {
     res.status(500).json({ error: "Error declining certificate" });
@@ -248,6 +250,7 @@ export const getCertificates = async (req, res) => {
     const pendingRequests = await PendingRequest.find({
       studentId: userId,
     }).populate("certificateId");
+    console.log("Pending Requests:", pendingRequests);
 
     const certificates = await Certificate.find({ uploadedBy: userId });
 
