@@ -83,6 +83,7 @@ const adminController = {
       const totalStudents = await User.countDocuments(studentsQuery);
 
       const totalPages = Math.ceil(totalStudents / limit);
+      console.log("Total students:", totalStudents);
 
       res.status(200).json({
         success: true,

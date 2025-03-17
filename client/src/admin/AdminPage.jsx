@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axiosInstance from "../utils/axiosInstance";
 import { ClipLoader } from "react-spinners";
-import { Users, FileSpreadsheet, Layout, Trash2, Briefcase } from "lucide-react";
+import { Users, FileSpreadsheet, Layout, Trash2, Briefcase, UserPlus, ShieldCheck, GraduationCap, Globe, Building } from "lucide-react";
 
 const AdminPage = () => {
   const user = useSelector((store) => store.app.user);
@@ -122,35 +122,35 @@ const AdminPage = () => {
           onClick={() => navigate("/registation")}
           className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
         >
-          <FileSpreadsheet className="h-5 w-5" />
+          <UserPlus className="h-5 w-5" />
           <span>Add Student Using File</span>
         </button>
         <button
           onClick={() => navigate("/registationCounsellor")}
           className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
         >
-          <FileSpreadsheet className="h-5 w-5" />
+          <ShieldCheck className="h-5 w-5" />
           <span>Add Counsellor Using File</span>
         </button>
         <button
           onClick={() => navigate("/studentsDomain")}
           className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
         >
-          <Layout className="h-5 w-5" />
+          <Globe className="h-5 w-5" />
           <span>Domain</span>
         </button>
         <button
           onClick={() => navigate("/students")}
           className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
         >
-          <Users className="h-5 w-5" />
+          <GraduationCap className="h-5 w-5" />
           <span>Student</span>
         </button>
         <button
           onClick={() => navigate("/companypage")}
-          className="flex items-center justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-purple-300 transition"
+          className="flex items-center justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
         >
-          <Briefcase className="h-5 w-5" /> {/* Added icon here */}
+          <Building className="h-5 w-5" />
           <span>Company</span>
         </button>
       </div>
