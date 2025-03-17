@@ -83,7 +83,6 @@ const adminController = {
       const totalStudents = await User.countDocuments(studentsQuery);
 
       const totalPages = Math.ceil(totalStudents / limit);
-      console.log("Total students:", totalStudents);
 
       res.status(200).json({
         success: true,
@@ -304,6 +303,170 @@ const adminController = {
     }
   },
 
+  updatePlacedStudents: async (req, res) => {
+    try {
+      const { students } = req.body;
+      
+      if (!students || !Array.isArray(students)) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Invalid data format. Expected an array of students.' 
+        });
+      }
+
+      const emails = students.map(student => student.email);
+      
+      // Update all students in the list to be placed
+      const result = await User.updateMany(
+        { email: { $in: emails }, role: 'student' },
+        { $set: { isPlaced: true } }
+      );
+
+      res.status(200).json({
+        success: true,
+        message: `Successfully updated ${result.modifiedCount} students`,
+        updatedCount: result.modifiedCount
+      });
+    } catch (error) {
+      console.error('Error updating placed students:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Error updating placed students' 
+      });
+    }
+  },
+
+  addSinglePlacedStudent: async (req, res) => {
+    try {
+      const { email, studentId } = req.body;
+      
+      if (!email && !studentId) {
+        return res.status(400).json({
+          success: false,
+          message: 'Either email or student ID is required'
+        });
+      }
+
+      let query = {};
+      if (email) {
+        query = { email };
+      } else {
+        query = { id: studentId };
+      }
+
+      // Find and update the student
+      const student = await User.findOneAndUpdate(
+        { ...query, role: 'student' },
+        { $set: { isPlaced: true, placedDate: new Date() } },
+        { new: true }
+      );
+
+      if (!student) {
+        return res.status(404).json({
+          success: false,
+          message: 'Student not found'
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Student successfully marked as placed',
+        student: {
+          name: student.name,
+          email: student.email,
+          id: student.id
+        }
+      });
+    } catch (error) {
+      console.error('Error adding placed student:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error adding placed student'
+      });
+    }
+  },
+
+  getPlacedStudents: async (req, res) => {
+    try {
+      const { page = 1, limit = 10, search = '' } = req.query;
+      const skip = (page - 1) * limit;
+
+      // Create search query
+      let searchQuery = { 
+        role: 'student',
+        isPlaced: true
+      };
+
+      if (search) {
+        searchQuery.$or = [
+          { name: { $regex: search, $options: 'i' } },
+          { email: { $regex: search, $options: 'i' } },
+          { id: { $regex: search, $options: 'i' } }
+        ];
+      }
+
+      // Get placed students with pagination
+      const students = await User.find(searchQuery)
+        .select('name email id placedDate')
+        .sort({ placedDate: -1 })
+        .skip(skip)
+        .limit(parseInt(limit));
+
+      // Get total count for pagination
+      const totalStudents = await User.countDocuments(searchQuery);
+
+      res.status(200).json({
+        success: true,
+        students,
+        totalStudents,
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(totalStudents / limit)
+      });
+    } catch (error) {
+      console.error('Error fetching placed students:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error fetching placed students'
+      });
+    }
+  },
+
+  removeFromPlacedStudents: async (req, res) => {
+    try {
+      const { studentId } = req.body;
+
+      if (!studentId) {
+        return res.status(400).json({
+          success: false,
+          message: "Student ID is required"
+        });
+      }
+
+      const student = await User.findOne({ id: studentId });
+      if (!student) {
+        return res.status(404).json({
+          success: false,
+          message: "Student not found"
+        });
+      }
+
+      // Update student's placement status
+      student.isPlaced = false;
+      student.placedDate = null;
+      await student.save();
+
+      return res.status(200).json({
+        success: true,
+        message: "Student removed from placed list successfully"
+      });
+    } catch (error) {
+      console.error("Error removing student from placed list:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Internal server error"
+      });
+    }
+  }
 };
 
 export default adminController;

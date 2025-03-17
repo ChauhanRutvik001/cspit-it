@@ -15,6 +15,7 @@ import certificateRoutes from "./routes/certificate.routes.js"; // Add this impo
 import resumeRoutes from "./routes/resume.routes.js";
 import testRoutes from "./routes/test.routes.js";
 import companyRoutes from "./routes/company.routes.js"; // ✅ Company Routes
+import applicationRoutes from "./routes/application.routes.js"; // ✅ Application Routes
 
 // Load environment variables
 config();
@@ -44,6 +45,7 @@ app.use("/api/v1/certificates", certificateRoutes);
 app.use("/api/v1/resumes", resumeRoutes);
 app.use("/api/v1/tests", testRoutes);
 app.use("/api/v1/company", companyRoutes); // ✅ Added Company Routes
+app.use("/api/v1/application", applicationRoutes); // ✅ Added Application Routes
 
 // Database connection and server initialization
 const PORT = process.env.PORT || 3100;
