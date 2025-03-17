@@ -187,7 +187,8 @@ const StudentData = () => {
           `${endpoint}?page=${currentPage}&limit=${recordsPerPage}`
         );
         setStudents(response.data.data);
-        setTotalDocuments(response.data.data.length);
+        console.log(response.data);
+        setTotalDocuments(response.data?.meta?.totalStudents);
         setTotalPages(response.data.meta.totalPages);
       } catch (err) {
         setError(err.response?.data?.message || "An error occurred");

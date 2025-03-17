@@ -245,6 +245,7 @@ export const updateUser = async (req, res) => {
 };
 
 export const getAllStudents = async (req, res) => {
+  
   try {
     const { page = 1, limit = 10 } = req.query;
 
@@ -264,14 +265,16 @@ export const getAllStudents = async (req, res) => {
     }
 
     const skip = (pageNumber - 1) * limitNumber;
+    
+    // Define a consistent query filter to use in both operations
+    const queryFilter = { role: "student" };
 
-    const students = await User.find({
-      role: "student",
-    })
+    const students = await User.find(queryFilter)
       .select("name id profile certificates resume passwordChanged")
+      .populate("profile.counsellor", "name") // Populate counsellor with name
       .skip(skip)
       .limit(limitNumber)
-      .lean(); // Convert MongoDB documents to plain JavaScript objects
+      .lean();
 
     if (!students || students.length === 0) {
       return res
@@ -280,22 +283,30 @@ export const getAllStudents = async (req, res) => {
     }
 
     // Modify student data based on password change and handle missing data
-    const studentsWithCertLength = students.map((student) => ({
-      name: student.name || "-",
-      id: student.id || "-",
-      _id: student._id || "-",
-      profile: student.profile || "-",
-      certificatesLength: student.certificates
-        ? student.certificates.length
-        : 0,
-      resume: student.resume && student.resume.length > 0,
-    }));
-
-    // Get the total count of students
-    const totalStudents = await User.countDocuments({
-      role: "student",
-      profile: { $exists: true, $ne: null },
+    const studentsWithCertLength = students.map((student) => {
+      // Extract counsellor information
+      const counsellor = student.profile?.counsellor;
+      const counsellorName = counsellor ? counsellor.name : "-";
+      
+      return {
+        name: student.name || "-",
+        id: student.id || "-",
+        _id: student._id || "-",
+        profile: {
+          ...student.profile,
+          // Replace counsellor object with just the name for cleaner response
+          counsellor: counsellorName
+        } || "-",
+        certificatesLength: student.certificates
+          ? student.certificates.length
+          : 0,
+        resume: student.resume && student.resume.length > 0,
+      };
     });
+
+    // Get the total count of students using the same filter as the find query
+    const totalStudents = await User.countDocuments(queryFilter);
+    console.log("Total students:", totalStudents);
 
     // Send response with paginated data and metadata
     res.status(200).json({
@@ -362,7 +373,7 @@ export const getProfileCounsellor = async (req, res) => {
 export const getCounsellorStudents = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
-    const counsellorId = req.user.id; // Assuming req.user contains the authenticated user info
+    const counsellorId = req.user.id;
 
     const pageNumber = parseInt(page, 10);
     const limitNumber = parseInt(limit, 10);
@@ -380,15 +391,18 @@ export const getCounsellorStudents = async (req, res) => {
     }
 
     const skip = (pageNumber - 1) * limitNumber;
-
-    const students = await User.find({
+    
+    // Define a consistent query filter for both operations
+    const queryFilter = {
       role: "student",
-      "profile.counsellor": counsellorId, // Filter by counsellor ID
-    })
+      "profile.counsellor": counsellorId
+    };
+
+    const students = await User.find(queryFilter)
       .select("name id profile certificates resume passwordChanged")
       .skip(skip)
       .limit(limitNumber)
-      .lean(); // Convert MongoDB documents to plain JavaScript objects
+      .lean();
 
     if (!students || students.length === 0) {
       return res
@@ -396,30 +410,35 @@ export const getCounsellorStudents = async (req, res) => {
         .json({ success: false, message: "No students with profiles found" });
     }
 
+    // Get the counsellor's name to include in the response
+    const counsellor = await User.findById(counsellorId).select("name").lean();
+    const counsellorName = counsellor ? counsellor.name : "Unknown";
+
     // Modify student data based on password change and handle missing data
     const studentsWithCertLength = students.map((student) => ({
       name: student.name || "-",
       id: student.id || "-",
       _id: student._id || "-",
-      profile: student.profile || "-",
+      profile: {
+        ...student.profile,
+        counsellor: counsellorName // Add counsellor name to profile
+      } || "-",
       certificatesLength: student.certificates
         ? student.certificates.length
         : 0,
       resume: student.resume && student.resume.length > 0,
     }));
 
-    // Get the total count of students
-    const totalStudents = await User.countDocuments({
-      role: "student",
-      "profile.counsellor": counsellorId, // Filter by counsellor ID
-      profile: { $exists: true, $ne: null },
-    });
+    // Get the total count using the same filter
+    const totalStudents = await User.countDocuments(queryFilter);
+    console.log("Total assigned students:", totalStudents);
 
     // Send response with paginated data and metadata
     res.status(200).json({
       success: true,
       data: studentsWithCertLength,
       meta: {
+        counsellorName,
         totalStudents,
         currentPage: pageNumber,
         totalPages: Math.ceil(totalStudents / limitNumber),

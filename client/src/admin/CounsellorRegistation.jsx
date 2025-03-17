@@ -211,7 +211,7 @@ const CounsellorRegistation = () => {
             className="py-2 px-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-indigo-700 active:scale-95 transition transform duration-200"
             onClick={() => setIsModalOpen(true)}
           >
-            Add Single Student
+            Add Single Counsellor
           </button>
         </div>
       </div>
@@ -349,7 +349,7 @@ const CounsellorRegistation = () => {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white text-black rounded-lg p-6 max-w-sm w-full">
-            <h3 className="text-2xl font-semibold mb-4">Add Single Student</h3>
+            <h3 className="text-2xl font-semibold mb-4">Add Single Counsellor</h3>
             <input
               type="text"
               className="w-full p-3 mb-4 border rounded"
