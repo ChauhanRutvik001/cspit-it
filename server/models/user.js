@@ -32,6 +32,10 @@ const userSchema = new Schema(
       default: ROLES.STUDENT,
       required: [true, "Role is required"],
     },
+    isPlaced: {
+      type: Boolean,
+      default: false
+    },
     firstTimeLogin: {
       type: Boolean,
       default: true,

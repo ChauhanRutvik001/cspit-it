@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axiosInstance from "../utils/axiosInstance";
 import { ClipLoader } from "react-spinners";
-import { Users, Layout, Eye, CheckCircle, XCircle } from "lucide-react";
+import { Users, Layout, Eye, CheckCircle, XCircle, Building } from "lucide-react";
 
 const CounsellorPage = () => {
   const user = useSelector((store) => store.app.user);
@@ -101,6 +101,13 @@ const CounsellorPage = () => {
         >
           <Users className="h-5 w-5" />
           <span>Student</span>
+        </button>
+        <button
+          onClick={() => navigate("/counsellor/applications")}
+          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
+        >
+          <Building className="h-5 w-5" />
+          <span>Pending Applications</span>
         </button>
       </div>
 

@@ -11,10 +11,11 @@ import axiosInstance from "../utils/axiosInstance";
 const navigation = [
   { name: "Home", to: "/browse" },
   { name: "Developer", to: "/developer" },
-  { name: "Alumni", to: "/Alumni" },
+  { name: "Company", to: "/company" },
   { name: "Schedule", to: "/schedule" },
   { name: "Tests", to: "/tests" },
   { name: "Contact Us", to: "/Contact" },
+  
 ];
 
 function classNames(...classes) {

@@ -13,6 +13,8 @@ import {
   ChevronRight,
   FileDown,
   Download,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 
 const StudentData = () => {
@@ -186,9 +188,9 @@ const StudentData = () => {
         const response = await axiosInstance.get(
           `${endpoint}?page=${currentPage}&limit=${recordsPerPage}`
         );
-        setStudents(response.data.data);
         console.log(response.data);
-        setTotalDocuments(response.data?.meta?.totalStudents);
+        setStudents(response.data.data);
+        setTotalDocuments(response.data.meta.totalStudents);
         setTotalPages(response.data.meta.totalPages);
       } catch (err) {
         setError(err.response?.data?.message || "An error occurred");
@@ -315,6 +317,12 @@ const StudentData = () => {
                     scope="col"
                     className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
                   >
+                    Placement Status
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                  >
                     Batch
                   </th>
                   <th
@@ -425,6 +433,30 @@ const StudentData = () => {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900 capitalize">
                             {highlightText(student.name)}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            {student.isPlaced ? (
+                              <>
+                                <CheckCircle className="text-green-500" size={16} />
+                                <span className="text-sm font-medium text-green-500">
+                                  Placed
+                                  {student.placedDate && (
+                                    <span className="text-xs text-gray-500 block">
+                                      {new Date(student.placedDate).toLocaleDateString()}
+                                    </span>
+                                  )}
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                <XCircle className="text-gray-500" size={16} />
+                                <span className="text-sm font-medium text-gray-500">
+                                  Not Placed
+                                </span>
+                              </>
+                            )}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">

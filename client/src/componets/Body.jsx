@@ -4,8 +4,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./Login";
 import Browse from "./Browse";
 import NotFoundError from "./NotFoundError";
-import Students from "./Students";
-import Alumni from "./Alumni";
 import Contact from "./Contact";
 import Profile from "./Profile";
 import AdminPage from "../admin/AdminPage";
@@ -25,6 +23,10 @@ import CounsellorPage from "../counsellor/CounsellorPage";
 import Tests from "./Tests";
 import TestView from "./TestView";
 import CompanyPage from "../admin/CompanyDetails";
+import Company from "./Company";
+import CompanyApplications from "../admin/CompanyApplications";
+import PlacedStudents from "../admin/PlacedStudents";
+import CounsellorApplications from "../counsellor/CounsellorApplications";
 
 const Body = () => {
   const appRouter = createBrowserRouter([
@@ -32,7 +34,6 @@ const Body = () => {
     { path: "/", element: <Login /> },
     { path: "/browse", element: <Layout><Browse /></Layout> },
     { path: "/developer", element: <Layout><Developers /></Layout> },
-    { path: "/alumni", element: <Layout><Alumni /></Layout> },
     { path: "/schedule", element: <Layout><SchedulePage /></Layout> },
     { path: "/contact", element: <Layout><Contact /></Layout> },
     { path: "/profile", element: <Layout><Profile /></Layout> },
@@ -50,8 +51,12 @@ const Body = () => {
     { path: "/counsellor", element: <Layout><CounsellorPage/></Layout> },
     { path: "/tests", element: <Layout><Tests /></Layout> },
     { path: "/tests/:testId", element: <Layout><TestView /></Layout> },
-    { path: "/companypage", element: <Layout><CompanyPage /></Layout> }, 
-  
+    { path: "/companypage", element: <Layout><CompanyPage /></Layout> },
+    { path: "/company", element: <Layout><Company /></Layout> },
+    { path: "/admin/applications", element: <Layout><CompanyApplications /></Layout> },
+    { path: "/admin/applications/:companyId", element: <Layout><CompanyApplications /></Layout> },
+    { path: "/placed-students", element: <Layout><PlacedStudents /></Layout> },
+    { path: "/counsellor/applications", element: <Layout><CounsellorApplications /></Layout> },
   ]);
 
   return (

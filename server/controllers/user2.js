@@ -264,14 +264,11 @@ export const getAllStudents = async (req, res) => {
     }
 
     const skip = (pageNumber - 1) * limitNumber;
-    
-    // Create a consistent filter for both queries
-    const studentFilter = { role: "student" };
 
-    // Populate counsellor information to get the names
-    const students = await User.find(studentFilter)
+    const students = await User.find({
+      role: "student",
+    })
       .select("name id profile certificates resume passwordChanged isPlaced placedDate")
-      .populate("profile.counsellor", "name")  // Populate counsellor field with name
       .skip(skip)
       .limit(limitNumber)
       .lean();
@@ -279,40 +276,26 @@ export const getAllStudents = async (req, res) => {
     if (!students || students.length === 0) {
       return res
         .status(404)
-        .json({ success: false, message: "No students found" });
+        .json({ success: false, message: "No students with profiles found" });
     }
 
-    // Modify student data and replace counsellor ID with name
-    const studentsWithCertLength = students.map((student) => {
-      // Extract the profile data or empty object
-      const profileData = student.profile || {};
-      
-      // Get counsellor name or use a placeholder
-      let counsellorName = "-";
-      if (profileData.counsellor) {
-        counsellorName = typeof profileData.counsellor === 'object' ? 
-          profileData.counsellor.name : 
-          profileData.counsellor;
-      }
-      
-      return {
-        name: student.name || "-",
-        id: student.id || "-",
-        _id: student._id || "-",
-        profile: {
-          ...profileData,
-          counsellor: counsellorName
-        },
-        certificatesLength: student.certificates ? student.certificates.length : 0,
-        resume: student.resume && student.resume.length > 0,
-        isPlaced: student.isPlaced || false,
-        placedDate: student.placedDate || null
-      };
-    });
+    // Modify student data based on password change and handle missing data
+    const studentsWithCertLength = students.map((student) => ({
+      name: student.name || "-",
+      id: student.id || "-",
+      _id: student._id || "-",
+      profile: student.profile || "-",
+      certificatesLength: student.certificates ? student.certificates.length : 0,
+      resume: student.resume && student.resume.length > 0,
+      isPlaced: student.isPlaced || false,
+      placedDate: student.placedDate || null
+    }));
 
-    // Get the TOTAL count of ALL students in database
-    const totalStudents = await User.countDocuments(studentFilter);
-    console.log("Total students in database:", totalStudents);
+    // Get the total count of students
+    const totalStudents = await User.countDocuments({
+      role: "student",
+      profile: { $exists: true, $ne: null },
+    });
 
     // Send response with paginated data and metadata
     res.status(200).json({
@@ -379,7 +362,7 @@ export const getProfileCounsellor = async (req, res) => {
 export const getCounsellorStudents = async (req, res) => {
   try {
     const { page = 1, limit = 10 } = req.query;
-    const counsellorId = req.user.id;
+    const counsellorId = req.user.id; // Assuming req.user contains the authenticated user info
 
     const pageNumber = parseInt(page, 10);
     const limitNumber = parseInt(limit, 10);
@@ -396,67 +379,47 @@ export const getCounsellorStudents = async (req, res) => {
       });
     }
 
-    // Get the counsellor's name to include in response
-    const counsellor = await User.findById(counsellorId).select("name").lean();
-    if (!counsellor) {
-      return res.status(404).json({
-        success: false,
-        message: "Counsellor not found"
-      });
-    }
-
     const skip = (pageNumber - 1) * limitNumber;
-    
-    // Create consistent filter for both queries
-    const studentFilter = { 
-      role: "student", 
-      "profile.counsellor": counsellorId 
-    };
 
-    const students = await User.find(studentFilter)
+    const students = await User.find({
+      role: "student",
+      "profile.counsellor": counsellorId, // Filter by counsellor ID
+    })
       .select("name id profile certificates resume passwordChanged isPlaced placedDate")
       .skip(skip)
       .limit(limitNumber)
-      .lean();
+      .lean(); // Convert MongoDB documents to plain JavaScript objects
 
     if (!students || students.length === 0) {
       return res
         .status(404)
-        .json({ success: false, message: "No students found for this counsellor" });
+        .json({ success: false, message: "No students with profiles found" });
     }
 
-    // Modify student data to include counsellor name
-    const studentsWithCertLength = students.map((student) => {
-      const profileData = student.profile || {};
-      
-      return {
-        name: student.name || "-",
-        id: student.id || "-",
-        _id: student._id || "-",
-        profile: {
-          ...profileData,
-          counsellor: counsellor.name // Use counsellor name instead of ID
-        },
-        certificatesLength: student.certificates ? student.certificates.length : 0,
-        resume: student.resume && student.resume.length > 0,
-        isPlaced: student.isPlaced || false,
-        placedDate: student.placedDate || null
-      };
+    // Modify student data based on password change and handle missing data
+    const studentsWithCertLength = students.map((student) => ({
+      name: student.name || "-",
+      id: student.id || "-",
+      _id: student._id || "-",
+      profile: student.profile || "-",
+      certificatesLength: student.certificates ? student.certificates.length : 0,
+      resume: student.resume && student.resume.length > 0,
+      isPlaced: student.isPlaced || false,
+      placedDate: student.placedDate || null
+    }));
+
+    // Get the total count of students
+    const totalStudents = await User.countDocuments({
+      role: "student",
+      "profile.counsellor": counsellorId, // Filter by counsellor ID
+      profile: { $exists: true, $ne: null },
     });
 
-    // Use the same filter for count query to ensure consistency
-    const totalStudents = await User.countDocuments(studentFilter);
-    console.log("Total students for counsellor:", totalStudents);
-
-    // Send response with counsellor info and paginated data
+    // Send response with paginated data and metadata
     res.status(200).json({
       success: true,
       data: studentsWithCertLength,
       meta: {
-        counsellor: {
-          id: counsellorId,
-          name: counsellor.name
-        },
         totalStudents,
         currentPage: pageNumber,
         totalPages: Math.ceil(totalStudents / limitNumber),
@@ -464,7 +427,7 @@ export const getCounsellorStudents = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching counsellor students:", error);
+    console.error("Error fetching students data:", error);
     res.status(500).json({
       success: false,
       message: "An error occurred while retrieving student details",

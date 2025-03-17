@@ -3,8 +3,18 @@ import Company from "../models/company.js";
 // Create a new company
 export const createCompany = async (req, res) => {
   try {
-    const { name, domain, salary } = req.body;
-    const company = new Company({ name, domain, salary });
+    const { name, domain, description, salary, website, linkedin } = req.body;
+    const company = new Company({ 
+      name, 
+      domain, 
+      description, 
+      salary: {
+        min: salary.min,
+        max: salary.max
+      },
+      website,
+      linkedin
+    });
     await company.save();
     res.status(201).json({ message: "Company created successfully", company });
   } catch (error) {
@@ -36,7 +46,7 @@ export const getCompanyById = async (req, res) => {
   }
 };
 
-// ✅ Delete a company
+// Delete a company
 export const deleteCompany = async (req, res) => {
   try {
     const company = await Company.findByIdAndDelete(req.params.id);
@@ -51,10 +61,20 @@ export const deleteCompany = async (req, res) => {
 // Update a company by ID
 export const updateCompany = async (req, res) => {
   try {
-    const { name, domain, salary } = req.body;
+    const { name, domain, description, salary, website, linkedin } = req.body;
     const updatedCompany = await Company.findByIdAndUpdate(
       req.params.id,
-      { name, domain, salary },
+      { 
+        name, 
+        domain, 
+        description,
+        salary: {
+          min: salary.min,
+          max: salary.max
+        },
+        website,
+        linkedin
+      },
       { new: true, runValidators: true }
     );
 
@@ -69,7 +89,7 @@ export const updateCompany = async (req, res) => {
 
 export const approveCompany = async (req, res) => {
   try {
-    console.log("Received request:", req.body); // Debug log
+    console.log("Received request:", req.body);
 
     const { studentId, companyId } = req.body;
     if (!studentId || !companyId) {

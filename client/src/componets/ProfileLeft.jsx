@@ -8,6 +8,8 @@ import {
   Briefcase,
   Award,
   FileText,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
 import axiosInstance from "../utils/axiosInstance";
 import toast from "react-hot-toast";
@@ -29,6 +31,7 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
   const loading = useSelector((state) => state.app.isLoading);
   const avatarId = useSelector((state) => state.app?.user?.profile?.avatar);
   const avatarUrl = useSelector((state) => state.app?.user?.profile?.avatarUrl);
+  const user = useSelector((state) => state.app.user);
 
   const githubURL = formData.github ? `https://github.com/${formData.github}` : null;
   const linkedInURL = formData.linkedIn || null;
@@ -226,6 +229,31 @@ const ProfileLeft = ({ formData, toggleEdit, isEditing }) => {
                 >
                   Remove Profile Picture
                 </button>
+              )}
+            </div>
+          )}
+          {user?.role === 'student' && (
+            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-gray-700 px-2">Placement Status </span>
+                <div className="flex items-center gap-2">
+                  {user?.isPlaced ? (
+                    <>
+                      <CheckCircle className="text-green-500" size={18} />
+                      <span className="text-sm font-medium text-green-500">Placed</span>
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="text-gray-500" size={18} />
+                      <span className="text-sm font-medium text-gray-500">Not Placed</span>
+                    </>
+                  )}
+                </div>
+              </div>
+              {user?.isPlaced && user?.placedDate && (
+                <p className="mt-2 text-xs text-gray-500">
+                  Placed on: {new Date(user.placedDate).toLocaleDateString()}
+                </p>
               )}
             </div>
           )}
