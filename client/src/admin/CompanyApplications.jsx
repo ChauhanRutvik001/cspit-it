@@ -73,7 +73,7 @@ const CompanyApplications = () => {
     try {
       const response = await axiosInstance.get(`/application/company/${selectedCompany}`);
       setApplications(response.data);
-      setTotalDocuments(response.data.length);
+      setTotalDocuments(response.data?.length);
       setTotalPages(Math.ceil(response.data.length / limit));
     } catch (err) {
       setError(err.response?.data?.message || "An error occurred");

@@ -4,7 +4,16 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axiosInstance from "../utils/axiosInstance";
 import { ClipLoader } from "react-spinners";
-import { Users, FileSpreadsheet, Layout, Trash2, Briefcase, Award } from "lucide-react";
+import { 
+  Users, 
+  Trash2, 
+  Briefcase, 
+  Upload, 
+  UserPlus, 
+  GraduationCap, 
+  Layers,
+  Medal
+} from "lucide-react";
 
 const AdminPage = () => {
   const user = useSelector((store) => store.app.user);
@@ -117,48 +126,48 @@ const AdminPage = () => {
       {/* Option Buttons */}
 
       {/* Action Buttons */}
-      <div className="grid grid-cols-1 sm:grid-cols-5 gap-4 mb-2 p-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-2 p-3">
         <button
           onClick={() => navigate("/registation")}
-          className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
+          className="flex items-center justify-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3 py-3 rounded-md shadow-sm transition duration-150 ease-in-out text-sm"
         >
-          <FileSpreadsheet className="h-5 w-5" />
-          <span>Add Student Using File</span>
+          <Upload className="h-4 w-4" />
+          <span>Add Students</span>
         </button>
         <button
           onClick={() => navigate("/registationCounsellor")}
-          className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
+          className="flex items-center justify-center gap-1.5 bg-red-600 hover:bg-red-700 text-white px-3 py-3 rounded-md shadow-sm transition duration-150 ease-in-out text-sm"
         >
-          <FileSpreadsheet className="h-5 w-5" />
-          <span>Add Counsellor Using File</span>
+          <UserPlus className="h-4 w-4" />
+          <span>Add Counsellors</span>
         </button>
         <button
           onClick={() => navigate("/studentsDomain")}
-          className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
+          className="flex items-center justify-center gap-1.5 bg-purple-600 hover:bg-purple-700 text-white px-3 py-3 rounded-md shadow-sm transition duration-150 ease-in-out text-sm"
         >
-          <Layout className="h-5 w-5" />
+          <Layers className="h-4 w-4" />
           <span>Domain</span>
         </button>
         <button
           onClick={() => navigate("/students")}
-          className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
+          className="flex items-center justify-center gap-1.5 bg-green-600 hover:bg-green-700 text-white px-3 py-3 rounded-md shadow-sm transition duration-150 ease-in-out text-sm"
         >
-          <Users className="h-5 w-5" />
+          <GraduationCap className="h-4 w-4" />
           <span>Student</span>
         </button>
         <button
           onClick={() => navigate("/companypage")}
-          className="flex items-center justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-purple-300 transition"
+          className="flex items-center justify-center gap-1.5 bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-3 rounded-md shadow-sm transition duration-150 ease-in-out text-sm"
         >
-          <Briefcase className="h-5 w-5" />
+          <Briefcase className="h-4 w-4" />
           <span>Company</span>
         </button>
         <button
           onClick={() => navigate("/placed-students")}
-          className="flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-300 transition"
+          className="flex items-center justify-center gap-1.5 bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-2 rounded-md shadow-sm transition duration-150 ease-in-out text-sm"
         >
-          <Award className="h-5 w-5" />
-          <span>Add Placed Students</span>
+          <Medal className="h-4 w-4" />
+          <span>Placed Students</span>
         </button>
       </div>
 

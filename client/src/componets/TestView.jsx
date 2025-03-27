@@ -74,21 +74,21 @@ const TestView = () => {
         </div>
 
         <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-          <h1 className="text-3xl font-bold mb-4">{test.title}</h1>
-          <p className="text-gray-600 mb-4">{test.description}</p>
+          <h1 className="text-3xl font-bold mb-4">{test?.title}</h1>
+          <p className="text-gray-600 mb-4">{test?.description}</p>
           <div className="space-y-2 mb-6">
             <p className="text-sm">
-              <span className="font-medium">Subject:</span> {test.subject}
+              <span className="font-medium">Subject:</span> {test?.subject}
             </p>
             <p className="text-sm">
-              <span className="font-medium">Duration:</span> {test.duration}
+              <span className="font-medium">Duration:</span> {test?.duration}
             </p>
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow-lg p-6">
           <iframe
-            src={getEmbeddedFormUrl(test.formLink)}
+            src={getEmbeddedFormUrl(test?.formLink)}
             width="100%"
             height="800px"
             frameBorder="0"
