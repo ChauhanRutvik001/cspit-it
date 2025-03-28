@@ -42,6 +42,7 @@ const Company = () => {
       // Ensure we have an array, even if response is unexpected
       setCompanies(Array.isArray(response?.data) ? response.data : []);
       setLoading(false);
+      console.log("Companies fetched successfully:", response.data);
     } catch (error) {
       console.error("Error fetching companies:", error?.response || error);
       setError("Failed to fetch companies. Please try again later.");
@@ -658,10 +659,10 @@ const Company = () => {
                             </span>
                           </div>
                           <div className="text-sm text-gray-900 max-w-md break-words whitespace-normal">
-                            {comp.description ? (
+                            {company?.description ? (
                               <>
-                                {comp.description.substring(0, 40)}
-                                {comp.description.length > 40 ? "..." : ""}
+                                {company.description.substring(0, 40)}
+                                {company.description.length > 40 ? "..." : ""}
                               </>
                             ) : (
                               "No description available"

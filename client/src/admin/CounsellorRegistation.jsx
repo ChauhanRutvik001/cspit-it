@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
+import ExcelUploadInstructions from "../componets/ExcelUploadInstructions";
 
 const CounsellorRegistation = () => {
   const [students, setStudents] = useState([]); // Holds parsed Excel data
@@ -22,32 +23,78 @@ const CounsellorRegistation = () => {
     if (user?.role !== "admin") navigate("/browse");
   }, [user, navigate]);
 
-
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+
+    // Verify file extension
+    const fileExt = file.name.split('.').pop().toLowerCase();
+    if (fileExt !== 'xlsx' && fileExt !== 'xls') {
+      toast.error('Please upload a valid Excel file (.xlsx or .xls)');
+      e.target.value = ''; // Clear the file input
+      return;
+    }
 
     // Create a FileReader to read the file
     const reader = new FileReader();
 
     reader.onload = (event) => {
-      const data = new Uint8Array(event.target.result); // Read the file as ArrayBuffer
-      const workbook = XLSX.read(data, { type: "array" }); // Parse the Excel data into a workbook
-      const sheet = workbook.Sheets[workbook.SheetNames[0]]; // Get the first sheet
-      const parsedData = XLSX.utils.sheet_to_json(sheet); // Parse the sheet into JSON data
+      try {
+        const data = new Uint8Array(event.target.result); // Read the file as ArrayBuffer
+        const workbook = XLSX.read(data, { type: "array" }); // Parse the Excel data into a workbook
+        
+        if (!workbook.SheetNames || workbook.SheetNames.length === 0) {
+          toast.error('The Excel file is empty or corrupted');
+          e.target.value = ''; // Clear the file input
+          return;
+        }
 
-      // Transform parsed data to expected format
-      setStudents(
-        parsedData.map((row, index) => ({
-          id: row.ID?.toLowerCase() || "", // Match the key 'ID' in the parsed data
-          name: row.NAME || "", // Match the key 'Name'
-          index,
-        }))
-      );
+        const sheet = workbook.Sheets[workbook.SheetNames[0]]; // Get the first sheet
+        const parsedData = XLSX.utils.sheet_to_json(sheet); // Parse the sheet into JSON data
 
-      // Reset selected students and error messages
-      setSelectedStudents({});
-      setErrorMessages([]);
+        // Check if data has required headers
+        if (parsedData.length > 0 && (!parsedData[0].hasOwnProperty('ID') || !parsedData[0].hasOwnProperty('NAME'))) {
+          toast.error('Excel file must contain "ID" and "NAME" columns exactly as shown');
+          e.target.value = ''; // Clear the file input
+          return;
+        }
+
+        // Transform parsed data to expected format
+        const formattedData = parsedData.map((row, index) => {
+          // Check for valid data
+          if (!row.ID && !row.NAME) {
+            return null; // Skip empty rows
+          }
+          
+          return {
+            id: row.ID?.toString().toLowerCase() || "", // Match the key 'ID' in the parsed data
+            name: row.NAME?.toString() || "", // Match the key 'Name'
+            index,
+          };
+        }).filter(Boolean); // Remove null items (empty rows)
+
+        if (formattedData.length === 0) {
+          toast.error('No valid data found in the Excel file');
+          e.target.value = ''; // Clear the file input
+          return;
+        }
+
+        setStudents(formattedData);
+        toast.success(`Successfully loaded ${formattedData.length} entries`);
+
+        // Reset selected students and error messages
+        setSelectedStudents({});
+        setErrorMessages([]);
+      } catch (error) {
+        console.error("Error parsing Excel file:", error);
+        toast.error('Failed to parse the Excel file. The file might be corrupted or in an invalid format.');
+        e.target.value = ''; // Clear the file input
+      }
+    };
+
+    reader.onerror = () => {
+      toast.error('Error reading the file. Please try again with a different file.');
+      e.target.value = ''; // Clear the file input
     };
 
     reader.readAsArrayBuffer(file); // Start reading the file
@@ -192,6 +239,9 @@ const CounsellorRegistation = () => {
           Back
         </button>
       </div>
+
+      {/* Add Excel Upload Instructions */}
+      <ExcelUploadInstructions type="counsellor" />
 
       <div className="px-6 mt-10 flex md:flex-row flex-col md:items-center md:justify-between gap-4">
         <div className="md:w-auto w-full sm:text-center">

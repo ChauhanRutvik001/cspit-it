@@ -2,6 +2,7 @@ import User from "../models/user.js";
 import { StatusCodes } from "http-status-codes";
 import { createToken, verifyToken } from "../utils/jwt.js";
 import jwt from "jsonwebtoken";
+import admin from "../config/firebase-admin.js"; // We'll create this next
 
 export const login = async (req, res) => {
   console.log("API hit");
@@ -347,5 +348,55 @@ export const updateUser = async (req, res) => {
   } catch (error) {
     console.error("Error updating user:", error);
     return res.status(500).json({ message: "Server error." });
+  }
+};
+
+export const googleLogin = async (req, res) => {
+  try {
+    const { idToken } = req.body;
+    
+    if (!idToken) {
+      return res.status(400).json({ message: "ID token is required", success: false });
+    }
+    
+    // Verify the Firebase ID token
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const { email, name, picture } = decodedToken;
+    
+    // Check if a user with this email exists
+    let user = await User.findOne({ email });
+    
+    if (!user) {
+      return res.status(401).json({
+        message: "No account registered with this Google email. Please contact admin.",
+        success: false
+      });
+    }
+    
+    // Create JWT token for our application
+    const token = await createToken({ id: user._id });
+    const oneDay = 1000 * 60 * 60 * 24;
+    
+    // Exclude password from the response
+    const { password: _, ...userData } = user.toObject();
+    
+    return res
+      .status(200)
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        expires: new Date(Date.now() + oneDay),
+      })
+      .json({
+        message: "Google login successful!",
+        user: userData,
+        success: true,
+      });
+  } catch (error) {
+    console.error("Google Login Error:", error);
+    return res.status(500).json({
+      message: "An error occurred during Google login. Please try again later.",
+      success: false,
+    });
   }
 };
