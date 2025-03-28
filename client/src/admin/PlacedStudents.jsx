@@ -32,6 +32,10 @@ const PlacedStudents = () => {
     try {
       setSearchLoading(true);
       setError(null);
+      
+      // Add a 3-second delay before making the API call
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
       const response = await axiosInstance.get('/admin/placed-students', {
         params: {
           page: page + 1,
@@ -42,6 +46,7 @@ const PlacedStudents = () => {
       
       if (response.data.success) {
         setPlacedStudents(response.data.students);
+        console.log(response.data.students)
         setTotalStudents(response.data.totalStudents);
       } else {
         setError(response.data.message || 'Failed to fetch placed students');
@@ -384,14 +389,26 @@ const PlacedStudents = () => {
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                       {searchLoading ? (
-                        <tr>
-                          <td colSpan="5" className="px-6 py-8 text-center">
-                            <div className="flex items-center justify-center gap-3">
-                              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-indigo-500"></div>
-                              <span className="text-gray-500">Loading students...</span>
-                            </div>
-                          </td>
-                        </tr>
+                        // YouTube-style skeleton loading rows
+                        Array(rowsPerPage).fill(0).map((_, index) => (
+                          <tr key={`skeleton-${index}`} className="animate-pulse">
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="h-6 w-20 bg-gray-200 rounded"></div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="h-6 w-32 bg-gray-200 rounded"></div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="h-6 w-48 bg-gray-200 rounded"></div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="h-6 w-24 bg-gray-200 rounded"></div>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right">
+                              <div className="h-8 w-8 bg-gray-200 rounded-lg ml-auto"></div>
+                            </td>
+                          </tr>
+                        ))
                       ) : placedStudents.length === 0 ? (
                         <tr>
                           <td colSpan="5" className="px-6 py-8 text-center">
