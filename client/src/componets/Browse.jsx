@@ -30,7 +30,7 @@ const recruiters = [
 const Browse = () => {
   return (
     <div className="relative  bg-white text-gray-900 overflow-hidden">
-      <div className="content">
+      <div className="content ">
         <HeroSection />
         <CDPCDetails />
         <ImageCarousel />
@@ -70,7 +70,7 @@ const HeroSection = () => {
   }, [mousePosition, controls]);
 
   return (
-    <section className="relative min-h-screen overflow-hidden py-20 px-4 sm:px-6 lg:px-8 flex justify-center items-center bg-white">
+    <section className="bg-blue-50 relative min-h-screen overflow-hidden py-20 px-4 sm:px-6 lg:px-8 flex justify-center items-center">
       <div className="absolute inset-0 bg-white opacity-75"></div>
 
       <div className="max-w-6xl mx-auto relative z-10 flex flex-col md:flex-row items-center">

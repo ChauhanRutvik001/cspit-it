@@ -14,6 +14,39 @@ import {
   Layers,
 } from "lucide-react";
 
+// Skeleton loader component for YouTube-style loading UI
+const TableSkeletonLoader = () => {
+  return (
+    <>
+      {Array(7).fill(0).map((_, index) => (
+        <tr key={index}>
+        <td className="px-6 py-4 whitespace-nowrap">
+            <div className="h-16 w-16 rounded-full bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse"></div>
+          </td>
+          
+          <td className="px-6 py-4 whitespace-nowrap">
+            <div className="h-6 w-32 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-pulse"></div>
+          </td>
+         
+          <td className="px-6 py-4 whitespace-nowrap">
+            <div className="h-6 w-32 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-pulse"></div>
+          </td>
+          <td className="px-6 py-4">
+            <div className="h-6 w-full max-w-[200px] bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-pulse"></div>
+          </td>
+          <td className="px-6 py-4">
+            <div className="h-6 w-full bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-pulse"></div>
+          </td>
+          <td className="px-6 py-4">
+            <div className="h-6 w-full bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-pulse"></div>
+            <div className="h-6 w-3/4 mt-2 bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 rounded animate-pulse"></div>
+          </td>
+        </tr>
+      ))}
+    </>
+  );
+};
+
 const AllStudentSelections = () => {
   const user = useSelector((store) => store.app.user);
   const navigate = useNavigate();
@@ -38,6 +71,10 @@ const AllStudentSelections = () => {
     const fetchSelections = async () => {
       setLoading(true);
       setError(null);
+
+      // Start time tracking for minimum 3-second loading
+      const startTime = Date.now();
+      
       try {
         let endpoint =
         user?.role === "admin"
@@ -54,18 +91,35 @@ const AllStudentSelections = () => {
 
         console.log("response", response.data);
         const { data, pagination } = response.data;
-        setTotalDocuments(pagination.totalDocuments);
-        setSelections(data || []);
-        setTotalPages(pagination.totalPages || 1);
+        
+        // Calculate elapsed time
+        const elapsedTime = Date.now() - startTime;
+        
+        // If less than 3 seconds have passed, wait until 3 seconds total
+        const remainingTime = Math.max(0, 3000 - elapsedTime);
+        
+        // Use setTimeout to ensure minimum loading time of 3 seconds
+        setTimeout(() => {
+          setTotalDocuments(pagination.totalDocuments);
+          setSelections(data || []);
+          setTotalPages(pagination.totalPages || 1);
+          setLoading(false);
+        }, remainingTime);
+        
       } catch (err) {
-        setError(err.response?.data?.message || "An error occurred");
-      } finally {
-        setLoading(false);
+        // Also respect the minimum 3-second delay for error states
+        const elapsedTime = Date.now() - startTime;
+        const remainingTime = Math.max(0, 3000 - elapsedTime);
+        
+        setTimeout(() => {
+          setError(err.response?.data?.message || "An error occurred");
+          setLoading(false);
+        }, remainingTime);
       }
     };
 
     fetchSelections();
-  }, [currentPage, limit, sortBy, order]);
+  }, [currentPage, limit, sortBy, order, user?.role]);
 
   const handleSort = (field) => {
     setSortBy(field);
@@ -314,6 +368,13 @@ const AllStudentSelections = () => {
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-100">
                     <tr>
+                      
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+                      >
+                        Photo
+                      </th>
                       <th
                         scope="col"
                         className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer"
@@ -327,12 +388,6 @@ const AllStudentSelections = () => {
                             </span>
                           )}
                         </div>
-                      </th>
-                      <th
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
-                      >
-                        Photo
                       </th>
                       <th
                         scope="col"
@@ -363,7 +418,7 @@ const AllStudentSelections = () => {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {error && (
                       <tr>
-                        <td colSpan={5} className="px-6 py-4 text-center">
+                        <td colSpan={6} className="px-6 py-4 text-center">
                           <div className="bg-red-50 text-red-600 p-3 rounded-lg">
                             {error}
                           </div>
@@ -371,16 +426,7 @@ const AllStudentSelections = () => {
                       </tr>
                     )}
                     {loading ? (
-                      <tr>
-                        <td colSpan={5} className="px-6 py-10 text-center">
-                          <div className="flex justify-center">
-                            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-purple-600"></div>
-                          </div>
-                          <p className="mt-2 text-sm text-gray-500">
-                            Loading selection data...
-                          </p>
-                        </td>
-                      </tr>
+                      <TableSkeletonLoader />
                     ) : (
                       filteredSelections.map((student, index) => (
                         <tr
@@ -451,7 +497,7 @@ const AllStudentSelections = () => {
                     {!loading && filteredSelections.length === 0 && (
                       <tr>
                         <td
-                          colSpan={5}
+                          colSpan={6}
                           className="px-6 py-4 text-center text-gray-500"
                         >
                           No matching records found

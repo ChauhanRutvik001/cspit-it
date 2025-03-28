@@ -17,6 +17,56 @@ import {
   XCircle,
 } from "lucide-react";
 
+// Skeleton loader component for table rows
+const SkeletonRow = () => {
+  return (
+    <tr className="animate-pulse">
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="h-16 w-16 rounded-full bg-gray-300"></div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="h-6 w-20 bg-gray-300 rounded"></div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="h-6 w-32 bg-gray-300 rounded"></div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="h-6 w-24 bg-gray-300 rounded"></div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="h-6 w-16 bg-gray-300 rounded"></div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="h-6 w-16 bg-gray-300 rounded"></div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="h-6 w-24 bg-gray-300 rounded"></div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="h-6 w-16 bg-gray-300 rounded"></div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="h-6 w-24 bg-gray-300 rounded"></div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="h-6 w-28 bg-gray-300 rounded"></div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="h-6 w-28 bg-gray-300 rounded"></div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="h-6 w-20 bg-gray-300 rounded"></div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="h-6 w-20 bg-gray-300 rounded"></div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="h-6 w-20 bg-gray-300 rounded"></div>
+      </td>
+    </tr>
+  );
+};
+
 const StudentData = () => {
   const user = useSelector((store) => store.app.user);
   const navigate = useNavigate();
@@ -185,6 +235,10 @@ const StudentData = () => {
           user?.role === "admin"
             ? "/user/profile/getAllstudent"
             : "/user/profile/getCounsellorStudents";
+            
+        // Simulate loading delay for demonstration purposes
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
         const response = await axiosInstance.get(
           `${endpoint}?page=${currentPage}&limit=${recordsPerPage}`
         );
@@ -392,16 +446,12 @@ const StudentData = () => {
                   </tr>
                 )}
                 {loading ? (
-                  <tr>
-                    <td colSpan={13} className="px-6 py-10 text-center">
-                      <div className="flex justify-center">
-                        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
-                      </div>
-                      <p className="mt-2 text-sm text-gray-500">
-                        Loading student data...
-                      </p>
-                    </td>
-                  </tr>
+                  // YouTube-style skeleton loader
+                  <>
+                    {[...Array(recordsPerPage > 5 ? 5 : recordsPerPage)].map((_, index) => (
+                      <SkeletonRow key={index} />
+                    ))}
+                  </>
                 ) : (
                   filteredSelections.map((student) => {
                     const hasCertificates = student?.certificatesLength > 0;

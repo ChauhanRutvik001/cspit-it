@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axiosInstance from "../utils/axiosInstance";
-import { ClipLoader } from "react-spinners";
 import { 
   Users, 
   Trash2, 
@@ -14,6 +13,29 @@ import {
   Layers,
   Medal
 } from "lucide-react";
+
+// Skeleton loader for table rows with YouTube-style shimmer effect
+const TableRowSkeleton = ({ rows = 5 }) => {
+  return Array(rows).fill(0).map((_, index) => (
+    <tr key={`skeleton-row-${index}`} className="animate-pulse">
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="h-4 w-6 bg-gray-200 rounded skeleton-shimmer"></div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="h-4 w-28 bg-gray-200 rounded skeleton-shimmer"></div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="h-4 w-40 bg-gray-200 rounded skeleton-shimmer"></div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="h-4 w-32 bg-gray-200 rounded skeleton-shimmer"></div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="h-4 w-16 bg-gray-200 rounded skeleton-shimmer"></div>
+      </td>
+    </tr>
+  ));
+};
 
 const AdminPage = () => {
   const user = useSelector((store) => store.app.user);
@@ -35,6 +57,10 @@ const AdminPage = () => {
       const endpoint = isStudent
         ? "/admin/get-students-by-admin"
         : "/admin/get-counsellor-by-admin";
+      
+      // Simulate API delay for better UX testing (remove in production)
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
       const response = await axiosInstance.post(endpoint, {
         page,
         limit: studentsPerPage,
@@ -69,6 +95,24 @@ const AdminPage = () => {
   useEffect(() => {
     fetchData(currentPage);
   }, [currentPage, isStudent]);
+
+  // Add shimmer animation style
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+      }
+      .skeleton-shimmer {
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
@@ -195,9 +239,13 @@ const AdminPage = () => {
           <h2 className="text-lg font-semibold text-gray-700">
             Total {isStudent ? "Students" : "Counsellors"}
           </h2>
-          <span className="ml-2 text-3xl font-bold text-blue-600">
-            {totalStudents}
-          </span>
+          {loading ? (
+            <div className="ml-2 w-16 h-8 bg-gray-200 rounded-md skeleton-shimmer"></div>
+          ) : (
+            <span className="ml-2 text-3xl font-bold text-blue-600">
+              {totalStudents}
+            </span>
+          )}
         </div>
       </div>
 
@@ -239,18 +287,16 @@ const AdminPage = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {error && (
-                <td colSpan="5" className="text-red-600 py-4 text-center">
-                  {error}
-                </td>
+              {error && !loading && (
+                <tr>
+                  <td colSpan="5" className="text-red-600 py-4 text-center">
+                    {error}
+                  </td>
+                </tr>
               )}
 
               {loading ? (
-                <tr>
-                  <td colSpan="5" className="text-center py-4 text-gray-500">
-                    <ClipLoader size={40} color="#1D4ED8" />
-                  </td>
-                </tr>
+                <TableRowSkeleton rows={studentsPerPage} />
               ) : (
                 students.map((student, index) => (
                   <tr key={student._id} className="hover:bg-gray-50">
@@ -283,22 +329,26 @@ const AdminPage = () => {
           <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
-                <p className="text-sm text-gray-700">
-                  Page <span className="font-medium">{currentPage}</span> of{" "}
-                  <span className="font-medium">{totalPages}</span>
-                </p>
+                {loading ? (
+                  <div className="h-5 w-32 bg-gray-200 rounded skeleton-shimmer"></div>
+                ) : (
+                  <p className="text-sm text-gray-700">
+                    Page <span className="font-medium">{currentPage}</span> of{" "}
+                    <span className="font-medium">{totalPages}</span>
+                  </p>
+                )}
               </div>
               <div className="flex items-center space-x-2">
                 <button
                   onClick={handlePreviousPage}
-                  disabled={currentPage === 1}
+                  disabled={currentPage === 1 || loading}
                   className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400"
                 >
                   Previous
                 </button>
                 <button
                   onClick={handleNextPage}
-                  disabled={currentPage === totalPages}
+                  disabled={currentPage === totalPages || loading}
                   className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:bg-gray-100 disabled:text-gray-400"
                 >
                   Next
