@@ -59,7 +59,7 @@ const AdminPage = () => {
         : "/admin/get-counsellor-by-admin";
       
       // Simulate API delay for better UX testing (remove in production)
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // await new Promise(resolve => setTimeout(resolve, 100));
       
       const response = await axiosInstance.post(endpoint, {
         page,
