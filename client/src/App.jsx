@@ -4,7 +4,6 @@ import AuthService from "./Auth/auth";
 import { useDispatch } from "react-redux";
 import { setUser, logout } from "./redux/userSlice";
 import Body from "./componets/Body";
-import Header from "./componets/Header";
 
 function App() {
   const dispatch = useDispatch();
@@ -17,7 +16,7 @@ function App() {
         console.log(authStatus);
         setIsAuthenticated(authStatus.authStatus);
         if (authStatus.authStatus) {
-          dispatch(setUser(authStatus.data.data.user));
+          dispatch(setUser(authStatus.data?.data?.user));
           // console.log(authStatus.data.user);
           console.log("User is authenticated");
         } else {

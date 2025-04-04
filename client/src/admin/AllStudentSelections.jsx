@@ -96,7 +96,7 @@ const AllStudentSelections = () => {
         const elapsedTime = Date.now() - startTime;
         
         // If less than 3 seconds have passed, wait until 3 seconds total
-        const remainingTime = Math.max(0, 3000 - elapsedTime);
+        const remainingTime = Math.max(0, 1500 - elapsedTime);
         
         // Use setTimeout to ensure minimum loading time of 3 seconds
         setTimeout(() => {
@@ -109,7 +109,7 @@ const AllStudentSelections = () => {
       } catch (err) {
         // Also respect the minimum 3-second delay for error states
         const elapsedTime = Date.now() - startTime;
-        const remainingTime = Math.max(0, 3000 - elapsedTime);
+        const remainingTime = Math.max(0, 1500 - elapsedTime);
         
         setTimeout(() => {
           setError(err.response?.data?.message || "An error occurred");

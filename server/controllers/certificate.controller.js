@@ -269,23 +269,69 @@ export const getCertificates = async (req, res) => {
 
 export const getPendingRequests = async (req, res) => {
   try {
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10, search = "" } = req.query;
     const counsellorId = req.user.id;
     console.log("Counsellor ID:", counsellorId);
-
-    const pendingRequests = await PendingRequest.find({
+    console.log("Search Term:", search);
+    
+    // Base query for pending requests
+    let pendingRequestsQuery = {
       counsellorId,
-      status: "pending",
-    })
+      status: "pending"
+    };
+    
+    // Find student IDs matching the search criteria if search term is provided
+    let matchingStudentIds = [];
+    let matchingCertificateIds = [];
+    
+    if (search && search.trim() !== "") {
+      // Find students matching the search term
+      const searchRegex = new RegExp(search, 'i');
+      
+      // Find students by ID or name
+      const matchingStudents = await User.find({
+        $or: [
+          { id: searchRegex },
+          { name: searchRegex }
+        ]
+      }).select('_id');
+      
+      matchingStudentIds = matchingStudents.map(student => student._id);
+      
+      // Find certificates matching the search term (by filename)
+      const matchingCertificates = await Certificate.find({
+        filename: searchRegex
+      }).select('_id');
+      
+      matchingCertificateIds = matchingCertificates.map(cert => cert._id);
+      
+      // If we have matching students or certificates, update the query
+      if (matchingStudentIds.length > 0 || matchingCertificateIds.length > 0) {
+        pendingRequestsQuery = {
+          counsellorId,
+          status: "pending",
+          $or: [
+            { studentId: { $in: matchingStudentIds } },
+            { certificateId: { $in: matchingCertificateIds } }
+          ]
+        };
+      } else if (search.trim() !== "") {
+        // If no matches found but search term was provided, return empty results
+        return res.json({ students: [], total: 0 });
+      }
+    }
+    
+    // Get total count for pagination
+    const total = await PendingRequest.countDocuments(pendingRequestsQuery);
+    
+    // Get the actual pending requests with pagination
+    const pendingRequests = await PendingRequest.find(pendingRequestsQuery)
       .populate("studentId certificateId")
       .skip((page - 1) * limit)
-      .limit(parseInt(limit));
+      .limit(parseInt(limit))
+      .sort({ createdAt: -1 }); // Sort by newest first
 
-    const total = await PendingRequest.countDocuments({
-      counsellorId,
-      status: "pending",
-    });
-
+    // Map the pending requests to student data with certificates
     const students = await Promise.all(
       pendingRequests.map(async (request) => {
         const student = await User.findById(request.studentId);
@@ -305,9 +351,11 @@ export const getPendingRequests = async (req, res) => {
 
     res.json({ students, total });
   } catch (error) {
-    res
-      .status(500)
-      .json({ error: "Failed to fetch students with pending requests" });
+    console.error("Error in getPendingRequests:", error);
+    res.status(500).json({ 
+      error: "Failed to fetch students with pending requests",
+      details: error.message 
+    });
   }
 };
 

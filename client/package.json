@@ -22,6 +22,7 @@
     "framer-motion": "^12.4.7",
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
+    "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.475.0",
     "pdfjs-dist": "^3.11.174",
     "react": "^18.3.1",

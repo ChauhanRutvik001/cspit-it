@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axiosInstance from "../utils/axiosInstance";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Search, Building, Check, X } from "lucide-react";
 import { toast } from "react-hot-toast";
+import debounce from "lodash.debounce";
 
 const CounsellorApplications = () => {
   const user = useSelector((store) => store.app.user);
@@ -13,37 +14,35 @@ const CounsellorApplications = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  useEffect(() => {
-    if (user?.role !== "counsellor") {
-      navigate("/browse");
-    }
-    fetchApplications();
-  }, [user, navigate]);
-
-  const fetchApplications = async () => {
+  const fetchApplications = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      // Get all applications where counsellor matches current user and status is pending
       const response = await axiosInstance.get('/application/counsellor/pending');
       setApplications(response.data);
     } catch (err) {
-      setError(err.response?.data?.message || "An error occurred");
+      setError(err.response?.data?.message || "An error occurred while fetching applications");
       toast.error("Failed to fetch applications");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const handleSearch = (e) => {
+  useEffect(() => {
+    if (user?.role !== "counsellor") {
+      navigate("/browse");
+    } else {
+      fetchApplications();
+    }
+  }, [user, navigate, fetchApplications]);
+
+  const handleSearch = debounce((e) => {
     setSearchTerm(e.target.value.toLowerCase());
-  };
+  }, 300);
 
   const handleApproval = async (applicationId, approve) => {
     try {
-      await axiosInstance.patch(`/application/${applicationId}/counsellor-approval`, {
-        approve
-      });
+      await axiosInstance.patch(`/application/${applicationId}/counsellor-approval`, { approve });
       toast.success(approve ? "Application approved" : "Application rejected");
       fetchApplications(); // Refresh the list
     } catch (error) {
@@ -57,9 +56,9 @@ const CounsellorApplications = () => {
     const companyName = application.company?.name || "";
 
     return (
-      studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      studentEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      companyName.toLowerCase().includes(searchTerm.toLowerCase())
+      studentName.toLowerCase().includes(searchTerm) ||
+      studentEmail.toLowerCase().includes(searchTerm) ||
+      companyName.toLowerCase().includes(searchTerm)
     );
   });
 
@@ -92,7 +91,6 @@ const CounsellorApplications = () => {
               <input
                 type="text"
                 placeholder="Search applications..."
-                value={searchTerm}
                 onChange={handleSearch}
                 className="pl-10 pr-4 py-2 border rounded-lg w-full focus:ring-2 focus:ring-blue-500"
               />
@@ -173,4 +171,4 @@ const CounsellorApplications = () => {
   );
 };
 
-export default CounsellorApplications; 
+export default CounsellorApplications;
