@@ -99,7 +99,11 @@ const Login = () => {
   const handleGoogleLogin = async () => {
     try {
       setAssignLoading(true);
+      setPopUp(""); // Clear any previous error messages
+      
       const googleAuthResult = await signInWithGoogle();
+      
+      // If we get here, the popup wasn't closed by the user
       const idToken = await googleAuthResult.user.getIdToken();
       
       // Send the Firebase ID token to your backend for verification
@@ -116,7 +120,26 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Google login error:", error);
-      toast.error(error?.response?.data?.message || "Failed to login with Google. Please try again.");
+      
+      // Handle specific Firebase auth errors
+      if (error.message?.includes("cancelled")) {
+        // User closed the popup - just show a mild toast notification
+        toast.error("Sign-in was cancelled");
+      } else if (error.message?.includes("blocked")) {
+        // Popup was blocked
+        toast.error("Pop-up was blocked by the browser. Please enable pop-ups for this site.");
+        setPopUp("Pop-up was blocked. Please enable pop-ups for this site and try again.");
+      } else if (error.response?.status === 401) {
+        // Authentication issue - user not registered with Google
+        toast.error("This Google account is not registered in our system. Please contact admin.");
+      } else if (error.response?.status === 500) {
+        // Server error
+        toast.error("Server error during Google login. Please try again later.");
+        setPopUp("Our servers are experiencing issues. Please try again in a few minutes.");
+      } else {
+        // Generic error
+        toast.error("Failed to login with Google. Please try again.");
+      }
     } finally {
       setAssignLoading(false);
     }
