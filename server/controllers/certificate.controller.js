@@ -78,6 +78,38 @@ export const uploadCertificate = async (req, res) => {
   }
 };
 
+export const getUserCertificatesByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    console.log("Fetching certificates for user:", userId);
+    
+    // Get all certificates for the user
+    const certificates = await Certificate.find({ uploadedBy: userId });
+    
+    // Get all pending requests for these certificates
+    const pendingRequests = await PendingRequest.find({
+      studentId: userId,
+      certificateId: { $in: certificates.map(cert => cert._id) }
+    });
+    
+    // Filter to only include approved certificates
+    const approvedCertificates = certificates.filter(cert => {
+      const pendingRequest = pendingRequests.find(
+        req => req.certificateId.toString() === cert._id.toString()
+      );
+      
+      // Only include if the certificate status is 'approved'
+      return pendingRequest?.status === 'approved';
+    });
+    
+    console.log(`Found ${certificates.length} total certificates, ${approvedCertificates.length} are approved`);
+    res.status(200).json(approvedCertificates);
+  } catch (error) {
+    console.error("Error fetching certificates:", error);
+    res.status(500).json({ error: "Failed to retrieve certificates" });
+  }
+};
+
 export const updateCertificate = async (req, res) => {
   try {
     const { certificateId } = req.params;

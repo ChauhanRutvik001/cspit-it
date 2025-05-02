@@ -7,7 +7,8 @@ import {
   declineCertificate,
   getCertificates,
   getPendingRequests,
-  getCertificateFile
+  getCertificateFile,
+  getUserCertificatesByUserId
 } from "../controllers/certificate.controller.js";
 import { isAdmin, isCounsellor, isAuthorized } from "../middlewares/auth.js";
 import { upload } from "../middlewares/multer.utils.js";
@@ -37,5 +38,8 @@ router.patch("/decline/:requestId", isAuthorized, isCounsellor, declineCertifica
 
 // Route to get students with pending certificate requests for the counsellor
 router.get("/students", isAuthorized, isCounsellor, getPendingRequests);
+
+// Add to certificate.routes.js or admin.router.js
+router.get("/admin/user/:userId/certificates", isAuthorized, isAdmin, getUserCertificatesByUserId);
 
 export default router;

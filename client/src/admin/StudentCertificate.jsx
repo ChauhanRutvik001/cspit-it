@@ -20,13 +20,18 @@ const StudentCertificate = () => {
   const fetchCertificates = async () => {
     try {
       setLoading(true);
+      // Updated API endpoint - check with your backend developer for the correct endpoint
+      // Options:
+      // 1. Use an admin-specific endpoint if it exists
       const response = await axiosInstance.get(
-        `/certificates/getUserCertificate/${userId}`
+        `/certificates/admin/user/${userId}/certificates`
       );
+      // If the above doesn't work, you might need to add a new endpoint to your API
       console.log(response.data);
       setCertificates(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
-      // toast.error("Failed to fetch certificates. Please try again.");
+      console.error("Error fetching certificates:", error.message);
+      toast.error("Failed to fetch certificates. Please try again.");
       setCertificates([]);
     } finally {
       setLoading(false);
