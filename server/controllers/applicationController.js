@@ -1,6 +1,8 @@
 import Application from "../models/application.js";
 import User from "../models/user.js";
 import mongoose from "mongoose";
+import { generateNotification } from "./notification.controller.js";
+import Company from "../models/company.js";
 
 // Submit an application
 export const submitApplication = async (req, res) => {
@@ -11,6 +13,12 @@ export const submitApplication = async (req, res) => {
     const student = await User.findById(studentId);
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
+    }
+
+    // Get company details for notification
+    const company = await Company.findById(companyId);
+    if (!company) {
+      return res.status(404).json({ message: "Company not found" });
     }
 
     // Check for existing application
@@ -33,6 +41,24 @@ export const submitApplication = async (req, res) => {
     });
     
     await application.save();
+
+    // If student is placed, send notification to counsellor about pending approval
+    if (student.isPlaced && student.profile?.counsellor) {
+      const counsellorId = student.profile.counsellor;
+      
+      // Send notification to counsellor
+      await generateNotification(
+        counsellorId,
+        `${student.name} has applied to ${company.name} and is awaiting your approval`,
+        {
+          type: "application",
+          relatedId: application._id,
+          relatedModel: "Application"
+        }
+      );
+      
+      console.log(`Notification sent to counsellor ${counsellorId} about application from ${student.name} to ${company.name}`);
+    }
 
     // Return appropriate message
     const message = student.isPlaced 
@@ -84,6 +110,30 @@ export const counsellorApproval = async (req, res) => {
     application.status = approve ? "approved" : "rejected";
     application.counsellorApproval = approve;
     await application.save();
+
+    // Get counsellor's name for the notification
+    const counsellor = await User.findById(counsellorId);
+    
+    // Send notification to the student about application approval/rejection
+    if (application.student && application.student._id) {
+      // Prepare notification message based on approval status
+      const notificationMessage = approve
+        ? `Your application to ${application.company.name} has been approved by counsellor ${counsellor ? counsellor.name : ''}`
+        : `Your application to ${application.company.name} has been rejected by counsellor ${counsellor ? counsellor.name : ''}`;
+      
+      // Send the notification
+      await generateNotification(
+        application.student._id,
+        notificationMessage,
+        {
+          type: "application",
+          relatedId: application._id,
+          relatedModel: "Application"
+        }
+      );
+      
+      console.log(`Notification sent to student ${application.student._id} about ${approve ? 'approval' : 'rejection'} of application to ${application.company.name}`);
+    }
 
     res.status(200).json({ 
       message: approve ? "Application approved successfully" : "Application rejected",
@@ -235,4 +285,4 @@ export const getCounsellorPendingApplications = async (req, res) => {
     console.error("Error fetching counsellor applications:", error);
     res.status(500).json({ message: "Error fetching applications" });
   }
-}; 
+};

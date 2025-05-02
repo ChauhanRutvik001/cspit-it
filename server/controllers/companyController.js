@@ -1,4 +1,6 @@
 import Company from "../models/company.js";
+import User from "../models/user.js";
+import { generateNotification } from "./notification.controller.js";
 
 // Create a new company
 export const createCompany = async (req, res) => {
@@ -16,6 +18,33 @@ export const createCompany = async (req, res) => {
       linkedin
     });
     await company.save();
+    
+    // Send notifications to all students about the new company
+    try {
+      // Find all users with role "student"
+      const students = await User.find({ role: "student" });
+      
+      // Create notification promises for all students
+      const notificationPromises = students.map(student => 
+        generateNotification(
+          student._id,
+          `New company ${name} has posted job opportunities in ${domain} with salary range of ${salary.min}-${salary.max}`,
+          {
+            type: "company",
+            relatedId: company._id,
+            relatedModel: "Company"
+          }
+        )
+      );
+      
+      // Send notifications in parallel
+      await Promise.all(notificationPromises);
+      console.log(`Notifications sent to ${students.length} students about new company ${name}`);
+    } catch (notificationError) {
+      console.error("Error sending company notifications:", notificationError);
+      // Don't fail the API call if notifications have an issue
+    }
+    
     res.status(201).json({ message: "Company created successfully", company });
   } catch (error) {
     console.error("Error creating company:", error);

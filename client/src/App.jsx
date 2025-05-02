@@ -4,6 +4,7 @@ import AuthService from "./Auth/auth";
 import { useDispatch } from "react-redux";
 import { setUser, logout } from "./redux/userSlice";
 import Body from "./componets/Body";
+import { SocketProvider } from "./utils/SocketProvider";
 
 function App() {
   const dispatch = useDispatch();
@@ -33,10 +34,12 @@ function App() {
   }, [dispatch]);
 
   return (
-    <div>
-      <Body />
-      <Toaster />
-    </div>
+    <SocketProvider>
+      <div>
+        <Body />
+        <Toaster />
+      </div>
+    </SocketProvider>
   );
 }
 

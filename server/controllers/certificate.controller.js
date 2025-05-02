@@ -3,6 +3,7 @@ import Certificate from "../models/certificateSchema.js";
 import PendingRequest from "../models/pendingRequestSchema.js";
 import { GridFSBucket } from "mongodb";
 import User from "../models/user.js";
+import { generateNotification } from "./notification.controller.js";
 
 // Delete declined certificates after 20 seconds
 const DECLINE_EXPIRATION_SECONDS = 1;
@@ -64,6 +65,20 @@ export const uploadCertificate = async (req, res) => {
     });
 
     await pendingRequest.save();
+
+    // Send notification to counsellor
+    const counsellor = await User.findById(user.profile.counsellor);
+    if (counsellor) {
+      await generateNotification(
+        counsellor._id,
+        `Student ${user.name} has uploaded a new certificate "${file.filename}" for approval`,
+        {
+          type: "certificate",
+          relatedId: newCertificate._id,
+          relatedModel: "Certificate"
+        }
+      );
+    }
 
     res.status(201).json({
       message:
@@ -219,6 +234,22 @@ export const approveCertificate = async (req, res) => {
       { new: true }
     );
 
+    // Get certificate details for the notification
+    const certificate = await Certificate.findById(request.certificateId);
+
+    // Send notification to student
+    if (certificate) {
+      await generateNotification(
+        request.studentId,
+        `Your certificate "${certificate.filename}" has been approved!`,
+        {
+          type: "certificate",
+          relatedId: certificate._id,
+          relatedModel: "Certificate"
+        }
+      );
+    }
+
     res.status(200).json({ message: "Certificate approved" });
   } catch (error) {
     res.status(500).json({ error: "Error approving certificate" });
@@ -240,6 +271,22 @@ export const declineCertificate = async (req, res) => {
 
     request.status = "declined";
     await request.save();
+
+    // Get certificate details for the notification
+    const certificate = await Certificate.findById(request.certificateId);
+
+    // Send notification to student
+    if (certificate) {
+      await generateNotification(
+        request.studentId,
+        `Your certificate "${certificate.filename}" has been declined. Please review and resubmit.`,
+        {
+          type: "certificate",
+          relatedId: certificate._id,
+          relatedModel: "Certificate"
+        }
+      );
+    }
 
     // Schedule deletion of the certificate after specified seconds
     setTimeout(async () => {

@@ -27,6 +27,7 @@ import Company from "./Company";
 import CompanyApplications from "../admin/CompanyApplications";
 import PlacedStudents from "../admin/PlacedStudents";
 import CounsellorApplications from "../counsellor/CounsellorApplications";
+import Notifications from "./Notifications";
 
 const Body = () => {
   const appRouter = createBrowserRouter([
@@ -57,6 +58,7 @@ const Body = () => {
     { path: "/admin/applications/:companyId", element: <Layout><CompanyApplications /></Layout> },
     { path: "/placed-students", element: <Layout><PlacedStudents /></Layout> },
     { path: "/counsellor/applications", element: <Layout><CounsellorApplications /></Layout> },
+    { path: "/notifications", element: <Layout><Notifications /></Layout> },
   ]);
 
   return (

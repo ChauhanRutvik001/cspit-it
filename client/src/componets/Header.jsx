@@ -1,13 +1,15 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout, setUser, setAvatarBlobUrl, fetchAvatarBlob } from "../redux/userSlice";
 import toast from "react-hot-toast";
-import { Disclosure, Menu } from "@headlessui/react";
+import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { ClipLoader } from "react-spinners";
 import axiosInstance from "../utils/axiosInstance";
+import { useSocket } from "../utils/SocketProvider";
 
+// Navigation items
 const navigation = [
   { name: "Home", to: "/browse" },
   { name: "Developer", to: "/developer" },
@@ -15,7 +17,6 @@ const navigation = [
   { name: "Schedule", to: "/schedule" },
   { name: "Tests", to: "/tests" },
   { name: "Contact Us", to: "/Contact" },
-  
 ];
 
 function classNames(...classes) {
@@ -25,8 +26,6 @@ function classNames(...classes) {
 const Header = () => {
   const authStatus = useSelector((store) => store.app.authStatus);
   const user = useSelector((store) => store.app.user);
-  console.log(user);
-  console.log("user:", user?.role);
   const avatarId = user?.profile?.avatar;
   const avatarBlobUrl = user?.profile?.avatarUrl;
   const dispatch = useDispatch();
@@ -34,6 +33,19 @@ const Header = () => {
   const location = useLocation();
   const [imagePreview, setImagePreview] = useState(null);
   const loading = useSelector((state) => state.app.isLoading);
+  const { socket } = useSocket();
+
+  // Notification states
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [hasNewNotification, setHasNewNotification] = useState(false);
+
+  // Get only the top 4 notifications for dropdown display
+  const topNotifications = useMemo(() => {
+    return notifications.slice(0, 4);
+  }, [notifications]);
 
   // Clear stored blob URL on mount to ensure a fresh fetch
   useEffect(() => {
@@ -45,6 +57,144 @@ const Header = () => {
       navigate("/");
     }
   }, [authStatus, navigate]);
+
+  // Fetch notifications from API
+  const fetchNotifications = useCallback(async () => {
+    if (!user?.id) return;
+    
+    try {
+      setNotificationsLoading(true);
+      const response = await axiosInstance.get('/notifications?limit=10&page=1');
+      
+      if (response.data.success) {
+        setNotifications(response.data.data);
+        setUnreadCount(response.data.meta.unread);
+      }
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+      // Fallback to empty notifications if API fails
+      setNotifications([]);
+      setUnreadCount(0);
+    } finally {
+      setNotificationsLoading(false);
+    }
+  }, [user?.id]);
+
+  // Listen for real-time notifications
+  useEffect(() => {
+    if (socket && user?.id) {
+      // Listen for new notifications
+      socket.on('new-notification', (notification) => {
+        console.log('New notification received:', notification);
+        
+        // Add the new notification to the state
+        setNotifications(prev => [notification, ...prev]);
+        
+        // Increment unread count
+        setUnreadCount(prev => prev + 1);
+        
+        // Visual and sound indicator that a new notification arrived
+        setHasNewNotification(true);
+        
+        // Show toast notification
+        const notificationIcon = getNotificationIcon(notification.type);
+        toast(
+          <div className="flex items-start">
+            <span className="mr-2 text-xl">{notificationIcon}</span>
+            <div>
+              <p className="font-medium">{notification.message}</p>
+            </div>
+          </div>,
+          { duration: 5000 }
+        );
+        
+        // Reset notification animation after 3 seconds
+        setTimeout(() => {
+          setHasNewNotification(false);
+        }, 3000);
+      });
+      
+      // Cleanup listener on component unmount
+      return () => {
+        socket.off('new-notification');
+      };
+    }
+  }, [socket, user?.id]);
+
+  // Load notifications when user is authenticated
+  useEffect(() => {
+    if (authStatus && user?.id) {
+      fetchNotifications();
+      
+      // Set up polling for notifications every 30 seconds
+      const notificationInterval = setInterval(fetchNotifications, 30000);
+      
+      return () => clearInterval(notificationInterval);
+    }
+  }, [authStatus, user?.id, fetchNotifications]);
+
+  // Get notification icon based on type
+  const getNotificationIcon = (type) => {
+    switch (type) {
+      case "certificate":
+        return "🎓";
+      case "company":
+        return "🏢";
+      case "application":
+        return "📝";
+      case "resume":
+        return "📄";
+      case "student":
+        return "👨‍🎓";
+      default:
+        return "🔔";
+    }
+  };
+
+  // Format notification date to relative time (e.g. "2 hours ago")
+  const formatRelativeTime = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - date) / 1000);
+    
+    if (diffInSeconds < 60) return 'Just now';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)} days ago`;
+    
+    // Format as regular date if more than a week ago
+    return date.toLocaleDateString();
+  };
+
+  // Mark all notifications as read
+  const markAllAsRead = async () => {
+    try {
+      const response = await axiosInstance.patch('/notifications/read-all');
+      if (response.data.success) {
+        setNotifications(notifications.map(notif => ({...notif, isRead: true})));
+        setUnreadCount(0);
+        toast.success('All notifications marked as read');
+      }
+    } catch (error) {
+      console.error("Error marking all as read:", error);
+      toast.error('Failed to mark notifications as read');
+    }
+  };
+
+  // Mark a single notification as read
+  const markAsRead = async (id) => {
+    try {
+      const response = await axiosInstance.patch(`/notifications/${id}/read`);
+      if (response.data.success) {
+        setNotifications(notifications.map(notif => 
+          notif._id === id ? {...notif, isRead: true} : notif
+        ));
+        setUnreadCount(prev => prev > 0 ? prev - 1 : 0);
+      }
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
+    }
+  };
 
   const logoutHandler = async () => {
     try {
@@ -149,13 +299,122 @@ const Header = () => {
                       )}
                     </Disclosure.Button>
                   </div>
-                  <button
-                    type="button"
-                    className="rounded-full bg-blue-100 p-1 text-gray-600 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-blue-50"
-                  >
-                    <span className="sr-only">View notifications</span>
-                    <BellIcon className="h-6 w-6" aria-hidden="true" />
-                  </button>
+
+                  {/* Notification Menu */}
+                  <Menu as="div" className="relative">
+                    <div>
+                      <Menu.Button
+                        className={`relative rounded-full bg-blue-100 p-1 text-gray-600 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-blue-50 ${
+                          hasNewNotification ? 'animate-pulse' : ''
+                        }`}
+                        onClick={() => {
+                          setShowNotifications(!showNotifications);
+                          setHasNewNotification(false);
+                        }}
+                      >
+                        <span className="sr-only">View notifications</span>
+                        <BellIcon className="h-6 w-6" aria-hidden="true" />
+                        {unreadCount > 0 && (
+                          <span className="absolute -top-1 -right-1 inline-flex items-center justify-center h-5 w-5 rounded-full bg-red-500 text-xs font-medium text-white">
+                            {unreadCount > 9 ? '9+' : unreadCount}
+                          </span>
+                        )}
+                      </Menu.Button>
+                    </div>
+                    <Transition
+                      enter="transition ease-out duration-100"
+                      enterFrom="transform opacity-0 scale-95"
+                      enterTo="transform opacity-100 scale-100"
+                      leave="transition ease-in duration-75"
+                      leaveFrom="transform opacity-100 scale-100"
+                      leaveTo="transform opacity-0 scale-95"
+                    >
+                      <Menu.Items className="absolute right-0 z-10 mt-2 w-80 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <div className="px-4 py-3">
+                          <div className="flex items-center justify-between">
+                            <p className="text-sm font-medium text-gray-900">Notifications</p>
+                            {unreadCount > 0 && (
+                              <button
+                                onClick={markAllAsRead}
+                                className="text-xs text-blue-600 hover:text-blue-800"
+                              >
+                                Mark all as read
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                        <div className="max-h-80 overflow-y-auto py-1">
+                          {notificationsLoading ? (
+                            <div className="flex justify-center py-4">
+                              <ClipLoader size={24} color="#1D4ED8" />
+                            </div>
+                          ) : notifications.length === 0 ? (
+                            <div className="px-4 py-3 text-sm text-gray-500">
+                              No notifications
+                            </div>
+                          ) : (
+                            <>
+                              {/* Only show top 4 notifications in dropdown */}
+                              {topNotifications.map((notification) => (
+                                <Menu.Item key={notification._id}>
+                                  {({ active }) => (
+                                    <div
+                                      className={classNames(
+                                        active ? "bg-gray-100" : "",
+                                        notification.isRead ? "" : "bg-blue-50",
+                                        "block px-4 py-2 text-sm"
+                                      )}
+                                    >
+                                      <div className="flex justify-between">
+                                        <div 
+                                          className="cursor-pointer flex-1 flex"
+                                          onClick={() => !notification.isRead && markAsRead(notification._id)}
+                                        >
+                                          <span className="mr-2 text-xl flex-shrink-0">
+                                            {getNotificationIcon(notification.type)}
+                                          </span>
+                                          <div className="flex-1">
+                                            <p className={classNames(
+                                              notification.isRead ? "text-gray-700" : "text-gray-900 font-medium",
+                                            )}>
+                                              {notification.message}
+                                            </p>
+                                            <p className="text-xs text-gray-500 mt-1">
+                                              {formatRelativeTime(notification.createdAt)}
+                                            </p>
+                                          </div>
+                                        </div>
+                                        {!notification.isRead && (
+                                          <div className="h-2 w-2 mt-1 rounded-full bg-blue-600"></div>
+                                        )}
+                                      </div>
+                                    </div>
+                                  )}
+                                </Menu.Item>
+                              ))}
+                              
+                              {/* Show a count if there are more notifications */}
+                              {notifications.length > 4 && (
+                                <div className="px-4 py-2 text-center text-sm text-gray-500">
+                                  + {notifications.length - 4} more notifications
+                                </div>
+                              )}
+                            </>
+                          )}
+                        </div>
+                        <div className="px-4 py-2">
+                          <Link
+                            to="/notifications"
+                            className="block text-center text-sm text-blue-600 hover:text-blue-800 font-medium"
+                          >
+                            View all notifications
+                          </Link>
+                        </div>
+                      </Menu.Items>
+                    </Transition>
+                  </Menu>
+
+                  {/* User Profile Menu */}
                   <Menu as="div" className="relative ml-3">
                     <div>
                       <Menu.Button className="flex rounded-full bg-blue-100 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-blue-50">
@@ -168,7 +427,7 @@ const Header = () => {
                             src={imagePreview || avatarBlobUrl || "/default-img.png"}
                             alt={user?.name || "Default Profile"}
                           />
-                        )}
+                        )} 
                       </Menu.Button>
                     </div>
                     <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
