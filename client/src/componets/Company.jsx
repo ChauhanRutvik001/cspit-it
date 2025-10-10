@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import axiosInstance from "../utils/axiosInstance";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +10,8 @@ import {
   Search,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
+  ChevronDown,
   FileDown,
   Building2,
   Briefcase,
@@ -23,6 +25,11 @@ import {
   MapPin,
   Mail,
   Phone,
+  PlusCircle,
+  Award,
+  AlertCircle,
+  UserCheck,
+  UserX,
 } from "lucide-react";
 
 const Company = () => {
@@ -38,6 +45,23 @@ const Company = () => {
   const [showCompanyModal, setShowCompanyModal] = useState(false);
   const [studentProgress, setStudentProgress] = useState([]);
   const [progressLoading, setProgressLoading] = useState(false);
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
+  const [sectionPagination, setSectionPagination] = useState({
+    placed: { page: 1, limit: 6 },
+    pending: { page: 1, limit: 6 },
+    approved: { page: 1, limit: 6 },
+    rejected: { page: 1, limit: 6 },
+    available: { page: 1, limit: 12 }
+  });
+  const [expandedSections, setExpandedSections] = useState({
+    placed: true,
+    pending: true,
+    approved: true,
+    rejected: false, // Start collapsed for less important sections
+    available: true
+  });
   const user = useSelector((store) => store.app?.user);
 
   useEffect(() => {
@@ -92,10 +116,151 @@ const Company = () => {
     }
   };
 
-  const handleSearch = (e) => {
-    setSearchTerm(e?.target?.value || "");
+  // Generate search suggestions with priority order
+  const generateSuggestions = useMemo(() => {
+    if (!searchTerm.trim() || searchTerm.length < 1) return [];
+    
+    const searchLower = searchTerm.toLowerCase();
+    const companySuggestions = [];
+    const domainSuggestions = [];
+    const locationSuggestions = [];
+    
+    companies.forEach(company => {
+      if (!company) return;
+      
+      // Company name suggestions - prioritize companies that START with the search term
+      if (company.name?.toLowerCase().startsWith(searchLower)) {
+        companySuggestions.unshift({
+          type: 'company',
+          value: company.name,
+          label: company.name,
+          icon: Building2,
+          category: 'Companies',
+          priority: 1 // Highest priority for exact start matches
+        });
+      } else if (company.name?.toLowerCase().includes(searchLower)) {
+        companySuggestions.push({
+          type: 'company',
+          value: company.name,
+          label: company.name,
+          icon: Building2,
+          category: 'Companies',
+          priority: 2 // Lower priority for contains matches
+        });
+      }
+      
+      // Domain suggestions
+      if (company.domain?.toLowerCase().startsWith(searchLower)) {
+        domainSuggestions.unshift({
+          type: 'domain',
+          value: company.domain,
+          label: company.domain,
+          icon: Briefcase,
+          category: 'Domains',
+          priority: 1
+        });
+      } else if (company.domain?.toLowerCase().includes(searchLower)) {
+        domainSuggestions.push({
+          type: 'domain',
+          value: company.domain,
+          label: company.domain,
+          icon: Briefcase,
+          category: 'Domains',
+          priority: 2
+        });
+      }
+      
+      // Location suggestions
+      if (company.location?.toLowerCase().startsWith(searchLower)) {
+        locationSuggestions.unshift({
+          type: 'location',
+          value: company.location,
+          label: company.location,
+          icon: MapPin,
+          category: 'Locations',
+          priority: 1
+        });
+      } else if (company.location?.toLowerCase().includes(searchLower)) {
+        locationSuggestions.push({
+          type: 'location',
+          value: company.location,
+          label: company.location,
+          icon: MapPin,
+          category: 'Locations',
+          priority: 2
+        });
+      }
+    });
+    
+    // Remove duplicates using Set with custom key
+    const uniqueCompanies = Array.from(
+      new Map(companySuggestions.map(item => [item.value.toLowerCase(), item])).values()
+    );
+    const uniqueDomains = Array.from(
+      new Map(domainSuggestions.map(item => [item.value.toLowerCase(), item])).values()
+    );
+    const uniqueLocations = Array.from(
+      new Map(locationSuggestions.map(item => [item.value.toLowerCase(), item])).values()
+    );
+    
+    // Combine in priority order: Companies (starting with) -> Companies (containing) -> Domains -> Locations
+    const allSuggestions = [
+      ...uniqueCompanies.slice(0, 4), // Top 4 companies
+      ...uniqueDomains.slice(0, 2),   // Top 2 domains
+      ...uniqueLocations.slice(0, 2)  // Top 2 locations
+    ];
+    
+    return allSuggestions.slice(0, 8); // Limit to 8 suggestions total
+  }, [companies, searchTerm]);
+
+  // Update suggestions when search term changes
+  useEffect(() => {
+    setSearchSuggestions(generateSuggestions);
+    setSelectedSuggestionIndex(-1);
+  }, [generateSuggestions]);
+
+  // Handle search input changes
+  const handleSearch = useCallback((e) => {
+    const value = e?.target?.value || "";
+    setSearchTerm(value);
+    setShowSuggestions(value.trim().length > 0);
     setCurrentPage(1);
-  };
+  }, []);
+
+  // Handle suggestion selection
+  const handleSuggestionSelect = useCallback((suggestion) => {
+    setSearchTerm(suggestion.value);
+    setShowSuggestions(false);
+    setSelectedSuggestionIndex(-1);
+  }, []);
+
+  // Handle keyboard navigation for suggestions
+  const handleKeyDown = useCallback((e) => {
+    if (!showSuggestions || searchSuggestions.length === 0) return;
+    
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev => 
+          prev < searchSuggestions.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev => prev > 0 ? prev - 1 : -1);
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (selectedSuggestionIndex >= 0) {
+          handleSuggestionSelect(searchSuggestions[selectedSuggestionIndex]);
+        }
+        break;
+      case 'Escape':
+        setShowSuggestions(false);
+        setSelectedSuggestionIndex(-1);
+        break;
+    }
+  }, [showSuggestions, searchSuggestions, selectedSuggestionIndex, handleSuggestionSelect]);
 
   const handleLimitChange = (e) => {
     const value = Number(e?.target?.value);
@@ -103,20 +268,26 @@ const Company = () => {
     setCurrentPage(1);
   };
 
-  // Safely filter companies with null checks
-  const filteredCompanies = (companies || []).filter((company) => {
-    try {
-      const searchLower = (searchTerm || "").toLowerCase();
+  // Memoized filtered companies for performance
+  const filteredCompanies = useMemo(() => {
+    if (!Array.isArray(companies)) return [];
+    
+    if (!searchTerm.trim()) return companies;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return companies.filter((company) => {
+      if (!company) return false;
+      
       return (
-        (company?.name || "").toLowerCase().includes(searchLower) ||
-        (company?.domain || "").toLowerCase().includes(searchLower) ||
-        (company?.description || "").toLowerCase().includes(searchLower)
+        company.name?.toLowerCase().includes(searchLower) ||
+        company.domain?.toLowerCase().includes(searchLower) ||
+        company.location?.toLowerCase().includes(searchLower) ||
+        company.description?.toLowerCase().includes(searchLower)
       );
-    } catch (err) {
-      return false;
-    }
-  });
+    });
+  }, [companies, searchTerm]);
 
+  // Legacy pagination for admin/counsellor view
   const totalPages = Math.max(
     1,
     Math.ceil(filteredCompanies.length / Math.max(1, recordsPerPage))
@@ -262,6 +433,384 @@ const Company = () => {
       toast.error("Invalid company ID");
     }
   };
+
+  // Memoized company categorization for performance
+  const companiesByStatus = useMemo(() => {
+    const placed = [];
+    const pending = [];
+    const approved = [];
+    const rejected = [];
+    const available = [];
+
+    filteredCompanies.forEach(company => {
+      if (!company?._id) return;
+      
+      const status = applications[company._id];
+      switch (status) {
+        case "placed":
+          placed.push(company);
+          break;
+        case "pending":
+          pending.push(company);
+          break;
+        case "approved":
+          approved.push(company);
+          break;
+        case "rejected":
+          rejected.push(company);
+          break;
+        default:
+          available.push(company);
+      }
+    });
+
+    return { placed, pending, approved, rejected, available };
+  }, [filteredCompanies, applications]);
+
+  // Pagination calculations for each section
+  const getSectionData = useCallback((sectionKey) => {
+    const companies = companiesByStatus[sectionKey] || [];
+    const pagination = sectionPagination[sectionKey];
+    const startIndex = (pagination.page - 1) * pagination.limit;
+    const endIndex = startIndex + pagination.limit;
+    
+    return {
+      companies: companies.slice(startIndex, endIndex),
+      totalCompanies: companies.length,
+      totalPages: Math.ceil(companies.length / pagination.limit),
+      currentPage: pagination.page,
+      hasMore: endIndex < companies.length
+    };
+  }, [companiesByStatus, sectionPagination]);
+
+  // Handle section pagination
+  const handleSectionPagination = useCallback((section, action) => {
+    setSectionPagination(prev => {
+      const current = prev[section];
+      let newPage = current.page;
+      
+      if (action === 'next') {
+        const maxPage = Math.ceil(companiesByStatus[section]?.length / current.limit) || 1;
+        newPage = Math.min(current.page + 1, maxPage);
+      } else if (action === 'prev') {
+        newPage = Math.max(current.page - 1, 1);
+      } else if (action === 'loadMore') {
+        // For "Load More" functionality, increase the limit
+        return {
+          ...prev,
+          [section]: {
+            ...current,
+            limit: current.limit + (section === 'available' ? 12 : 6)
+          }
+        };
+      }
+      
+      return {
+        ...prev,
+        [section]: { ...current, page: newPage }
+      };
+    });
+  }, [companiesByStatus]);
+
+  // Toggle section expansion
+  const toggleSection = useCallback((section) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  }, []);
+
+  // Filter companies by status for sections (kept for backward compatibility but optimized)
+  const getCompaniesByStatus = useCallback((status) => {
+    return companiesByStatus[status] || [];
+  }, [companiesByStatus]);
+
+  const getCompaniesWithoutApplication = useCallback(() => {
+    return companiesByStatus.available || [];
+  }, [companiesByStatus]);
+
+  const placedCompanies = getCompaniesByStatus("placed");
+  const pendingCompanies = getCompaniesByStatus("pending");
+  const approvedCompanies = getCompaniesByStatus("approved");
+  const rejectedCompanies = getCompaniesByStatus("rejected");
+  const availableCompanies = getCompaniesWithoutApplication();
+
+  // Optimized CompanySection with lazy loading and pagination
+  const CompanySection = React.memo(({ 
+    title, 
+    sectionKey, 
+    sectionColor, 
+    icon: Icon, 
+    isSpecial = false 
+  }) => {
+    const sectionData = getSectionData(sectionKey);
+    const isExpanded = expandedSections[sectionKey];
+    
+    if (sectionData.totalCompanies === 0) return null;
+    
+    return (
+      <div className={`mb-8 ${isSpecial ? 'order-first' : ''}`}>
+        <div 
+          className={`flex items-center justify-between mb-4 cursor-pointer ${
+            isSpecial 
+              ? 'bg-gradient-to-r from-purple-50 to-violet-50 p-4 rounded-xl border border-purple-200' 
+              : 'p-2 hover:bg-gray-50 rounded-lg'
+          }`}
+          onClick={() => toggleSection(sectionKey)}
+        >
+          <div className="flex items-center">
+            {Icon && <Icon className={`h-6 w-6 mr-3 ${sectionColor}`} />}
+            <h2 className={`text-xl font-bold ${isSpecial ? 'text-purple-800' : 'text-gray-800'}`}>
+              {title} ({sectionData.totalCompanies})
+            </h2>
+            {isSpecial && (
+              <div className="ml-3">
+                <span className="text-2xl animate-bounce">🎉</span>
+              </div>
+            )}
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            {/* Show pagination info */}
+            {sectionData.totalCompanies > sectionPagination[sectionKey].limit && (
+              <span className="text-sm text-gray-500">
+                Showing {Math.min(sectionData.companies.length, sectionData.totalCompanies)} of {sectionData.totalCompanies}
+              </span>
+            )}
+            <button className="text-gray-400 hover:text-gray-600">
+              {isExpanded ? (
+                <ChevronUp className="h-5 w-5" />
+              ) : (
+                <ChevronDown className="h-5 w-5" />
+              )}
+            </button>
+          </div>
+        </div>
+        
+        {/* Collapsible Content */}
+        {isExpanded && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {sectionData.companies.map((company, index) => (
+                <CompanyCard 
+                  key={`${company._id}-${index}`} 
+                  company={company} 
+                  priority={isSpecial ? 'high' : 'normal'}
+                />
+              ))}
+            </div>
+            
+            {/* Load More / Pagination Controls */}
+            {sectionData.totalCompanies > sectionData.companies.length && (
+              <div className="flex justify-center items-center space-x-4 pt-4">
+                <button
+                  onClick={() => handleSectionPagination(sectionKey, 'loadMore')}
+                  className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center"
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  Load More ({sectionData.totalCompanies - sectionData.companies.length} remaining)
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  });
+
+  // Optimized CompanyCard with lazy loading and memoization
+  const CompanyCard = React.memo(({ company, priority = 'normal' }) => {
+    const [imageLoaded, setImageLoaded] = useState(false);
+    const [isInView, setIsInView] = useState(priority === 'high'); // Load immediately for special sections
+    
+    // Intersection Observer for lazy loading
+    const cardRef = useCallback(node => {
+      if (node && !isInView) {
+        const observer = new IntersectionObserver(
+          ([entry]) => {
+            if (entry.isIntersecting) {
+              setIsInView(true);
+              observer.disconnect();
+            }
+          },
+          { threshold: 0.1, rootMargin: '50px' }
+        );
+        observer.observe(node);
+        return () => observer.disconnect();
+      }
+    }, [isInView]);
+    
+    if (!isInView && priority !== 'high') {
+      return (
+        <div 
+          ref={cardRef}
+          className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden h-96 flex items-center justify-center"
+        >
+          <div className="animate-pulse text-gray-400">Loading...</div>
+        </div>
+      );
+    }
+    
+    return (
+      <div 
+        ref={cardRef}
+        className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
+      >
+        <div className="p-6 flex flex-col h-full">
+          <div className="flex items-start justify-between mb-4">
+            <div className="flex items-center">
+              <div className="h-12 w-12 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg flex items-center justify-center mr-4">
+                <Building2 className="h-6 w-6 text-indigo-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
+                  {company.name}
+                </h3>
+                <div className="flex items-center mt-1">
+                  <MapPin className="h-4 w-4 text-gray-400 mr-1" />
+                  <span className="text-sm text-gray-600">
+                    {company.location || "Location not specified"}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="flex space-x-2">
+              {company.website && (
+                <a
+                  href={company.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-blue-600 transition-colors"
+                  title="Company Website"
+                >
+                  <Globe className="h-5 w-5 transform hover:scale-110 transition-transform" />
+                </a>
+              )}
+              {company.linkedin && (
+                <a
+                  href={company.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-blue-600 transition-colors"
+                  title="LinkedIn Profile"
+                >
+                  <Linkedin className="h-5 w-5 transform hover:scale-110 transition-transform" />
+                </a>
+              )}
+            </div>
+          </div>
+          <div className="space-y-3 flex-1">
+            <div className="flex items-center text-sm">
+              <Briefcase className="h-4 w-4 text-gray-400 mr-2" />
+              <span className="text-gray-600">Domain:</span>
+              <span className="ml-1 text-gray-900 font-medium">
+                {company.domain || "Not specified"}
+              </span>
+            </div>
+            <div className="flex items-center text-sm">
+              <DollarSign className="h-4 w-4 text-gray-400 mr-2" />
+              <span className="text-gray-600">Salary:</span>
+              <span className="ml-1 text-gray-900 font-medium">
+                {typeof company.salary === "object" &&
+                company.salary?.min &&
+                company.salary?.max
+                  ? `₹${(
+                      company.salary.min || 0
+                    ).toLocaleString()} - ₹${(
+                      company.salary.max || 0
+                    ).toLocaleString()}`
+                  : company.salary
+                  ? `₹${company.salary.toLocaleString()}`
+                  : "Not specified"}
+              </span>
+            </div>
+            <div className="text-sm text-gray-900 max-w-md break-words whitespace-normal line-clamp-3">
+              {company?.description ? (
+                company.description
+              ) : (
+                "No description available"
+              )}
+            </div>
+          </div>
+          <div className="pt-4 mt-auto border-t border-gray-100 space-y-3">
+            {/* View Details Button */}
+            <button
+              onClick={() => handleViewCompanyDetails(company)}
+              className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors flex items-center justify-center"
+            >
+              <Eye className="h-4 w-4 mr-2" />
+              View Details
+            </button>
+            
+            {/* Application Status */}
+            {loading === company._id ? (
+              <div className="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg flex items-center justify-center w-full">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 mr-2"></div>
+                Processing...
+              </div>
+            ) : applications[company._id] ? (
+              <div className="flex items-center justify-end gap-2">
+                {applications[company._id] === "pending" ? (
+                  <span className="bg-yellow-50 text-yellow-800 px-4 py-2 rounded-lg flex items-center group w-full justify-center">
+                    <div className="animate-pulse mr-2 h-2 w-2 bg-yellow-400 rounded-full"></div>
+                    Pending Approval
+                    <button
+                      onClick={() => handleCancel(company._id)}
+                      className="ml-2 text-yellow-600 hover:text-red-600 transition-colors"
+                      title="Cancel Application"
+                    >
+                      <X className="h-4 w-4 transform hover:scale-110 transition-transform" />
+                    </button>
+                  </span>
+                ) : applications[company._id] === "approved" ? (
+                  <span className="bg-green-50 text-green-800 px-4 py-2 rounded-lg flex items-center w-full justify-center">
+                    <div className="mr-2 h-2 w-2 bg-green-400 rounded-full"></div>
+                    Approved
+                    <button
+                      onClick={() => handleCancel(company._id)}
+                      className="ml-2 text-green-600 hover:text-red-600 transition-colors"
+                      title="Cancel Application"
+                    >
+                      <X className="h-4 w-4 transform hover:scale-110 transition-transform" />
+                    </button>
+                  </span>
+                ) : applications[company._id] === "rejected" ? (
+                  <span className="bg-red-50 text-red-800 px-4 py-2 rounded-lg flex items-center w-full justify-center">
+                    <div className="mr-2 h-2 w-2 bg-red-400 rounded-full"></div>
+                    Rejected
+                  </span>
+                ) : applications[company._id] === "placed" ? (
+                  <span className="bg-gradient-to-r from-purple-50 to-violet-50 text-purple-800 px-4 py-2 rounded-lg flex items-center w-full justify-center font-semibold border border-purple-200 shadow-md">
+                    <div className="mr-2 h-2 w-2 bg-purple-500 rounded-full animate-pulse"></div>
+                    🎉 Placed in {company.name}
+                  </span>
+                ) : (
+                  <span className="bg-blue-50 text-blue-800 px-4 py-2 rounded-lg flex items-center w-full justify-center">
+                    Applied
+                    <button
+                      onClick={() => handleCancel(company._id)}
+                      className="ml-2 text-blue-600 hover:text-red-600 transition-colors"
+                      title="Cancel Application"
+                    >
+                      <X className="h-4 w-4 transform hover:scale-110 transition-transform" />
+                    </button>
+                  </span>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => handleApply(company._id)}
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center justify-center"
+              >
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Apply Now
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  });
 
   if (error) {
     return (
@@ -530,63 +1079,6 @@ const Company = () => {
                 </table>
               )}
             </div>
-
-            {/* Pagination */}
-            <div className="px-6 py-4 bg-white border-t border-gray-200">
-              <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-                <div className="text-sm text-gray-700">
-                  Showing{" "}
-                  <span className="font-medium">
-                    {filteredCompanies.length > 0 ? startIndex + 1 : 0}
-                  </span>{" "}
-                  to{" "}
-                  <span className="font-medium">
-                    {Math.min(
-                      startIndex + recordsPerPage,
-                      filteredCompanies.length
-                    )}
-                  </span>{" "}
-                  of{" "}
-                  <span className="font-medium">
-                    {filteredCompanies.length}
-                  </span>{" "}
-                  entries
-                </div>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={handlePreviousPage}
-                    disabled={
-                      currentPage === 1 || filteredCompanies.length === 0
-                    }
-                    className={`p-2 rounded-lg border ${
-                      currentPage === 1 || filteredCompanies.length === 0
-                        ? "bg-gray-50 text-gray-400 cursor-not-allowed border-gray-200"
-                        : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300 hover:border-indigo-500 transition-all duration-200"
-                    }`}
-                  >
-                    <ChevronLeft className="h-5 w-5" />
-                  </button>
-                  <span className="px-4 py-2 rounded-lg bg-gray-50 text-gray-700 font-medium">
-                    Page {currentPage} of {totalPages}
-                  </span>
-                  <button
-                    onClick={handleNextPage}
-                    disabled={
-                      currentPage === totalPages ||
-                      filteredCompanies.length === 0
-                    }
-                    className={`p-2 rounded-lg border ${
-                      currentPage === totalPages ||
-                      filteredCompanies.length === 0
-                        ? "bg-gray-50 text-gray-400 cursor-not-allowed border-gray-200"
-                        : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300 hover:border-indigo-500 transition-all duration-200"
-                    }`}
-                  >
-                    <ChevronRight className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -791,15 +1283,88 @@ const Company = () => {
                   Explore and apply to companies
                 </p>
               </div>
-              <div className="relative w-full sm:w-64">
-                <input
-                  type="text"
-                  placeholder="Search companies..."
-                  value={searchTerm}
-                  onChange={handleSearch}
-                  className="w-full pl-10 pr-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent placeholder-white/60 text-white"
-                />
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 h-5 w-5" />
+              <div className="relative w-full sm:w-80">
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Search companies, domains, locations..."
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    onKeyDown={handleKeyDown}
+                    onFocus={() => setShowSuggestions(searchTerm.trim().length > 0)}
+                    onBlur={() => {
+                      // Delay hiding suggestions to allow clicking
+                      setTimeout(() => setShowSuggestions(false), 200);
+                    }}
+                    className="w-full pl-12 pr-10 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent placeholder-white/60 text-white"
+                  />
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60 h-5 w-5" />
+                  {searchTerm && (
+                    <button
+                      onClick={() => {
+                        setSearchTerm("");
+                        setShowSuggestions(false);
+                      }}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white/60 hover:text-white transition-colors"
+                    >
+                      <X className="h-5 w-5" />
+                    </button>
+                  )}
+                </div>
+                
+                {/* Search Suggestions Dropdown */}
+                {showSuggestions && searchSuggestions.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-xl border border-gray-200 z-50 max-h-80 overflow-y-auto">
+                    <div className="p-2">
+                      <div className="text-xs font-medium text-gray-500 px-3 py-2">
+                        Search Suggestions
+                      </div>
+                      {searchSuggestions.map((suggestion, index) => {
+                        const IconComponent = suggestion.icon;
+                        // Highlight matching text
+                        const highlightText = (text, searchTerm) => {
+                          if (!searchTerm) return text;
+                          const regex = new RegExp(`(${searchTerm})`, 'gi');
+                          const parts = text.split(regex);
+                          return parts.map((part, i) => 
+                            regex.test(part) ? 
+                              <span key={i} className="font-semibold text-indigo-600">{part}</span> : 
+                              part
+                          );
+                        };
+                        
+                        return (
+                          <button
+                            key={`${suggestion.type}-${suggestion.value}-${index}`}
+                            onClick={() => handleSuggestionSelect(suggestion)}
+                            className={`w-full flex items-center px-3 py-3 rounded-lg text-left transition-colors ${
+                              index === selectedSuggestionIndex
+                                ? 'bg-indigo-50 text-indigo-700 border-l-4 border-indigo-500'
+                                : 'hover:bg-gray-50 text-gray-700 border-l-4 border-transparent'
+                            }`}
+                          >
+                            <IconComponent className={`h-4 w-4 mr-3 ${
+                              index === selectedSuggestionIndex ? 'text-indigo-500' : 'text-gray-400'
+                            }`} />
+                            <div className="flex-1">
+                              <div className="font-medium">
+                                {highlightText(suggestion.label, searchTerm)}
+                              </div>
+                              <div className="text-xs text-gray-500 flex items-center">
+                                {suggestion.category}
+                                {suggestion.priority === 1 && (
+                                  <span className="ml-2 text-xs bg-green-100 text-green-700 px-1.5 py-0.5 rounded">
+                                    Exact match
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -870,166 +1435,76 @@ const Company = () => {
               )}
             </div>
           ) : (
-            <div className="p-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-                {paginatedCompanies.map((company) =>
-                  company && company._id ? (
-                    <div
-                      key={company._id}
-                      className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-indigo-200 flex flex-col min-h-[400px]"
-                    >
-                      <div className="p-6 flex-1 flex flex-col">
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="flex items-center gap-3">
-                            <div className="flex-shrink-0 h-10 w-10 bg-indigo-100 rounded-lg flex items-center justify-center group-hover:bg-indigo-200 transition-colors">
-                              <Building2 className="h-6 w-6 text-indigo-600" />
-                            </div>
-                            <h3 className="text-xl font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors">
-                              {company.name || "Unnamed Company"}
-                            </h3>
-                          </div>
-                          <div className="flex gap-2">
-                            {company.website && (
-                              <a
-                                href={company.website}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-gray-400 hover:text-indigo-600 transition-colors"
-                                title="Company Website"
-                              >
-                                <Globe className="h-5 w-5 transform hover:scale-110 transition-transform" />
-                              </a>
-                            )}
-                            {company.linkedin && (
-                              <a
-                                href={company.linkedin}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-gray-400 hover:text-blue-600 transition-colors"
-                                title="LinkedIn Profile"
-                              >
-                                <Linkedin className="h-5 w-5 transform hover:scale-110 transition-transform" />
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                        <div className="space-y-3 flex-1">
-                          <div className="flex items-center text-sm">
-                            <Briefcase className="h-4 w-4 text-gray-400 mr-2" />
-                            <span className="text-gray-600">Domain:</span>
-                            <span className="ml-1 text-gray-900 font-medium">
-                              {company.domain || "Not specified"}
-                            </span>
-                          </div>
-                          <div className="flex items-center text-sm">
-                            <DollarSign className="h-4 w-4 text-gray-400 mr-2" />
-                            <span className="text-gray-600">Salary:</span>
-                            <span className="ml-1 text-gray-900 font-medium">
-                              {typeof company.salary === "object" &&
-                              company.salary?.min &&
-                              company.salary?.max
-                                ? `₹${(
-                                    company.salary.min || 0
-                                  ).toLocaleString()} - ₹${(
-                                    company.salary.max || 0
-                                  ).toLocaleString()}`
-                                : company.salary
-                                ? `₹${company.salary.toLocaleString()}`
-                                : "Not specified"}
-                            </span>
-                          </div>
-                          <div className="text-sm text-gray-900 max-w-md break-words whitespace-normal line-clamp-3">
-                            {company?.description ? (
-                              company.description
-                            ) : (
-                              "No description available"
-                            )}
-                          </div>
-                        </div>
-                        <div className="pt-4 mt-auto border-t border-gray-100 space-y-3">
-                          {/* View Details Button */}
-                          <button
-                            onClick={() => handleViewCompanyDetails(company)}
-                            className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors flex items-center justify-center"
-                          >
-                            <Eye className="h-4 w-4 mr-2" />
-                            View Details
-                          </button>
-                          
-                          {/* Application Status */}
-                          {loading === company._id ? (
-                            <div className="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg flex items-center justify-center w-full">
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 mr-2"></div>
-                              Processing...
-                            </div>
-                          ) : applications[company._id] ? (
-                            <div className="flex items-center justify-end gap-2">
-                              {applications[company._id] === "pending" ? (
-                                <span className="bg-yellow-50 text-yellow-800 px-4 py-2 rounded-lg flex items-center group w-full justify-center">
-                                  <div className="animate-pulse mr-2 h-2 w-2 bg-yellow-400 rounded-full"></div>
-                                  Pending Approval
-                                  <button
-                                    onClick={() => handleCancel(company._id)}
-                                    className="ml-2 text-yellow-600 hover:text-red-600 transition-colors"
-                                    title="Cancel Application"
-                                  >
-                                    <X className="h-4 w-4 transform hover:scale-110 transition-transform" />
-                                  </button>
-                                </span>
-                              ) : applications[company._id] === "approved" ? (
-                                <span className="bg-green-50 text-green-800 px-4 py-2 rounded-lg flex items-center w-full justify-center">
-                                  <div className="mr-2 h-2 w-2 bg-green-400 rounded-full"></div>
-                                  Approved
-                                  <button
-                                    onClick={() => handleCancel(company._id)}
-                                    className="ml-2 text-green-600 hover:text-red-600 transition-colors"
-                                    title="Cancel Application"
-                                  >
-                                    <X className="h-4 w-4 transform hover:scale-110 transition-transform" />
-                                  </button>
-                                </span>
-                              ) : applications[company._id] === "rejected" ? (
-                                <span className="bg-red-50 text-red-800 px-4 py-2 rounded-lg flex items-center w-full justify-center">
-                                  <div className="mr-2 h-2 w-2 bg-red-400 rounded-full"></div>
-                                  Rejected
-                                </span>
-                              ) : applications[company._id] === "placed" ? (
-                                <span className="bg-gradient-to-r from-purple-50 to-violet-50 text-purple-800 px-4 py-2 rounded-lg flex items-center w-full justify-center font-semibold border border-purple-200 shadow-md">
-                                  <div className="mr-2 h-2 w-2 bg-purple-500 rounded-full animate-pulse"></div>
-                                  🎉 Placed in {company.name}
-                                </span>
-                              ) : (
-                                <span className="bg-blue-50 text-blue-800 px-4 py-2 rounded-lg flex items-center w-full justify-center">
-                                  Applied
-                                  <button
-                                    onClick={() => handleCancel(company._id)}
-                                    className="ml-2 text-blue-600 hover:text-red-600 transition-colors"
-                                    title="Cancel Application"
-                                  >
-                                    <X className="h-4 w-4 transform hover:scale-110 transition-transform" />
-                                  </button>
-                                </span>
-                              )}
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => handleApply(company._id)}
-                              className="relative inline-flex items-center justify-center w-full px-8 py-3 bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-xl hover:from-indigo-500 hover:to-blue-400 transform hover:scale-[1.02] transition-all duration-200 font-medium shadow-lg hover:shadow-xl active:scale-[0.98] group overflow-hidden"
-                            >
-                              <span className="absolute inset-0 bg-white/10 group-hover:scale-x-100 scale-x-0 transition-transform origin-left"></span>
-                              <Briefcase className="h-5 w-5 mr-2 transform group-hover:rotate-12 transition-transform" />
-                              <span className="relative">Apply Now</span>
-                              <span className="absolute right-4 transform translate-x-8 opacity-0 group-hover:translate-x-0 group-hover:opacity-100 transition-all duration-200">
-                                →
-                              </span>
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ) : null
-                )}
-              </div>
+            <div className="p-6 space-y-8">
+              {/* Congratulations Section for Placed Students */}
+              <CompanySection 
+                title="🎉 Congratulations! You're Placed"
+                sectionKey="placed"
+                sectionColor="text-purple-600"
+                icon={Award}
+                isSpecial={true}
+              />
+
+              {/* Pending Applications */}
+              <CompanySection 
+                title="⏳ Pending Approval"
+                sectionKey="pending"
+                sectionColor="text-yellow-600"
+                icon={Clock}
+              />
+
+              {/* Approved Applications */}
+              <CompanySection 
+                title="✅ Approved Applications"
+                sectionKey="approved"
+                sectionColor="text-green-600"
+                icon={UserCheck}
+              />
+
+              {/* Rejected Applications */}
+              <CompanySection 
+                title="❌ Rejected Applications"
+                sectionKey="rejected"
+                sectionColor="text-red-600"
+                icon={UserX}
+              />
+
+              {/* Available Companies to Apply */}
+              <CompanySection 
+                title="🚀 Available Companies"
+                sectionKey="available"
+                sectionColor="text-blue-600"
+                icon={Building2}
+              />
+
+              {/* Show message if no companies in any section */}
+              {filteredCompanies.length === 0 && (
+                <div className="text-center py-16">
+                  <Building2 className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No companies found</h3>
+                  <p className="text-gray-500">Try adjusting your search terms or check back later for new opportunities.</p>
+                  <button
+                    onClick={() => setSearchTerm("")}
+                    className="mt-4 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
+                  >
+                    Clear Search
+                  </button>
+                </div>
+              )}
+
+              {/* Performance Stats (Development only) */}
+              {process.env.NODE_ENV === 'development' && (
+                <div className="mt-8 p-4 bg-gray-50 rounded-lg text-sm text-gray-600">
+                  <p><strong>Performance Stats:</strong></p>
+                  <p>Total Companies: {companies.length}</p>
+                  <p>Filtered Companies: {filteredCompanies.length}</p>
+                  <p>Placed: {companiesByStatus.placed?.length || 0}</p>
+                  <p>Pending: {companiesByStatus.pending?.length || 0}</p>
+                  <p>Approved: {companiesByStatus.approved?.length || 0}</p>
+                  <p>Rejected: {companiesByStatus.rejected?.length || 0}</p>
+                  <p>Available: {companiesByStatus.available?.length || 0}</p>
+                </div>
+              )}
             </div>
           )}
 
@@ -1037,49 +1512,9 @@ const Company = () => {
           <div className="px-6 py-4 bg-white border-t border-gray-200">
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
               <div className="text-sm text-gray-700">
-                Showing{" "}
                 <span className="font-medium">
-                  {filteredCompanies.length > 0 ? startIndex + 1 : 0}
-                </span>{" "}
-                to{" "}
-                <span className="font-medium">
-                  {Math.min(
-                    startIndex + recordsPerPage,
-                    filteredCompanies.length
-                  )}
-                </span>{" "}
-                of{" "}
-                <span className="font-medium">{filteredCompanies.length}</span>{" "}
-                entries
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handlePreviousPage}
-                  disabled={currentPage === 1 || filteredCompanies.length === 0}
-                  className={`p-2 rounded-lg border ${
-                    currentPage === 1 || filteredCompanies.length === 0
-                      ? "bg-gray-50 text-gray-400 cursor-not-allowed border-gray-200"
-                      : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300 hover:border-indigo-500 transition-all duration-200"
-                  }`}
-                >
-                  <ChevronLeft className="h-5 w-5" />
-                </button>
-                <span className="px-4 py-2 rounded-lg bg-gray-50 text-gray-700 font-medium">
-                  Page {currentPage} of {totalPages}
+                  Total Companies: {filteredCompanies.length}
                 </span>
-                <button
-                  onClick={handleNextPage}
-                  disabled={
-                    currentPage === totalPages || filteredCompanies.length === 0
-                  }
-                  className={`p-2 rounded-lg border ${
-                    currentPage === totalPages || filteredCompanies.length === 0
-                      ? "bg-gray-50 text-gray-400 cursor-not-allowed border-gray-200"
-                      : "bg-white text-gray-700 hover:bg-gray-50 border-gray-300 hover:border-indigo-500 transition-all duration-200"
-                  }`}
-                >
-                  <ChevronRight className="h-5 w-5" />
-                </button>
               </div>
             </div>
           </div>
