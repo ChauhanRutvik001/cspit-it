@@ -235,3 +235,137 @@ export const deleteNotification = async (req, res) => {
     });
   }
 };
+
+// Send notification when placement drive starts
+export const notifyPlacementDriveStart = async (placementDriveId, companyId) => {
+  try {
+    console.log('Sending placement drive start notifications...');
+    
+    // Get company details
+    const Company = (await import("../models/company.js")).default;
+    const PlacementDrive = (await import("../models/PlacementDrive.js")).default;
+    const Application = (await import("../models/application.js")).default;
+    
+    const company = await Company.findById(companyId);
+    const placementDrive = await PlacementDrive.findById(placementDriveId);
+    
+    if (!company || !placementDrive) {
+      console.error('Company or placement drive not found');
+      return;
+    }
+
+    // Get all students who applied to this company
+    const applications = await Application.find({ 
+      company: companyId,
+      status: 'approved'
+    }).populate('student', '_id name email');
+
+    // Get all counselors
+    const counselors = await User.find({ 
+      role: 'counsellor' 
+    }).select('_id name email');
+
+    const message = `🚀 Placement Drive Started! ${company.name} placement drive "${placementDrive.title}" has begun. Good luck to all participants!`;
+
+    // Notify all applied students
+    const studentNotifications = applications.map(async (application) => {
+      return generateNotification(
+        application.student._id,
+        message,
+        {
+          type: "placement_drive",
+          relatedId: placementDriveId,
+          relatedModel: "PlacementDrive"
+        }
+      );
+    });
+
+    // Notify all counselors
+    const counselorNotifications = counselors.map(async (counselor) => {
+      return generateNotification(
+        counselor._id,
+        `📋 ${company.name} placement drive "${placementDrive.title}" has started with ${applications.length} student participants.`,
+        {
+          type: "placement_drive",
+          relatedId: placementDriveId,
+          relatedModel: "PlacementDrive"
+        }
+      );
+    });
+
+    // Send all notifications
+    await Promise.all([...studentNotifications, ...counselorNotifications]);
+    
+    console.log(`Sent ${applications.length} notifications to students and ${counselors.length} notifications to counselors`);
+    return true;
+  } catch (error) {
+    console.error("Error sending placement drive start notifications:", error);
+    return false;
+  }
+};
+
+// Send notification when student status changes (shortlisted/rejected/placed)
+export const notifyStudentStatusChange = async (studentId, status, placementDriveId, roundNumber = null, companyName = '') => {
+  try {
+    console.log('Sending student status change notification...', { studentId, status, placementDriveId, roundNumber });
+    
+    // Get student details
+    const student = await User.findById(studentId).populate('profile.counsellor', '_id name email');
+    
+    if (!student) {
+      console.error('Student not found');
+      return;
+    }
+
+    let message = '';
+    let notificationType = "student_status";
+
+    // Generate appropriate message based on status
+    switch (status) {
+      case 'shortlisted':
+        message = `🎉 Congratulations! You have been shortlisted for ${companyName}${roundNumber ? ` - Round ${roundNumber}` : ''}. Prepare for the next stage!`;
+        break;
+      case 'rejected':
+        message = `😔 Unfortunately, you were not selected for ${companyName}${roundNumber ? ` - Round ${roundNumber}` : ''}. Keep applying and don't give up!`;
+        break;
+      case 'placed':
+        message = `🎊 CONGRATULATIONS! You have been successfully placed at ${companyName}! Your hard work has paid off!`;
+        notificationType = "placement_update";
+        break;
+      default:
+        message = `📝 Your status for ${companyName} has been updated${roundNumber ? ` - Round ${roundNumber}` : ''}.`;
+    }
+
+    // Notify the student
+    await generateNotification(
+      studentId,
+      message,
+      {
+        type: notificationType,
+        relatedId: placementDriveId,
+        relatedModel: "PlacementDrive"
+      }
+    );
+
+    // Notify the student's counselor if exists
+    if (student.profile.counsellor) {
+      const counselorMessage = `📋 Student Update: ${student.name} (${student.id}) has been ${status} for ${companyName}${roundNumber ? ` - Round ${roundNumber}` : ''}.`;
+      
+      await generateNotification(
+        student.profile.counsellor._id,
+        counselorMessage,
+        {
+          type: notificationType,
+          relatedId: studentId,
+          relatedModel: "User"
+        }
+      );
+    }
+
+    console.log(`Sent status change notification to student and counselor for status: ${status}`);
+    return true;
+  } catch (error) {
+    console.error("Error sending student status change notification:", error);
+    return false;
+  }
+};

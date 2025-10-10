@@ -3,6 +3,7 @@ import PlacementDrive from "../models/PlacementDrive.js";
 import StudentRoundProgress from "../models/StudentRoundProgress.js";
 import User from "../models/user.js";
 import Application from "../models/application.js";
+import { notifyStudentStatusChange } from "./notification.controller.js";
 
 // Create a new placement round
 export const createPlacementRound = async (req, res) => {
@@ -462,7 +463,7 @@ export const completePlacementRound = async (req, res) => {
       // If shortlisted, check if this is the final round
       if (isShortlisted) {
         // Get placement drive info to check if this is the final round
-        const placementDrive = await PlacementDrive.findById(placementRound.placementDrive).select('totalRounds company');
+        const placementDrive = await PlacementDrive.findById(placementRound.placementDrive).select('totalRounds company').populate('company', 'name');
         const isFinalRound = placementRound.roundNumber >= placementDrive.totalRounds;
         
         if (isFinalRound) {
@@ -490,7 +491,7 @@ export const completePlacementRound = async (req, res) => {
               $set: {
                 isPlaced: true,
                 placedDate: new Date(),
-                placedCompany: placementDrive.company
+                placedCompany: placementDrive.company._id
               }
             }
           );
@@ -499,13 +500,22 @@ export const completePlacementRound = async (req, res) => {
           await Application.findOneAndUpdate(
             {
               student: studentId,
-              company: placementDrive.company
+              company: placementDrive.company._id
             },
             {
               $set: {
                 status: 'placed'
               }
             }
+          );
+          
+          // Send placement notification
+          await notifyStudentStatusChange(
+            studentId, 
+            'placed', 
+            placementRound.placementDrive, 
+            placementRound.roundNumber, 
+            placementDrive.company.name
           );
           
           console.log(`Student ${studentId} completed all rounds and is now placed`);
@@ -547,10 +557,21 @@ export const completePlacementRound = async (req, res) => {
             }
           );
           
+          // Send shortlisted notification for non-final rounds
+          await notifyStudentStatusChange(
+            studentId, 
+            'shortlisted', 
+            placementRound.placementDrive, 
+            placementRound.roundNumber, 
+            placementDrive.company.name
+          );
+          
           console.log(`Student ${studentId} advanced to round ${placementRound.roundNumber + 1}`);
         }
       } else {
         // If rejected, mark overall status as rejected
+        const placementDrive = await PlacementDrive.findById(placementRound.placementDrive).select('company').populate('company', 'name');
+        
         await StudentRoundProgress.updateOne(
           { 
             student: studentId,
@@ -571,13 +592,22 @@ export const completePlacementRound = async (req, res) => {
         await Application.findOneAndUpdate(
           {
             student: studentId,
-            company: (await PlacementDrive.findById(placementRound.placementDrive)).company
+            company: placementDrive.company._id
           },
           {
             $set: {
               status: 'rejected'
             }
           }
+        );
+        
+        // Send rejection notification
+        await notifyStudentStatusChange(
+          studentId, 
+          'rejected', 
+          placementRound.placementDrive, 
+          placementRound.roundNumber, 
+          placementDrive.company.name
         );
         
         console.log(`Student ${studentId} rejected in round ${placementRound.roundNumber}`);

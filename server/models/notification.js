@@ -13,7 +13,7 @@ const NotificationSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["certificate", "company", "application", "resume", "student", "general"],
+      enum: ["certificate", "company", "application", "resume", "student", "general", "placement_drive", "student_status", "placement_update"],
       default: "general",
     },
     isRead: {
@@ -26,7 +26,7 @@ const NotificationSchema = new mongoose.Schema(
     },
     relatedModel: {
       type: String,
-      enum: ["Certificate", "User", "Company", "Resume", "Application"],
+      enum: ["Certificate", "User", "Company", "Resume", "Application", "PlacementDrive", "StudentRoundProgress"],
     },
   },
   { timestamps: true }
