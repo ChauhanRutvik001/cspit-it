@@ -345,7 +345,7 @@ const ComprehensiveStudentView = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-      <div className="max-w-7xl mx-auto pt-20 p-4">
+      <div className="max-w-8xl mx-auto pt-20 p-4">
         {/* Header */}
         <div className="bg-white rounded-xl shadow-xl overflow-hidden mb-6">
           <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-8">

@@ -19,7 +19,8 @@ import {
   UserCheck,
   UserX,
   Award,
-  Target
+  Target,
+  X
 } from 'lucide-react';
 
 const PlacementDriveDetails = () => {
@@ -31,6 +32,10 @@ const PlacementDriveDetails = () => {
   const [studentProgress, setStudentProgress] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showCreateRoundModal, setShowCreateRoundModal] = useState(false);
+  const [showShortlistModal, setShowShortlistModal] = useState(false);
+  const [currentRoundForShortlist, setCurrentRoundForShortlist] = useState(null);
+  const [studentsInCurrentRound, setStudentsInCurrentRound] = useState([]);
+  const [shortlistedStudentIds, setShortlistedStudentIds] = useState([]);
   const [newRound, setNewRound] = useState({
     roundNumber: 1,
     roundName: '',
@@ -136,21 +141,86 @@ const PlacementDriveDetails = () => {
   };
 
   const handleCompleteRound = async (roundId) => {
-    if (!window.confirm('Are you sure you want to complete this round? This will shortlist students for the next round.')) {
-      return;
-    }
-
     try {
-      // For now, we'll complete with empty shortlist - in real implementation, you'd have a UI to select shortlisted students
+      // First, get the students who are in this round
+      const round = rounds.find(r => r._id === roundId);
+      const studentsResponse = await axiosInstance.get(`/placement-drive/${driveId}/round/${round?.roundNumber}/students`);
+      const studentsInRound = studentsResponse.data.students || [];
+      
+      if (studentsInRound.length === 0) {
+        toast.error('No students found in this round');
+        return;
+      }
+
+      // Show confirmation dialog with student count
+      const confirmMessage = `Are you sure you want to complete this round?\n\nThis will:\n- Mark all ${studentsInRound.length} pending students as either shortlisted or rejected\n- Automatically advance shortlisted students to the next round\n- Mark rejected students as eliminated from the placement drive\n\nNote: You can view and manage individual students by clicking the "View Students" button first.`;
+      
+      if (!window.confirm(confirmMessage)) {
+        return;
+      }
+
+      // For now, we'll complete the round with an empty shortlist
+      // In a real implementation, you would want to show a student selection UI
+      // The backend will automatically handle all pending students as rejected unless they're in the shortlisted array
       await axiosInstance.patch(`/placement-round/${roundId}/complete`, {
-        shortlistedStudents: []
+        shortlistedStudents: [] // Empty array means all students will be marked as rejected
       });
-      toast.success('Round completed successfully');
+      
+      toast.success('Round completed successfully. All pending students have been marked as rejected. Use "View Students" to manage individual student progress.');
       fetchDriveDetails();
     } catch (error) {
       console.error('Error completing round:', error);
       toast.error('Failed to complete round');
     }
+  };
+
+  const handleOpenShortlistModal = async (roundId) => {
+    try {
+      setLoading(true);
+      const round = rounds.find(r => r._id === roundId);
+      const studentsResponse = await axiosInstance.get(`/placement-drive/${driveId}/round/${round?.roundNumber}/students`);
+      const studentsInRound = studentsResponse.data.students || [];
+      
+      setCurrentRoundForShortlist(round);
+      setStudentsInCurrentRound(studentsInRound);
+      setShortlistedStudentIds([]);
+      setShowShortlistModal(true);
+    } catch (error) {
+      console.error('Error fetching students for shortlist:', error);
+      toast.error('Failed to load students for shortlisting');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCompleteRoundWithShortlist = async () => {
+    try {
+      setLoading(true);
+      
+      await axiosInstance.patch(`/placement-round/${currentRoundForShortlist._id}/complete`, {
+        shortlistedStudents: shortlistedStudentIds
+      });
+      
+      const shortlistedCount = shortlistedStudentIds.length;
+      const rejectedCount = studentsInCurrentRound.length - shortlistedCount;
+      
+      toast.success(`Round completed successfully! ${shortlistedCount} students shortlisted, ${rejectedCount} students rejected.`);
+      setShowShortlistModal(false);
+      fetchDriveDetails();
+    } catch (error) {
+      console.error('Error completing round with shortlist:', error);
+      toast.error('Failed to complete round');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const toggleStudentShortlist = (studentId) => {
+    setShortlistedStudentIds(prev => 
+      prev.includes(studentId) 
+        ? prev.filter(id => id !== studentId)
+        : [...prev, studentId]
+    );
   };
 
   const getStatusIcon = (status) => {
@@ -227,7 +297,7 @@ const PlacementDriveDetails = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-      <div className="max-w-7xl mx-auto pt-20 p-4">
+      <div className="max-w-8xl mx-auto pt-20 p-4">
         {/* Header */}
         <div className="bg-white rounded-xl shadow-xl overflow-hidden mb-6">
           <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-8">
@@ -303,28 +373,37 @@ const PlacementDriveDetails = () => {
                           </button>
                         )}
                         {round.status === 'in_progress' && (
-                          <button
-                            onClick={() => handleCompleteRound(round._id)}
-                            className="text-blue-600 hover:text-blue-800"
-                            title="Complete Round"
-                          >
-                            <CheckCircle className="h-4 w-4" />
-                          </button>
+                          <>
+                            <button
+                              onClick={() => handleOpenShortlistModal(round._id)}
+                              className="text-blue-600 hover:text-blue-800 mr-2"
+                              title="Shortlist Students"
+                            >
+                              <UserCheck className="h-4 w-4" />
+                            </button>
+                            <button
+                              onClick={() => handleCompleteRound(round._id)}
+                              className="text-green-600 hover:text-green-800"
+                              title="Complete Round (All Rejected)"
+                            >
+                              <CheckCircle className="h-4 w-4" />
+                            </button>
+                          </>
                         )}
                                                  <button
                            onClick={() => navigate(`/admin/placement-drive/${driveId}/students?round=${round.roundNumber}`)}
                            className="text-blue-600 hover:text-blue-800"
                            title="View Students"
                          >
-                           <Users className="h-4 w-4" />
+                             <Edit className="h-4 w-4" />
                          </button>
-                         <button
+                         {/* <button
                            onClick={() => navigate(`/admin/placement-round/${round._id}`)}
                            className="text-gray-600 hover:text-gray-800"
                            title="View Details"
                          >
-                           <Edit className="h-4 w-4" />
-                         </button>
+                         
+                         </button> */}
                       </div>
                     </div>
 
@@ -594,6 +673,149 @@ const PlacementDriveDetails = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {/* Shortlist Students Modal */}
+        {showShortlistModal && currentRoundForShortlist && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg max-w-4xl w-full p-6 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold">
+                  Complete {currentRoundForShortlist.roundName} - Round {currentRoundForShortlist.roundNumber}
+                </h3>
+                <button
+                  onClick={() => setShowShortlistModal(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <AlertCircle className="h-5 w-5 text-blue-600" />
+                    <h4 className="font-semibold text-blue-800">Select Students to Shortlist</h4>
+                  </div>
+                  <p className="text-blue-700 text-sm">
+                    Students you select will advance to the next round. Unselected students will be automatically rejected and eliminated from the placement drive.
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between mb-4">
+                  <div className="text-sm text-gray-600">
+                    {shortlistedStudentIds.length} of {studentsInCurrentRound.length} students selected
+                  </div>
+                  <div className="space-x-2">
+                    <button
+                      onClick={() => setShortlistedStudentIds(studentsInCurrentRound.map(s => s.student._id))}
+                      className="text-sm text-blue-600 hover:text-blue-800"
+                    >
+                      Select All
+                    </button>
+                    <button
+                      onClick={() => setShortlistedStudentIds([])}
+                      className="text-sm text-red-600 hover:text-red-800"
+                    >
+                      Clear All
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3 mb-6 max-h-96 overflow-y-auto">
+                {studentsInCurrentRound.map((studentData) => (
+                  <div 
+                    key={studentData.student._id}
+                    className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                      shortlistedStudentIds.includes(studentData.student._id)
+                        ? 'border-green-500 bg-green-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                    onClick={() => toggleStudentShortlist(studentData.student._id)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                          shortlistedStudentIds.includes(studentData.student._id)
+                            ? 'border-green-500 bg-green-500'
+                            : 'border-gray-300'
+                        }`}>
+                          {shortlistedStudentIds.includes(studentData.student._id) && (
+                            <CheckCircle className="h-4 w-4 text-white" />
+                          )}
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-800">
+                            {studentData.student.fullName}
+                          </h4>
+                          <p className="text-sm text-gray-600">
+                            {studentData.student.email} • {studentData.student.enrollmentNumber}
+                          </p>
+                          <div className="flex items-center space-x-4 mt-1">
+                            <span className="text-xs text-gray-500">
+                              {studentData.student.branch} • {studentData.student.semester}th Sem
+                            </span>
+                            <span className={`text-xs px-2 py-1 rounded-full ${
+                              studentData.currentStatus === 'pending' 
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : studentData.currentStatus === 'shortlisted'
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-red-100 text-red-800'
+                            }`}>
+                              {studentData.currentStatus}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-medium text-gray-700">
+                          Round {studentData.currentRound}
+                        </div>
+                        {studentData.student.cgpa && (
+                          <div className="text-sm text-gray-500">
+                            CGPA: {studentData.student.cgpa}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex justify-between items-center pt-4 border-t">
+                <div className="text-sm text-gray-600">
+                  <span className="font-semibold text-green-600">{shortlistedStudentIds.length}</span> will advance to next round • 
+                  <span className="font-semibold text-red-600 ml-1">{studentsInCurrentRound.length - shortlistedStudentIds.length}</span> will be rejected
+                </div>
+                <div className="flex space-x-3">
+                  <button
+                    onClick={() => setShowShortlistModal(false)}
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleCompleteRoundWithShortlist}
+                    disabled={loading}
+                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center space-x-2"
+                  >
+                    {loading ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        <span>Completing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <CheckCircle className="h-4 w-4" />
+                        <span>Complete Round</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}

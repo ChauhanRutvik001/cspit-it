@@ -410,7 +410,7 @@ export const startPlacementRound = async (req, res) => {
 export const completePlacementRound = async (req, res) => {
   try {
     const { roundId } = req.params;
-    const { shortlistedStudents } = req.body; // Array of student IDs
+    const { shortlistedStudents = [] } = req.body; // Array of student IDs who are shortlisted
 
     const placementRound = await PlacementRound.findByIdAndUpdate(
       roundId,
@@ -428,23 +428,27 @@ export const completePlacementRound = async (req, res) => {
       });
     }
 
-    // Update student progress for this round
-    const updatePromises = shortlistedStudents.map(async (studentData) => {
-      const { studentId, marksObtained, feedback, isShortlisted } = studentData;
+    // Get all students who are currently in this round with 'pending' status
+    const studentsInRound = await StudentRoundProgress.find({
+      placementDrive: placementRound.placementDrive,
+      'roundProgress.roundNumber': placementRound.roundNumber,
+      'roundProgress.status': 'pending'
+    });
+
+    console.log(`Found ${studentsInRound.length} students in round ${placementRound.roundNumber}`);
+    console.log(`Shortlisted students: ${shortlistedStudents.length}`);
+
+    // Process each student in the current round
+    const updatePromises = studentsInRound.map(async (studentProgress) => {
+      const studentId = studentProgress.student.toString();
+      const isShortlisted = shortlistedStudents.includes(studentId);
       
       const updateQuery = {
         'roundProgress.$.status': isShortlisted ? 'shortlisted' : 'rejected',
-        'roundProgress.$.marksObtained': marksObtained,
-        'roundProgress.$.feedback': feedback,
         'roundProgress.$.evaluatedBy': req.user.id,
         'roundProgress.$.evaluatedAt': new Date(),
         'roundProgress.$.isShortlisted': isShortlisted
       };
-
-      // Calculate percentage
-      if (marksObtained && placementRound.maxMarks) {
-        updateQuery['roundProgress.$.percentage'] = (marksObtained / placementRound.maxMarks) * 100;
-      }
 
       await StudentRoundProgress.updateOne(
         { 
@@ -542,6 +546,8 @@ export const completePlacementRound = async (req, res) => {
               }
             }
           );
+          
+          console.log(`Student ${studentId} advanced to round ${placementRound.roundNumber + 1}`);
         }
       } else {
         // If rejected, mark overall status as rejected
@@ -560,15 +566,43 @@ export const completePlacementRound = async (req, res) => {
             }
           }
         );
+        
+        // Update application status to "rejected"
+        await Application.findOneAndUpdate(
+          {
+            student: studentId,
+            company: (await PlacementDrive.findById(placementRound.placementDrive)).company
+          },
+          {
+            $set: {
+              status: 'rejected'
+            }
+          }
+        );
+        
+        console.log(`Student ${studentId} rejected in round ${placementRound.roundNumber}`);
       }
     });
 
     await Promise.all(updatePromises);
 
+    // Summary of results
+    const shortlistedCount = shortlistedStudents.length;
+    const rejectedCount = studentsInRound.length - shortlistedCount;
+
+    console.log(`Round ${placementRound.roundNumber} completed: ${shortlistedCount} shortlisted, ${rejectedCount} rejected`);
+
     res.status(200).json({
       success: true,
-      message: "Placement round completed successfully",
-      data: placementRound
+      message: `Round completed successfully. ${shortlistedCount} students shortlisted, ${rejectedCount} students rejected.`,
+      data: {
+        placementRound,
+        summary: {
+          totalStudents: studentsInRound.length,
+          shortlisted: shortlistedCount,
+          rejected: rejectedCount
+        }
+      }
     });
   } catch (error) {
     console.error("Error completing placement round:", error);

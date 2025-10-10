@@ -254,17 +254,21 @@ export const getAllPlacementDrives = async (req, res) => {
 export const getStudentsInRound = async (req, res) => {
   try {
     const { driveId, roundNumber } = req.params;
+    console.log(`Getting students for drive ${driveId}, round ${roundNumber}`);
 
     const students = await StudentRoundProgress.find({
       placementDrive: driveId,
       currentRound: parseInt(roundNumber)
     })
-    .populate('student', 'name email id profile')
+    .populate('student', 'fullName email enrollmentNumber branch semester cgpa profile')
     .sort({ createdAt: 1 });
+
+    console.log(`Found ${students.length} students in round ${roundNumber}`);
 
     res.status(200).json({
       success: true,
-      data: students
+      students: students,  // Changed from 'data' to 'students' to match frontend expectation
+      count: students.length
     });
   } catch (error) {
     console.error("Error fetching students in round:", error);
