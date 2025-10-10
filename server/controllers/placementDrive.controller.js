@@ -512,6 +512,19 @@ export const uploadShortlistedStudents = async (req, res) => {
               }
             }
           );
+
+          // Update application status to "placed"
+          await Application.findOneAndUpdate(
+            {
+              student: studentId,
+              company: placementDrive.company
+            },
+            {
+              $set: {
+                status: 'placed'
+              }
+            }
+          );
           
           console.log(`Student ${studentId} completed all rounds and is now placed`);
         } else {

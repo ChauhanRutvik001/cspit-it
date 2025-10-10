@@ -2,6 +2,7 @@ import PlacementRound from "../models/PlacementRound.js";
 import PlacementDrive from "../models/PlacementDrive.js";
 import StudentRoundProgress from "../models/StudentRoundProgress.js";
 import User from "../models/user.js";
+import Application from "../models/application.js";
 
 // Create a new placement round
 export const createPlacementRound = async (req, res) => {
@@ -489,6 +490,19 @@ export const completePlacementRound = async (req, res) => {
               }
             }
           );
+
+          // Update application status to "placed"
+          await Application.findOneAndUpdate(
+            {
+              student: studentId,
+              company: placementDrive.company
+            },
+            {
+              $set: {
+                status: 'placed'
+              }
+            }
+          );
           
           console.log(`Student ${studentId} completed all rounds and is now placed`);
         } else {
@@ -637,6 +651,90 @@ export const getRoundDetails = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error fetching round details",
+      error: error.message
+    });
+  }
+};
+
+// Get student progress for a specific company
+export const getStudentProgressForCompany = async (req, res) => {
+  try {
+    const { studentId, companyId } = req.params;
+
+    // Find placement drives for this company
+    const placementDrives = await PlacementDrive.find({ company: companyId })
+      .select('_id title');
+
+    if (!placementDrives.length) {
+      return res.status(200).json({
+        success: true,
+        data: []
+      });
+    }
+
+    const driveIds = placementDrives.map(drive => drive._id);
+
+    // Find student progress across all placement drives for this company
+    const studentProgress = await StudentRoundProgress.find({
+      student: studentId,
+      placementDrive: { $in: driveIds }
+    })
+    .populate('placementDrive', 'title company')
+    .sort({ 'roundProgress.roundNumber': 1 });
+
+    // Flatten the round progress data and remove duplicates
+    const flattenedProgress = [];
+    const seenRounds = new Set(); // To track unique rounds
+    
+    for (const progress of studentProgress) {
+      for (const round of progress.roundProgress) {
+        // Create unique key for this round
+        const roundKey = `${progress.placementDrive._id}-${round.roundNumber}`;
+        
+        // Skip if we've already seen this round
+        if (seenRounds.has(roundKey)) {
+          continue;
+        }
+        seenRounds.add(roundKey);
+
+        // Get additional round details
+        const roundDetails = await PlacementRound.findOne({
+          placementDrive: progress.placementDrive._id,
+          roundNumber: round.roundNumber
+        }).select('roundName roundType scheduledDate scheduledTime maxMarks passingMarks');
+
+        if (roundDetails) {
+          flattenedProgress.push({
+            roundNumber: round.roundNumber,
+            roundName: roundDetails.roundName,
+            roundType: roundDetails.roundType,
+            status: round.status,
+            marks: round.marksObtained,
+            maxMarks: roundDetails.maxMarks,
+            passingMarks: roundDetails.passingMarks,
+            scheduledDate: roundDetails.scheduledDate,
+            scheduledTime: roundDetails.scheduledTime,
+            feedback: round.feedback,
+            attendedAt: round.attendedAt,
+            evaluatedAt: round.evaluatedAt,
+            placementDrive: progress.placementDrive.title
+          });
+        }
+      }
+    }
+
+    // Sort by round number
+    flattenedProgress.sort((a, b) => a.roundNumber - b.roundNumber);
+
+    res.status(200).json({
+      success: true,
+      data: flattenedProgress
+    });
+  } catch (error) {
+    console.error("Error fetching student progress for company:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching student progress",
       error: error.message
     });
   }

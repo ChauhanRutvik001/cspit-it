@@ -7,7 +7,8 @@ import {
   startPlacementRound,
   completePlacementRound,
   getRoundDetails,
-  cleanupOrphanedRounds
+  cleanupOrphanedRounds,
+  getStudentProgressForCompany
 } from "../controllers/placementRound.controller.js";
 import { isAuthorized, isAdmin } from "../middlewares/auth.js";
 
@@ -36,5 +37,8 @@ router.patch("/:roundId/complete", isAuthorized, isAdmin, completePlacementRound
 
 // Clean up orphaned rounds (utility route)
 router.post("/cleanup", isAuthorized, isAdmin, cleanupOrphanedRounds);
+
+// Get student progress for a specific company
+router.get("/student/:studentId/company/:companyId", isAuthorized, getStudentProgressForCompany);
 
 export default router;

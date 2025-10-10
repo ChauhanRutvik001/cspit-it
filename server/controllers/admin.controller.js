@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import Certificate from "../models/certificateSchema.js";
 import Resume from "../models/Resume.js";
 import DomainModel from "../models/StudentSelection.js";
+import Application from "../models/application.js";
 
 const adminController = {
   BulkRequests: async (req, res) => {

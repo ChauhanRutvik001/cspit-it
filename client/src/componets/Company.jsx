@@ -15,6 +15,14 @@ import {
   Briefcase,
   DollarSign,
   Users,
+  Eye,
+  CheckCircle,
+  Clock,
+  XCircle,
+  Calendar,
+  MapPin,
+  Mail,
+  Phone,
 } from "lucide-react";
 
 const Company = () => {
@@ -26,6 +34,10 @@ const Company = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [recordsPerPage, setRecordsPerPage] = useState(10);
+  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [showCompanyModal, setShowCompanyModal] = useState(false);
+  const [studentProgress, setStudentProgress] = useState([]);
+  const [progressLoading, setProgressLoading] = useState(false);
   const user = useSelector((store) => store.app?.user);
 
   useEffect(() => {
@@ -63,6 +75,11 @@ const Company = () => {
             applicationMap[app.company] = app.status || "applied";
           }
         });
+      }
+
+      // Check if user is placed in any company (even without direct application)
+      if (user?.isPlaced && user?.placedCompany) {
+        applicationMap[user.placedCompany] = "placed";
       }
 
       setApplications(applicationMap);
@@ -186,6 +203,56 @@ const Company = () => {
     } finally {
       setLoading(null);
     }
+  };
+
+  const handleViewCompanyDetails = async (company) => {
+    setSelectedCompany(company);
+    setShowCompanyModal(true);
+    
+    // Fetch student progress for this company if user is a student
+    if (user?.role === "student" && user?._id) {
+      await fetchStudentProgress(company._id);
+    }
+  };
+
+  const fetchStudentProgress = async (companyId) => {
+    try {
+      setProgressLoading(true);
+      const response = await axiosInstance.get(`/placement-round/student/${user._id}/company/${companyId}`);
+      setStudentProgress(response.data?.data || []);
+    } catch (error) {
+      console.error("Error fetching student progress:", error);
+      setStudentProgress([]);
+    } finally {
+      setProgressLoading(false);
+    }
+  };
+
+  const closeCompanyModal = () => {
+    setShowCompanyModal(false);
+    setSelectedCompany(null);
+    setStudentProgress([]);
+  };
+
+  const getStatusBadge = (status) => {
+    const statusConfig = {
+      shortlisted: { bg: "bg-green-100", text: "text-green-800", icon: CheckCircle },
+      selected: { bg: "bg-green-100", text: "text-green-800", icon: CheckCircle },
+      placed: { bg: "bg-purple-100", text: "text-purple-800", icon: CheckCircle },
+      rejected: { bg: "bg-red-100", text: "text-red-800", icon: XCircle },
+      pending: { bg: "bg-yellow-100", text: "text-yellow-800", icon: Clock },
+      active: { bg: "bg-blue-100", text: "text-blue-800", icon: Clock },
+    };
+    
+    const config = statusConfig[status] || { bg: "bg-gray-100", text: "text-gray-800", icon: Clock };
+    const IconComponent = config.icon;
+    
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.text}`}>
+        <IconComponent className="w-3 h-3 mr-1" />
+        {status.charAt(0).toUpperCase() + status.slice(1)}
+      </span>
+    );
   };
 
   const handleViewApplications = (companyId) => {
@@ -526,6 +593,190 @@ const Company = () => {
     );
   }
 
+  // Company Detail Modal Component
+  const CompanyDetailModal = () => {
+    if (!showCompanyModal || !selectedCompany) return null;
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-indigo-600 to-blue-500 p-6 text-white">
+            <div className="flex justify-between items-start">
+              <div>
+                <h2 className="text-2xl font-bold">{selectedCompany.name}</h2>
+                <p className="text-indigo-100 mt-1">{selectedCompany.domain}</p>
+              </div>
+              <button
+                onClick={closeCompanyModal}
+                className="text-white hover:text-gray-200 transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6">
+            {/* Company Information */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              {/* Basic Info */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                  <Building2 className="w-5 h-5 mr-2 text-indigo-600" />
+                  Company Information
+                </h3>
+                
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-sm font-medium text-gray-500">Description</label>
+                    <p className="text-gray-900 mt-1">{selectedCompany.description || "No description available"}</p>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Domain</label>
+                      <p className="text-gray-900 mt-1">{selectedCompany.domain}</p>
+                    </div>
+                    {selectedCompany.salary && (
+                      <div>
+                        <label className="text-sm font-medium text-gray-500">Salary Range</label>
+                        <p className="text-gray-900 mt-1 flex items-center">
+                          <DollarSign className="w-4 h-4 mr-1" />
+                          {selectedCompany.salary.min ? 
+                            `₹${selectedCompany.salary.min}L - ₹${selectedCompany.salary.max}L` : 
+                            "Not specified"
+                          }
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Links */}
+                  <div className="flex gap-4">
+                    {selectedCompany.website && (
+                      <a
+                        href={selectedCompany.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center text-indigo-600 hover:text-indigo-800 transition-colors"
+                      >
+                        <Globe className="w-4 h-4 mr-1" />
+                        Website
+                      </a>
+                    )}
+                    {selectedCompany.linkedin && (
+                      <a
+                        href={selectedCompany.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+                      >
+                        <Linkedin className="w-4 h-4 mr-1" />
+                        LinkedIn
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Application Status */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-gray-900 flex items-center">
+                  <Briefcase className="w-5 h-5 mr-2 text-indigo-600" />
+                  Application Status
+                </h3>
+                
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  {applications[selectedCompany._id] ? (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-gray-700">Current Status:</span>
+                      {getStatusBadge(applications[selectedCompany._id])}
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-600">You haven't applied to this company yet.</p>
+                      <button
+                        onClick={() => handleApply(selectedCompany._id)}
+                        disabled={loading === selectedCompany._id}
+                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg transition-colors disabled:bg-indigo-400"
+                      >
+                        {loading === selectedCompany._id ? "Applying..." : "Apply Now"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Student Progress */}
+            {user?.role === "student" && (
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 flex items-center mb-4">
+                  <Users className="w-5 h-5 mr-2 text-indigo-600" />
+                  My Progress
+                </h3>
+
+                {progressLoading ? (
+                  <div className="flex justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+                  </div>
+                ) : studentProgress.length > 0 ? (
+                  <div className="space-y-3">
+                    {studentProgress.map((round, index) => (
+                      <div key={index} className="bg-gray-50 p-4 rounded-lg border">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center">
+                            <div className="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center text-sm font-medium mr-3">
+                              {round.roundNumber}
+                            </div>
+                            <div>
+                              <h4 className="font-medium text-gray-900">{round.roundName}</h4>
+                              <p className="text-sm text-gray-500">{round.roundType}</p>
+                            </div>
+                          </div>
+                          {getStatusBadge(round.status)}
+                        </div>
+                        
+                        {round.scheduledDate && (
+                          <div className="flex items-center text-sm text-gray-600 mt-2">
+                            <Calendar className="w-4 h-4 mr-1" />
+                            {new Date(round.scheduledDate).toLocaleDateString()} at {round.scheduledTime}
+                          </div>
+                        )}
+                        
+                        {round.marks !== undefined && (
+                          <div className="mt-2 text-sm">
+                            <span className="text-gray-600">Score: </span>
+                            <span className="font-medium text-gray-900">
+                              {round.marks}/{round.maxMarks || 100}
+                            </span>
+                          </div>
+                        )}
+                        
+                        {round.feedback && (
+                          <div className="mt-2">
+                            <p className="text-sm text-gray-600">Feedback:</p>
+                            <p className="text-sm text-gray-900 mt-1">{round.feedback}</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <Users className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                    <p>No progress information available</p>
+                    <p className="text-sm">Apply to this company to see your progress</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Student View
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4">
@@ -687,18 +938,25 @@ const Company = () => {
                                 : "Not specified"}
                             </span>
                           </div>
-                          <div className="text-sm text-gray-900 max-w-md break-words whitespace-normal">
+                          <div className="text-sm text-gray-900 max-w-md break-words whitespace-normal line-clamp-3">
                             {company?.description ? (
-                              <>
-                                {company.description.substring(0, 40)}
-                                {company.description.length > 40 ? "..." : ""}
-                              </>
+                              company.description
                             ) : (
                               "No description available"
                             )}
                           </div>
                         </div>
-                        <div className="pt-4 mt-auto border-t border-gray-100">
+                        <div className="pt-4 mt-auto border-t border-gray-100 space-y-3">
+                          {/* View Details Button */}
+                          <button
+                            onClick={() => handleViewCompanyDetails(company)}
+                            className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors flex items-center justify-center"
+                          >
+                            <Eye className="h-4 w-4 mr-2" />
+                            View Details
+                          </button>
+                          
+                          {/* Application Status */}
                           {loading === company._id ? (
                             <div className="bg-gray-100 text-gray-600 px-4 py-2 rounded-lg flex items-center justify-center w-full">
                               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600 mr-2"></div>
@@ -734,6 +992,11 @@ const Company = () => {
                                 <span className="bg-red-50 text-red-800 px-4 py-2 rounded-lg flex items-center w-full justify-center">
                                   <div className="mr-2 h-2 w-2 bg-red-400 rounded-full"></div>
                                   Rejected
+                                </span>
+                              ) : applications[company._id] === "placed" ? (
+                                <span className="bg-gradient-to-r from-purple-50 to-violet-50 text-purple-800 px-4 py-2 rounded-lg flex items-center w-full justify-center font-semibold border border-purple-200 shadow-md">
+                                  <div className="mr-2 h-2 w-2 bg-purple-500 rounded-full animate-pulse"></div>
+                                  🎉 Placed in {company.name}
                                 </span>
                               ) : (
                                 <span className="bg-blue-50 text-blue-800 px-4 py-2 rounded-lg flex items-center w-full justify-center">
@@ -822,6 +1085,9 @@ const Company = () => {
           </div>
         </div>
       </div>
+      
+      {/* Company Detail Modal */}
+      <CompanyDetailModal />
     </div>
   );
 };
