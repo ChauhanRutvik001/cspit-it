@@ -4,7 +4,7 @@ import express from "express";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import http from "http";
+import { createServer } from "http";
 import { Server } from "socket.io";
 
 // Import routes
@@ -13,57 +13,33 @@ import adminRoutes from "./routes/admin.router.js";
 import scheduleRoutes from "./routes/schedule.router.js";
 import user from "./routes/user.js";
 import studentSelectionRoutes from "./routes/studentSelectionRoutes.js";
-import certificateRoutes from "./routes/certificate.routes.js";
+import certificateRoutes from "./routes/certificate.routes.js"; // Add this import
 import resumeRoutes from "./routes/resume.routes.js";
 import testRoutes from "./routes/test.routes.js";
-import companyRoutes from "./routes/company.routes.js";
-import applicationRoutes from "./routes/application.routes.js";
-import notificationRoutes from "./routes/notification.routes.js";
+import companyRoutes from "./routes/company.routes.js"; // ✅ Company Routes
+import applicationRoutes from "./routes/application.routes.js"; // ✅ Application Routes
+import placementDriveRoutes from "./routes/placementDrive.routes.js"; // ✅ Placement Drive Routes
+import placementRoundRoutes from "./routes/placementRound.routes.js"; // ✅ Placement Round Routes
+import counsellorRoutes from "./routes/counsellor.router.js";
+import notificationRoutes from "./routes/notification.routes.js"; // ✅ Notification Routes
 
 // Load environment variables
 config();
 
 const app = express();
-const server = http.createServer(app);
+const server = createServer(app);
 
-// Socket.io setup
+// Initialize Socket.io
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173", // Your frontend URL
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
     credentials: true
   }
 });
 
-// Store connected users with their socket ids
+// Store connected users
 const connectedUsers = new Map();
-
-// Socket.io connection handler
-io.on("connection", (socket) => {
-  console.log("New client connected:", socket.id);
-  
-  // User authentication and association with their socket
-  socket.on("authenticate", (userId) => {
-    if (userId) {
-      connectedUsers.set(userId, socket.id);
-      console.log(`User ${userId} connected with socket ${socket.id}`);
-    }
-  });
-
-  // Handle disconnection
-  socket.on("disconnect", () => {
-    // Remove user from connected users map
-    for (const [userId, socketId] of connectedUsers.entries()) {
-      if (socketId === socket.id) {
-        connectedUsers.delete(userId);
-        console.log(`User ${userId} disconnected`);
-        break;
-      }
-    }
-  });
-});
-
-// Export socket.io instance for use in other files
-export { io, connectedUsers };
 
 // Middleware configurations
 app.use(express.urlencoded({ extended: true }));
@@ -89,7 +65,35 @@ app.use("/api/v1/resumes", resumeRoutes);
 app.use("/api/v1/tests", testRoutes);
 app.use("/api/v1/company", companyRoutes); // ✅ Added Company Routes
 app.use("/api/v1/application", applicationRoutes); // ✅ Added Application Routes
+app.use("/api/v1/placement-drive", placementDriveRoutes); // ✅ Added Placement Drive Routes
+app.use("/api/v1/placement-round", placementRoundRoutes); // ✅ Added Placement Round Routes
+app.use("/api/v1/counsellor", counsellorRoutes);
 app.use("/api/v1/notifications", notificationRoutes); // ✅ Added Notification Routes
+
+// Socket.io connection handling
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
+  
+  // Handle user authentication and store connection
+  socket.on('authenticate', (userId) => {
+    if (userId) {
+      connectedUsers.set(userId, socket.id);
+      console.log(`User ${userId} authenticated with socket ${socket.id}`);
+    }
+  });
+  
+  // Handle disconnection
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
+    // Remove user from connected users
+    for (const [userId, socketId] of connectedUsers.entries()) {
+      if (socketId === socket.id) {
+        connectedUsers.delete(userId);
+        break;
+      }
+    }
+  });
+});
 
 // Database connection and server initialization
 const PORT = process.env.PORT || 3100;
@@ -107,4 +111,4 @@ mongoose
     process.exit(1);
   });
 
-export { mongoose };
+export { mongoose, io, connectedUsers };

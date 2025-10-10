@@ -553,6 +553,35 @@ const Company = () => {
             </div>
           </div>
 
+          {/* Placement Drives Section for Students */}
+          {user?.role === 'student' && (
+            <div className="bg-gradient-to-r from-green-50 to-blue-50 border-b border-gray-200">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <div className="h-10 w-10 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg flex items-center justify-center">
+                      <Briefcase className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900">My Placement Progress</h3>
+                      <p className="text-sm text-gray-600">Track your progress in placement drives</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => navigate('/placement-drives')}
+                    className="bg-gradient-to-r from-green-600 to-blue-600 text-white px-4 py-2 rounded-lg hover:from-green-500 hover:to-blue-500 transition-all duration-200 flex items-center space-x-2"
+                  >
+                    <span>View Progress</span>
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+                <div className="text-sm text-gray-600">
+                  Check your placement drive progress, round status, and selection results
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Company Cards */}
           {loading === true ? (
             <div className="flex flex-col items-center justify-center py-12">

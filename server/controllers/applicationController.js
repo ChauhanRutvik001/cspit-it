@@ -1,8 +1,74 @@
 import Application from "../models/application.js";
 import User from "../models/user.js";
+import PlacementDrive from "../models/PlacementDrive.js";
+import StudentRoundProgress from "../models/StudentRoundProgress.js";
 import mongoose from "mongoose";
-import { generateNotification } from "./notification.controller.js";
-import Company from "../models/company.js";
+
+// Utility function to add student to existing placement drives
+const addStudentToExistingDrives = async (studentId, companyId) => {
+  try {
+    // Find all active placement drives for this company
+    const activeDrives = await PlacementDrive.find({
+      company: companyId,
+      status: { $in: ['draft', 'active'] }
+    });
+
+    console.log(`Found ${activeDrives.length} active drives for company ${companyId}`);
+
+    // For each active drive, create student progress if it doesn't exist
+    for (const drive of activeDrives) {
+      const existingProgress = await StudentRoundProgress.findOne({
+        student: studentId,
+        placementDrive: drive._id
+      });
+
+      if (!existingProgress) {
+        const studentProgress = new StudentRoundProgress({
+          student: studentId,
+          placementDrive: drive._id,
+          currentRound: 1,
+          roundProgress: [{
+            roundNumber: 1,
+            roundName: "Round 1",
+            status: 'pending'
+          }]
+        });
+        
+        await studentProgress.save();
+        console.log(`Added student ${studentId} to drive ${drive._id}`);
+      }
+    }
+  } catch (error) {
+    console.error("Error adding student to existing drives:", error);
+  }
+};
+
+// Utility function to remove student from existing placement drives
+const removeStudentFromExistingDrives = async (studentId, companyId) => {
+  try {
+    // Find all active placement drives for this company
+    const activeDrives = await PlacementDrive.find({
+      company: companyId,
+      status: { $in: ['draft', 'active'] }
+    });
+
+    console.log(`Found ${activeDrives.length} active drives for company ${companyId}`);
+
+    // For each active drive, remove student progress if it exists
+    for (const drive of activeDrives) {
+      const result = await StudentRoundProgress.deleteOne({
+        student: studentId,
+        placementDrive: drive._id
+      });
+
+      if (result.deletedCount > 0) {
+        console.log(`Removed student ${studentId} from drive ${drive._id}`);
+      }
+    }
+  } catch (error) {
+    console.error("Error removing student from existing drives:", error);
+  }
+};
 
 // Submit an application
 export const submitApplication = async (req, res) => {
@@ -13,12 +79,6 @@ export const submitApplication = async (req, res) => {
     const student = await User.findById(studentId);
     if (!student) {
       return res.status(404).json({ message: "Student not found" });
-    }
-
-    // Get company details for notification
-    const company = await Company.findById(companyId);
-    if (!company) {
-      return res.status(404).json({ message: "Company not found" });
     }
 
     // Check for existing application
@@ -42,22 +102,9 @@ export const submitApplication = async (req, res) => {
     
     await application.save();
 
-    // If student is placed, send notification to counsellor about pending approval
-    if (student.isPlaced && student.profile?.counsellor) {
-      const counsellorId = student.profile.counsellor;
-      
-      // Send notification to counsellor
-      await generateNotification(
-        counsellorId,
-        `${student.name} has applied to ${company.name} and is awaiting your approval`,
-        {
-          type: "application",
-          relatedId: application._id,
-          relatedModel: "Application"
-        }
-      );
-      
-      console.log(`Notification sent to counsellor ${counsellorId} about application from ${student.name} to ${company.name}`);
+    // If application is automatically approved (non-placed student), add to existing drives
+    if (!student.isPlaced) {
+      await addStudentToExistingDrives(studentId, companyId);
     }
 
     // Return appropriate message
@@ -111,28 +158,12 @@ export const counsellorApproval = async (req, res) => {
     application.counsellorApproval = approve;
     await application.save();
 
-    // Get counsellor's name for the notification
-    const counsellor = await User.findById(counsellorId);
-    
-    // Send notification to the student about application approval/rejection
-    if (application.student && application.student._id) {
-      // Prepare notification message based on approval status
-      const notificationMessage = approve
-        ? `Your application to ${application.company.name} has been approved by counsellor ${counsellor ? counsellor.name : ''}`
-        : `Your application to ${application.company.name} has been rejected by counsellor ${counsellor ? counsellor.name : ''}`;
-      
-      // Send the notification
-      await generateNotification(
-        application.student._id,
-        notificationMessage,
-        {
-          type: "application",
-          relatedId: application._id,
-          relatedModel: "Application"
-        }
-      );
-      
-      console.log(`Notification sent to student ${application.student._id} about ${approve ? 'approval' : 'rejection'} of application to ${application.company.name}`);
+    // If application is approved, add student to existing drives
+    // If application is rejected, remove student from existing drives
+    if (approve) {
+      await addStudentToExistingDrives(application.student._id, application.company._id);
+    } else {
+      await removeStudentFromExistingDrives(application.student._id, application.company._id);
     }
 
     res.status(200).json({ 
@@ -170,6 +201,9 @@ export const cancelApplication = async (req, res) => {
     if (!result) {
       return res.status(404).json({ message: "Application not found" });
     }
+
+    // Remove student from existing placement drives
+    await removeStudentFromExistingDrives(studentId, companyId);
     
     res.status(200).json({ message: "Application cancelled successfully" });
   } catch (error) {
@@ -254,6 +288,9 @@ export const deleteApplication = async (req, res) => {
     if (!result) {
       return res.status(404).json({ message: "Application not found" });
     }
+
+    // Remove student from existing placement drives
+    await removeStudentFromExistingDrives(result.student, result.company);
     
     res.status(200).json({ message: "Application deleted successfully" });
   } catch (error) {
@@ -286,3 +323,75 @@ export const getCounsellorPendingApplications = async (req, res) => {
     res.status(500).json({ message: "Error fetching applications" });
   }
 };
+
+// Sync approved applications with existing placement drives (admin utility)
+export const syncApprovedApplicationsWithDrives = async (req, res) => {
+  try {
+    // Get all approved applications
+    const approvedApplications = await Application.find({
+      status: 'approved'
+    }).populate('student').populate('company');
+
+    console.log(`Found ${approvedApplications.length} approved applications to sync`);
+
+    // Get all active placement drives
+    const activeDrives = await PlacementDrive.find({
+      status: { $in: ['draft', 'active'] }
+    }).populate('company');
+
+    console.log(`Found ${activeDrives.length} active placement drives`);
+
+    let addedCount = 0;
+    let removedCount = 0;
+    let errorCount = 0;
+
+    // For each active drive, ensure only approved applications are included
+    for (const drive of activeDrives) {
+      try {
+        // Get all approved applications for this company
+        const companyApprovedApplications = approvedApplications.filter(
+          app => app.company._id.toString() === drive.company._id.toString()
+        );
+
+        // Get all current student progress for this drive
+        const currentStudentProgress = await StudentRoundProgress.find({
+          placementDrive: drive._id
+        });
+
+        const currentStudentIds = currentStudentProgress.map(sp => sp.student.toString());
+        const approvedStudentIds = companyApprovedApplications.map(app => app.student._id.toString());
+
+        // Add students who should be in the drive but aren't
+        for (const application of companyApprovedApplications) {
+          if (!currentStudentIds.includes(application.student._id.toString())) {
+            await addStudentToExistingDrives(application.student._id, application.company._id);
+            addedCount++;
+          }
+        }
+
+        // Remove students who are in the drive but shouldn't be (no approved application)
+        for (const studentProgress of currentStudentProgress) {
+          if (!approvedStudentIds.includes(studentProgress.student.toString())) {
+            await removeStudentFromExistingDrives(studentProgress.student, drive.company._id);
+            removedCount++;
+          }
+        }
+      } catch (error) {
+        console.error(`Error syncing drive ${drive._id}:`, error);
+        errorCount++;
+      }
+    }
+
+    res.status(200).json({
+      message: `Sync completed. ${addedCount} students added, ${removedCount} students removed, ${errorCount} errors.`,
+      addedCount,
+      removedCount,
+      errorCount,
+      totalDrives: activeDrives.length,
+      totalApplications: approvedApplications.length
+    });
+  } catch (error) {
+    console.error("Error syncing applications with drives:", error);
+    res.status(500).json({ message: "Error syncing applications with drives" });
+  }
+}; 

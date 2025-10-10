@@ -27,7 +27,14 @@ import Company from "./Company";
 import CompanyApplications from "../admin/CompanyApplications";
 import PlacedStudents from "../admin/PlacedStudents";
 import CounsellorApplications from "../counsellor/CounsellorApplications";
+import StudentProgress from "../counsellor/StudentProgress";
+import PlacementDriveManagement from "../admin/PlacementDriveManagement";
+import PlacementDriveDetails from "../admin/PlacementDriveDetails";
+import StudentRoundView from "../admin/StudentRoundView";
+import ComprehensiveStudentView from "../admin/ComprehensiveStudentView";
+import StudentPlacementDrives from "./StudentPlacementDrives";
 import Notifications from "./Notifications";
+
 
 const Body = () => {
   const appRouter = createBrowserRouter([
@@ -36,6 +43,7 @@ const Body = () => {
     { path: "/browse", element: <Layout><Browse /></Layout> },
     { path: "/developer", element: <Layout><Developers /></Layout> },
     { path: "/schedule", element: <Layout><SchedulePage /></Layout> },
+    { path: "/notifications", element: <Layout><Notifications /></Layout> },
     { path: "/contact", element: <Layout><Contact /></Layout> },
     { path: "/profile", element: <Layout><Profile /></Layout> },
     { path: "/admin", element: <Layout><AdminPage /></Layout> },
@@ -50,6 +58,7 @@ const Body = () => {
     { path: "/adminResume/:id", element: <Layout><StudentResume/></Layout> },
     { path: "/registationCounsellor", element: <Layout><CounsellorRegistation/></Layout> },
     { path: "/counsellor", element: <Layout><CounsellorPage/></Layout> },
+    { path: "/counsellor/student-progress", element: <Layout><StudentProgress /></Layout> },
     { path: "/tests", element: <Layout><Tests /></Layout> },
     { path: "/tests/:testId", element: <Layout><TestView /></Layout> },
     { path: "/companypage", element: <Layout><CompanyPage /></Layout> },
@@ -58,7 +67,11 @@ const Body = () => {
     { path: "/admin/applications/:companyId", element: <Layout><CompanyApplications /></Layout> },
     { path: "/placed-students", element: <Layout><PlacedStudents /></Layout> },
     { path: "/counsellor/applications", element: <Layout><CounsellorApplications /></Layout> },
-    { path: "/notifications", element: <Layout><Notifications /></Layout> },
+    { path: "/placement-drives", element: <Layout><StudentPlacementDrives /></Layout> },
+    { path: "/admin/placement-drives", element: <Layout><PlacementDriveManagement /></Layout> },
+    { path: "/admin/placement-drive/:driveId", element: <Layout><PlacementDriveDetails /></Layout> },
+    { path: "/admin/placement-drive/:driveId/students", element: <Layout><ComprehensiveStudentView /></Layout> },
+    { path: "/admin/placement-drive/:driveId/round/:roundNumber/students", element: <Layout><StudentRoundView /></Layout> },
   ]);
 
   return (

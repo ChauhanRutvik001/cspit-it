@@ -39,15 +39,15 @@ const Developers = () => {
     //   linkedin: "https://www.linkedin.com/in/22it116-trushang-patel/",
     //   email: "https://mail.google.com/mail/?view=cm&fs=1&to=22it116@charusat.edu.in",
     // },
-    {
-      id: "22IT011",
-      name: "Jeet Bilimoria",
-      image: "/jeet.jpg",
-      role: "Frontend Developer",
-      github: "https://github.com",
-      linkedin: "https://linkedin.com",
-      email: "https://mail.google.com/mail/?view=cm&fs=1&to=22it011@charusat.edu.in",
-    },
+    // {
+    //   id: "22IT011",
+    //   name: "Jeet Bilimoria",
+    //   image: "/jeet.jpg",
+    //   role: "Frontend Developer",
+    //   github: "https://github.com",
+    //   linkedin: "https://linkedin.com",
+    //   email: "https://mail.google.com/mail/?view=cm&fs=1&to=22it011@charusat.edu.in",
+    // },
   ];
 
   return (

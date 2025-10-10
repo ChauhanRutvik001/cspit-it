@@ -1,6 +1,7 @@
 import express from "express";
-import { isAuthorized, isAdmin } from "../middlewares/auth.js";
+import { isAuthorized, isAdmin, isCounsellor } from "../middlewares/auth.js";
 import adminController from "../controllers/admin.controller.js";
+import counsellorController from "../controllers/counsellor.controller.js";
 
 const router = express.Router();
 
@@ -20,5 +21,13 @@ router
 router
   .route("/get-faculty-by-admin")
   .post(isAuthorized, isAdmin, adminController.BulkRequestsCounsellor); //StudentRegistration.jsx
+
+// Counsellor-only APIs
+router
+  .route("/my-students")
+  .get(isAuthorized, isCounsellor, counsellorController.getMyStudents);
+router
+  .route("/my-students/progress")
+  .get(isAuthorized, isCounsellor, counsellorController.getMyStudentsProgress);
 
 export default router;

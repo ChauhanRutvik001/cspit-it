@@ -3,11 +3,21 @@ import { verifyToken } from "../utils/jwt.js";
 
 export const isAuthorized = async (req, res, next) => {
   try {
-    if (!req.headers.cookie) {
-      return res.status(401).json({ error: "Unauthorized: Token not found" });
+    // Try to get token from cookies first (preferred method)
+    let token = req.cookies.token;
+    
+    // If not found in cookies, try to extract from cookie header
+    if (!token && req.headers.cookie) {
+      const cookies = req.headers.cookie.split(';');
+      const tokenCookie = cookies.find(cookie => cookie.trim().startsWith('token='));
+      if (tokenCookie) {
+        token = tokenCookie.split('=')[1];
+      }
     }
 
-    const token = req.headers.cookie.slice(6); // Assuming 'token' starts after the first 6 characters
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized: Token not found" });
+    }
 
     const decoded = await verifyToken(token);
 

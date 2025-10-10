@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import axiosInstance from "../utils/axiosInstance";
 import { Users, Layout, Eye, CheckCircle, XCircle, Building, Search, ChevronLeft, ChevronRight, FileDown } from "lucide-react";
@@ -258,9 +258,7 @@ const CounsellorPage = () => {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
               <div className="flex items-center space-x-3 mb-4 md:mb-0">
                 <Users className="h-8 w-8 text-white" />
-                <h2 className="text-3xl font-bold text-white font-['Poppins']">
-                  Counsellor Dashboard
-                </h2>
+                <h2 className="text-3xl font-bold text-white font-['Poppins']">Counsellor Dashboard</h2>
               </div>
               <div className="flex items-center space-x-2 text-white">
                 <span className="bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm">
@@ -273,7 +271,7 @@ const CounsellorPage = () => {
 
           {/* Action Buttons */}
           <div className="px-6 py-4 bg-white border-b border-gray-200">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
               <button
                 onClick={() => navigate("/studentsDomain")}
                 className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
@@ -295,6 +293,13 @@ const CounsellorPage = () => {
                 <Building className="h-5 w-5" />
                 <span>Pending Applications</span>
               </button>
+              <Link
+                to="/counsellor/student-progress"
+                className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
+              >
+                <Users className="h-5 w-5" />
+                <span>Student Progress</span>
+              </Link>
             </div>
           </div>
 

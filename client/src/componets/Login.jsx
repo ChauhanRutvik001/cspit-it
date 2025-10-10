@@ -20,6 +20,7 @@ const Login = () => {
   const [isFirstTimeData, setIsFirstTimeData] = useState(false);
   const [popUp, setPopUp] = useState("");
   const authStatus = useSelector((store) => store.app.authStatus);
+  const user = useSelector((store) => store.app.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -32,12 +33,22 @@ const Login = () => {
   };
 
   useEffect(() => {
-    if (authStatus) {
-      navigate("/browse");
-    } else {
-      navigate("/");
+    // Only redirect if user is already authenticated
+    if (authStatus && user) {
+      console.log("User from Redux:", user);
+      // Role-based redirect for already authenticated users
+      if (user.role === "admin") {
+        navigate("/admin");
+      } else if (user.role === "counsellor") {
+        navigate("/counsellor");
+      } else if (user.role === "student") {
+        navigate("/company");
+      } else {
+        navigate("/");
+      }
     }
-  }, [authStatus]);
+    // Don't redirect if user is not authenticated - let them stay on login page
+  }, [authStatus, user, navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -73,12 +84,34 @@ const Login = () => {
           return;
         }
 
+        if (firstTimeData) {
+          setIsFirstTimeData(true);
+          toast.success("Please complete your profile information.");
+          return;
+        }
+
         toast.success(message || "Login successful!");
 
         // Store user data in Redux (without password)
         console.log("Logged in user:", loggedInUser);
+        console.log("User role:", loggedInUser.role);
         dispatch(setUser(loggedInUser));
-        navigate("/browse");
+        
+        // Role-based redirect
+        console.log("Redirecting based on role:", loggedInUser.role);
+        if (loggedInUser.role === "admin") {
+          console.log("Redirecting to /admin");
+          navigate("/admin");
+        } else if (loggedInUser.role === "counsellor") {
+          console.log("Redirecting to /counsellor");
+          navigate("/counsellor");
+        } else if (loggedInUser.role === "student") {
+          console.log("Redirecting to /company");
+          navigate("/company");
+        } else {
+          console.log("Redirecting to / (default)");
+          navigate("/"); // Default fallback
+        }
       } else {
         toast.error(res.data.message || "Login failed!");
       }
@@ -110,11 +143,32 @@ const Login = () => {
       const response = await axiosInstance.post("auth/google-login", { idToken });
 
       if (response.data.success) {
-        const { user: loggedInUser, message } = response.data;
+        const { user: loggedInUser, message, firstTimeData } = response.data;
+        
+        if (firstTimeData) {
+          setIsFirstTimeData(true);
+          toast.success("Please complete your profile information.");
+          return;
+        }
         
         toast.success(message || "Login successful!");
         dispatch(setUser(loggedInUser));
-        navigate("/browse");
+        
+        // Role-based redirect
+        console.log("Google login - Redirecting based on role:", loggedInUser.role);
+        if (loggedInUser.role === "admin") {
+          console.log("Redirecting to /admin");
+          navigate("/admin");
+        } else if (loggedInUser.role === "counsellor") {
+          console.log("Redirecting to /counsellor");
+          navigate("/counsellor");
+        } else if (loggedInUser.role === "student") {
+          console.log("Redirecting to /company");
+          navigate("/company");
+        } else {
+          console.log("Redirecting to / (default)");
+          navigate("/"); // Default fallback
+        }
       } else {
         toast.error(response.data.message || "Login failed. This Google account is not registered.");
       }

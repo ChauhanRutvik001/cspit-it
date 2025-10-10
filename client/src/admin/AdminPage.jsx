@@ -11,7 +11,8 @@ import {
   UserPlus, 
   GraduationCap, 
   Layers,
-  Medal
+  Medal,
+  Target
 } from "lucide-react";
 
 // Skeleton loader for table rows with YouTube-style shimmer effect
@@ -185,7 +186,7 @@ const AdminPage = () => {
 
           {/* Action Buttons */}
           <div className="px-6 py-4 bg-white border-b border-gray-200">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               <button
                 onClick={() => navigate("/registation")}
                 className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
@@ -212,7 +213,7 @@ const AdminPage = () => {
                 className="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
               >
                 <GraduationCap className="h-5 w-5" />
-                <span>Student</span>
+                <span>Students</span>
               </button>
               <button
                 onClick={() => navigate("/companypage")}
@@ -227,6 +228,13 @@ const AdminPage = () => {
               >
                 <Medal className="h-5 w-5" />
                 <span>Placed Students</span>
+              </button>
+              <button
+                onClick={() => navigate("/admin/placement-drives")}
+                className="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
+              >
+                <Target className="h-5 w-5" />
+                <span>Placement Drives</span>
               </button>
             </div>
           </div>

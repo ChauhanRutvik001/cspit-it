@@ -8,7 +8,8 @@ import {
   cancelApplication,
   deleteApplication,
   counsellorApproval,
-  getCounsellorPendingApplications
+  getCounsellorPendingApplications,
+  syncApprovedApplicationsWithDrives
 } from "../controllers/applicationController.js";
 
 const router = express.Router();
@@ -36,5 +37,8 @@ router.delete("/cancel", isAuthorized, cancelApplication);
 
 // Delete an application (admin only)
 router.delete("/:id", isAuthorized, isAdmin, deleteApplication);
+
+// Sync approved applications with existing placement drives (admin only)
+router.post("/sync-with-drives", isAuthorized, isAdmin, syncApprovedApplicationsWithDrives);
 
 export default router; 

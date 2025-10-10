@@ -2,6 +2,8 @@ import User from "../models/user.js";
 import Certificate from "../models/certificateSchema.js";
 import Resume from "../models/Resume.js";
 import DomainModel from "../models/StudentSelection.js";
+import StudentRoundProgress from "../models/StudentRoundProgress.js";
+import PlacementDrive from "../models/PlacementDrive.js";
 
 const CounsellorController = {
   getStudents: async (req, res) => {
@@ -36,6 +38,56 @@ const CounsellorController = {
       res
         .status(500)
         .json({ success: false, message: "Internal server error." });
+    }
+  },
+
+  // Get students under the counsellor (based on user.profile.counsellor)
+  getMyStudents: async (req, res) => {
+    try {
+      const counsellorId = req.user.id;
+      const students = await User.find({
+        role: "student",
+        isApproved: true,
+        "profile.counsellor": counsellorId
+      }).select("name _id id email");
+
+      return res.status(200).json({ success: true, students });
+    } catch (error) {
+      console.error("Error fetching counsellor students:", error);
+      return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  },
+
+  // Get progress for all students under the counsellor across drives
+  getMyStudentsProgress: async (req, res) => {
+    try {
+      const counsellorId = req.user.id;
+      const students = await User.find({
+        role: "student",
+        isApproved: true,
+        "profile.counsellor": counsellorId
+      }).select("_id name id email");
+
+      const studentIds = students.map(s => s._id);
+      if (studentIds.length === 0) {
+        return res.status(200).json({ success: true, data: [] });
+      }
+
+      const progress = await StudentRoundProgress.find({
+        student: { $in: studentIds }
+      })
+        .populate("student", "name email id")
+        .populate({
+          path: "placementDrive",
+          select: "title totalRounds company startDate endDate",
+          populate: { path: "company", select: "name domain" }
+        })
+        .sort({ updatedAt: -1 });
+
+      return res.status(200).json({ success: true, data: progress });
+    } catch (error) {
+      console.error("Error fetching counsellor students progress:", error);
+      return res.status(500).json({ success: false, message: "Internal server error" });
     }
   },
 
@@ -87,4 +139,4 @@ const CounsellorController = {
   },
 };
 
-export default adminController;
+export default CounsellorController;

@@ -36,6 +36,13 @@ const userSchema = new Schema(
       type: Boolean,
       default: false
     },
+    placedDate: {
+      type: Date
+    },
+    placedCompany: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Company"
+    },
     firstTimeLogin: {
       type: Boolean,
       default: true,
