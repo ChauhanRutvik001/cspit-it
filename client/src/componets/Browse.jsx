@@ -14,6 +14,29 @@ import {
   ExternalLink,
   Rocket,
   X,
+  TrendingUp,
+  BookOpen,
+  Building,
+  Globe,
+  Filter,
+  ArrowRight,
+  Target,
+  DollarSign,
+  Trophy,
+  Users2,
+  Building2,
+  Lightbulb,
+  CheckCircle,
+  Download,
+  Share2,
+  BarChart3,
+  Clock,
+  FileText,
+  Zap,
+  ArrowDown,
+  Calculator,
+  Percent,
+  Star,
 } from "lucide-react";
 
 const CIDAC_industry_visit = "/CIDAC_industry_visit.jpg";
@@ -22,6 +45,8 @@ const Imegica = "/Imegica.jpg";
 const sanket = "/SanketSuthar.jpg";
 const Ashwin = "/ashwin_sir.jpg";
 const Priyanka = "/priyanka.jpg";
+import CareerGuidanceSection from './CareerGuidanceSection';
+  import PersonalizedCareerGuide from './PersonalizedCareerGuide';
 
 const recruiters = [
   { name: "Jaro Education", logo: "recruiters.png" }, // Update with actual paths
@@ -33,6 +58,8 @@ const Browse = () => {
       <div className="content ">
         <HeroSection />
         <CDPCDetails />
+        <CareerGuidanceSection />
+        <PersonalizedCareerGuide />
         <ImageCarousel />
         <Description />
         <Faculty />
@@ -270,6 +297,9 @@ const CDPCDetails = () => {
     </div>
   );
 };
+
+// Post-Engineering Career Navigator Component
+
 
 const ImageCarousel = () => {
   const images = [
