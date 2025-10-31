@@ -271,6 +271,34 @@ const Header = () => {
                           Registration
                         </Link>
                       )}
+                      {user?.role === "admin"  && (
+                        <Link
+                          to="/admin/complaints"
+                          className={classNames(
+                            isActive("/admin/complaints")
+                              ? "bg-blue-200 text-blue-700"
+                              : "text-gray-600 hover:bg-blue-100 hover:text-blue-600",
+                            "rounded-md px-3 py-2 text-sm font-medium"
+                          )}
+                          aria-current={isActive("/admin/complaints") ? "page" : undefined}
+                        >
+                          Complaints
+                        </Link>
+                      )}
+                      {user?.role === "student"  && (
+                        <Link
+                          to="/complaints"
+                          className={classNames(
+                            isActive("/complaints")
+                              ? "bg-blue-200 text-blue-700"
+                              : "text-gray-600 hover:bg-blue-100 hover:text-blue-600",
+                            "rounded-md px-3 py-2 text-sm font-medium"
+                          )}
+                          aria-current={isActive("/complaints") ? "page" : undefined}
+                        >
+                          Complaints
+                        </Link>
+                      )}
                       {user?.role === "counsellor"  && (
                         <Link
                           to="/counsellor"
@@ -492,6 +520,34 @@ const Header = () => {
                     aria-current={isActive("/admin") ? "page" : undefined}
                   >
                     Registration
+                  </Link>
+                )}
+                {user?.role === "admin" && (
+                  <Link
+                    to="/admin/complaints"
+                    className={classNames(
+                      isActive("/admin/complaints")
+                        ? "bg-blue-200 text-blue-700"
+                        : "text-gray-600 hover:bg-blue-100 hover:text-blue-600",
+                      "block rounded-md px-3 py-2 text-base font-medium"
+                    )}
+                    aria-current={isActive("/admin/complaints") ? "page" : undefined}
+                  >
+                    Complaints
+                  </Link>
+                )}
+                {user?.role === "student" && (
+                  <Link
+                    to="/complaints"
+                    className={classNames(
+                      isActive("/complaints")
+                        ? "bg-blue-200 text-blue-700"
+                        : "text-gray-600 hover:bg-blue-100 hover:text-blue-600",
+                      "block rounded-md px-3 py-2 text-base font-medium"
+                    )}
+                    aria-current={isActive("/complaints") ? "page" : undefined}
+                  >
+                    Complaints
                   </Link>
                 )}
                 {user?.role === "counsellor" && (

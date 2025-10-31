@@ -34,6 +34,8 @@ import StudentRoundView from "../admin/StudentRoundView";
 import ComprehensiveStudentView from "../admin/ComprehensiveStudentView";
 import StudentPlacementDrives from "./StudentPlacementDrives";
 import Notifications from "./Notifications";
+import StudentComplaintForm from "./StudentComplaintForm";
+import AdminComplaintManagement from "../admin/AdminComplaintManagement";
 
 
 const Body = () => {
@@ -72,6 +74,8 @@ const Body = () => {
     { path: "/admin/placement-drive/:driveId", element: <Layout><PlacementDriveDetails /></Layout> },
     { path: "/admin/placement-drive/:driveId/students", element: <Layout><ComprehensiveStudentView /></Layout> },
     { path: "/admin/placement-drive/:driveId/round/:roundNumber/students", element: <Layout><StudentRoundView /></Layout> },
+    { path: "/complaints", element: <Layout><StudentComplaintForm /></Layout> },
+    { path: "/admin/complaints", element: <Layout><AdminComplaintManagement /></Layout> },
   ]);
 
   return (

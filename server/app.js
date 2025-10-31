@@ -22,6 +22,7 @@ import placementDriveRoutes from "./routes/placementDrive.routes.js"; // ✅ Pla
 import placementRoundRoutes from "./routes/placementRound.routes.js"; // ✅ Placement Round Routes
 import counsellorRoutes from "./routes/counsellor.router.js";
 import notificationRoutes from "./routes/notification.routes.js"; // ✅ Notification Routes
+import complaintRoutes from "./routes/complaint.routes.js"; // ✅ Complaint Routes
 
 // Load environment variables
 config();
@@ -69,6 +70,7 @@ app.use("/api/v1/placement-drive", placementDriveRoutes); // ✅ Added Placement
 app.use("/api/v1/placement-round", placementRoundRoutes); // ✅ Added Placement Round Routes
 app.use("/api/v1/counsellor", counsellorRoutes);
 app.use("/api/v1/notifications", notificationRoutes); // ✅ Added Notification Routes
+app.use("/api/v1/complaints", complaintRoutes); // ✅ Added Complaint Routes
 
 // Socket.io connection handling
 io.on('connection', (socket) => {
