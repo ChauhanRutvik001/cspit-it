@@ -87,17 +87,15 @@ const userSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchAvatarBlob.pending, (state) => {
-        state.isLoading = true;
+        // Don't set global loading for avatar fetching to avoid affecting ProtectedRoute
         state.error = null;
       })
       .addCase(fetchAvatarBlob.fulfilled, (state, action) => {
-        state.isLoading = false;
         if (state.user?.profile) {
           state.user.profile.avatarUrl = action.payload;
         }
       })
       .addCase(fetchAvatarBlob.rejected, (state, action) => {
-        state.isLoading = false;
         state.error = action.payload;
       });
   },

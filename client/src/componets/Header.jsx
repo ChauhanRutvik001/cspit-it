@@ -259,8 +259,11 @@ const Header = () => {
       dispatch(setAvatarBlobUrl(null));
       return;
     }
-    dispatch(fetchAvatarBlob());
-  }, [avatarId, dispatch]);
+    // Only fetch if we don't already have a blob URL
+    if (!avatarBlobUrl) {
+      dispatch(fetchAvatarBlob());
+    }
+  }, [avatarId, avatarBlobUrl, dispatch]);
 
   useEffect(() => {
     fetchProfilePic();

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -52,15 +52,12 @@ const AdminPage = () => {
   const [userId, setuserId] = useState(null);
   const [isStudent, setIsStudent] = useState(true); // New state to track student or counsellor
 
-  const fetchData = async (page) => {
+  const fetchData = useCallback(async (page) => {
     try {
       setLoading(true);
       const endpoint = isStudent
         ? "/admin/get-students-by-admin"
         : "/admin/get-counsellor-by-admin";
-      
-      // Simulate API delay for better UX testing (remove in production)
-      // await new Promise(resolve => setTimeout(resolve, 100));
       
       const response = await axiosInstance.post(endpoint, {
         page,
@@ -75,6 +72,8 @@ const AdminPage = () => {
 
         if (response.data.students.length === 0) {
           setError("No Records Found");
+        } else {
+          setError(""); // Clear error if data is found
         }
       } else {
         setError(response.data.message || "Failed to fetch records.");
@@ -87,15 +86,23 @@ const AdminPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [isStudent, studentsPerPage]);
 
   useEffect(() => {
-    if (user?.role !== "admin") navigate("/browse");
-  }, [user, navigate]);
+    if (user && user.role === "admin") {
+      fetchData(currentPage);
+    } else if (user && user.role !== "admin") {
+      navigate("/browse");
+    }
+  }, [user, currentPage, fetchData, navigate]);
 
+  // Separate useEffect for isStudent changes to reset to page 1
   useEffect(() => {
-    fetchData(currentPage);
-  }, [currentPage, isStudent]);
+    if (user && user.role === "admin") {
+      setCurrentPage(1);
+      fetchData(1);
+    }
+  }, [isStudent, user, fetchData]);
 
   // Add shimmer animation style
   useEffect(() => {
