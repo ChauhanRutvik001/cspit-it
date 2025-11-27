@@ -4,6 +4,20 @@ import { Github, Linkedin, Mail, ExternalLink, Code, Award } from "lucide-react"
 const Developers = () => {
   const [hoveredCard, setHoveredCard] = useState(null);
 
+  const mentorData = {
+    id: "MENTOR001",
+    name: "Dr. Priyanka Patel",
+    image: "/priyanka.jpg",
+    role: "Project Mentor & Faculty Guide",
+    email: "https://mail.google.com/mail/?view=cm&fs=1&to=priyankabpatel.it@charusat.ac.in",
+    linkedin: "https://www.linkedin.com/in/dr-priyanka-patel/",
+    skills: ["Project Management", "Software Engineering", "Research", "Mentoring", "Academic Leadership"],
+    experience: "10+ Years",
+    department: "Information Technology",
+    bio: "Distinguished faculty member and project mentor with extensive experience in software engineering and research. Guiding students to achieve excellence in their academic and professional endeavors.",
+    achievements: ["PhD in Computer Science", "Research Publications", "Industry Expert", "Academic Leader"]
+  };
+
   const studentsData = [
     {
       id: "22IT015",
@@ -19,6 +33,7 @@ const Developers = () => {
       bio: "Passionate full-stack developer with expertise in modern web technologies. Leading the development of innovative solutions for career development.",
       achievements: ["Team Lead", "Full Stack Expert", "Project Manager"]
     },
+    
     {
       id: "22IT012",
       name: "Jay Bodra",
@@ -60,6 +75,121 @@ const Developers = () => {
 
       {/* Team Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        {/* Mentor Section */}
+        <div className="text-center mb-16">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Our Project Mentor
+          </h2>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-12">
+            Meet our esteemed faculty guide who provides invaluable mentorship and guidance throughout our development journey.
+          </p>
+        </div>
+
+        {/* Mentor Card */}
+        <div className="flex justify-center mb-20">
+          <div
+            className="group relative bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-500 overflow-hidden transform hover:-translate-y-2 max-w-md w-full"
+            onMouseEnter={() => setHoveredCard(mentorData.id)}
+            onMouseLeave={() => setHoveredCard(null)}
+          >
+            {/* Card Background Pattern */}
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-50 to-pink-50 opacity-50"></div>
+            
+            {/* Image Section */}
+            <div className="relative h-80 overflow-hidden">
+              <img
+                src={mentorData.image}
+                alt={mentorData.name}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              
+              {/* Hover Overlay with Quick Info */}
+              <div className={`absolute inset-0 bg-gradient-to-t from-purple-600/90 to-transparent p-6 flex flex-col justify-end transform transition-all duration-300 ${
+                hoveredCard === mentorData.id ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
+              }`}>
+                <div className="text-white">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Award className="w-4 h-4" />
+                    <span className="text-sm font-medium">{mentorData.experience}</span>
+                  </div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <Code className="w-4 h-4" />
+                    <span className="text-sm font-medium">{mentorData.department}</span>
+                  </div>
+                  <p className="text-sm text-purple-100 line-clamp-3">{mentorData.bio}</p>
+                </div>
+              </div>
+
+              {/* Role Badge */}
+              <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full">
+                <span className="text-xs font-semibold text-purple-600">{mentorData.role}</span>
+              </div>
+            </div>
+
+            {/* Content Section */}
+            <div className="relative p-6">
+              <div className="text-center mb-4">
+                <h3 className="text-xl font-bold text-gray-900 mb-1">
+                  {mentorData.name}
+                </h3>
+                <p className="text-sm text-gray-500 mb-2">{mentorData.department} Department</p>
+                
+                {/* Achievements */}
+                <div className="flex flex-wrap justify-center gap-1 mb-4">
+                  {mentorData.achievements.map((achievement, idx) => (
+                    <span key={idx} className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
+                      {achievement}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Skills */}
+              <div className="mb-4">
+                <h4 className="text-sm font-semibold text-gray-700 mb-2">Expertise</h4>
+                <div className="flex flex-wrap gap-1">
+                  {mentorData.skills.slice(0, 4).map((skill, idx) => (
+                    <span key={idx} className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md">
+                      {skill}
+                    </span>
+                  ))}
+                  {mentorData.skills.length > 4 && (
+                    <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md">
+                      +{mentorData.skills.length - 4}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Social Links */}
+              <div className="flex justify-center space-x-4">
+                <a
+                  href={mentorData.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 bg-blue-100 hover:bg-blue-600 text-blue-600 hover:text-white rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110"
+                >
+                  <Linkedin className="w-5 h-5" />
+                </a>
+                <a
+                  href={mentorData.email}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 bg-red-100 hover:bg-red-600 text-red-600 hover:text-white rounded-full flex items-center justify-center transition-all duration-300 transform hover:scale-110"
+                >
+                  <Mail className="w-5 h-5" />
+                </a>
+              </div>
+            </div>
+
+            {/* Decorative Elements */}
+            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-purple-400/20 to-transparent rounded-bl-3xl"></div>
+            <div className="absolute bottom-0 left-0 w-16 h-16 bg-gradient-to-tr from-pink-400/20 to-transparent rounded-tr-3xl"></div>
+          </div>
+        </div>
+
+        {/* Development Team Section */}
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Our Development Team
