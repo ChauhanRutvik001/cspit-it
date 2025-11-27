@@ -1,14 +1,14 @@
-// Layout.js
+// PublicLayout.js
 import React from 'react';
-import Header from './Header';  // Import your Header component
+import PublicHeader from './PublicHeader';
 
-const Layout = ({ children }) => {
+const PublicLayout = ({ children }) => {
   return (
     <div>
-      <Header />
+      <PublicHeader />
       <main className="pt-16">{children}</main> {/* Add padding-top to account for fixed header */}
     </div>
   );
 };
 
-export default Layout;
+export default PublicLayout;

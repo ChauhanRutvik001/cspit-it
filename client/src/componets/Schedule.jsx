@@ -190,7 +190,6 @@ const Schedule = () => {
               )}
             </div>
           </div>
-          
           {/* Action Buttons */}
           <div className="flex items-center gap-3">
             {user?.role === "admin" && (

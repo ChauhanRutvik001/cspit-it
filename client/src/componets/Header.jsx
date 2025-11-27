@@ -11,12 +11,11 @@ import { useSocket } from "../utils/SocketProvider";
 
 // Navigation items
 const navigation = [
-  { name: "Home", to: "/browse" },
-  { name: "Developer", to: "/developer" },
   { name: "Company", to: "/company" },
-  { name: "Schedule", to: "/schedule" },
   { name: "Tests", to: "/tests" },
-  { name: "Contact Us", to: "/Contact" },
+  { name: "Schedule", to: "/schedule" },
+  { name: "Developer", to: "/developer" },
+  { name: "Contact Us", to: "/contact" },
 ];
 
 function classNames(...classes) {
@@ -35,6 +34,11 @@ const Header = () => {
   const loading = useSelector((state) => state.app.isLoading);
   const { socket } = useSocket();
 
+  // If user is not authenticated, don't render anything
+  if (!authStatus || !user) {
+    return null;
+  }
+
   // Notification states
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -52,11 +56,12 @@ const Header = () => {
     dispatch(setAvatarBlobUrl(null));
   }, [dispatch]);
 
-  useEffect(() => {
-    if (!authStatus) {
-      navigate("/");
-    }
-  }, [authStatus, navigate]);
+  // Remove the automatic redirect - let the routing handle authentication
+  // useEffect(() => {
+  //   if (!authStatus) {
+  //     navigate("/");
+  //   }
+  // }, [authStatus, navigate]);
 
   // Fetch notifications from API
   const fetchNotifications = useCallback(async () => {
@@ -198,13 +203,54 @@ const Header = () => {
 
   const logoutHandler = async () => {
     try {
-      await axiosInstance.get("/auth/logout");
-      dispatch(setUser(null));
+      console.log('Logout initiated...');
+      
+      // Set a flag to prevent immediate re-authentication
+      window._logoutInProgress = true;
+      
+      // Clear local state first to immediately update UI
       dispatch(logout());
+      dispatch(setUser(null));
+      
+      console.log('Redux state cleared');
+      
+      // Clear any local storage or session storage if used
+      localStorage.clear();
+      sessionStorage.clear();
+      
+      // Clear any cookies
+      document.cookie.split(";").forEach((c) => {
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+      });
+      
+      console.log('Local/session storage and cookies cleared');
+      
+      // Call server logout
+      try {
+        await axiosInstance.get("/auth/logout");
+        console.log('Server logout completed');
+      } catch (serverError) {
+        console.log('Server logout failed, but continuing with client logout');
+      }
+      
       toast.success("Logged out successfully");
-      navigate("/");
+      
+      // Navigate to home page
+      navigate("/", { replace: true });
+      
+      console.log('Navigation to home completed');
+      
+      // Clear the logout flag after a delay
+      setTimeout(() => {
+        window._logoutInProgress = false;
+      }, 2000);
+      
     } catch (error) {
+      console.error("Logout error:", error);
       toast.error("Failed to log out. Please try again.");
+      // Even if logout fails, still redirect to prevent UI issues
+      navigate("/", { replace: true });
+      window._logoutInProgress = false;
     }
   };
 

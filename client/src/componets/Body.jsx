@@ -14,6 +14,8 @@ import StudentSelectionPage from "./StudentSelectionPage";
 import AllStudentSelections from "../admin/AllStudentSelections";
 import StudentData from "../admin/StudentData";
 import Layout from "./Layout";  // Import the Layout component
+import PublicLayout from "./PublicLayout";  // Import the PublicLayout component
+import ProtectedRoute from "./ProtectedRoute";  // Import the ProtectedRoute component
 import Certificate from "./Certificate";
 import StudentCertificate from "../admin/StudentCertificate";
 import ResumeViewer from "./ResumeViewer";
@@ -41,41 +43,47 @@ import AdminComplaintManagement from "../admin/AdminComplaintManagement";
 const Body = () => {
   const appRouter = createBrowserRouter([
     { path: "*", element: <NotFoundError /> },
-    { path: "/", element: <Login /> },
-    { path: "/browse", element: <Layout><Browse /></Layout> },
-    { path: "/developer", element: <Layout><Developers /></Layout> },
-    { path: "/schedule", element: <Layout><SchedulePage /></Layout> },
-    { path: "/notifications", element: <Layout><Notifications /></Layout> },
-    { path: "/contact", element: <Layout><Contact /></Layout> },
-    { path: "/profile", element: <Layout><Profile /></Layout> },
-    { path: "/admin", element: <Layout><AdminPage /></Layout> },
-    { path: "/registation", element: <Layout><StudentRegistation /></Layout> },
-    { path: "/developers", element: <Layout><Developers /></Layout> },
-    { path: "/StudentSelectionPage", element: <Layout><StudentSelectionPage /></Layout> },
-    { path: "/studentsDomain", element: <Layout><AllStudentSelections /></Layout> },
-    { path: "/students", element: <Layout><StudentData /></Layout> },
-    { path: "/Certificate", element: <Layout><Certificate /></Layout> },
-    { path: "/resume", element: <Layout><ResumeViewer /></Layout> },
-    { path: "/adminCertificate/:id", element: <Layout><StudentCertificate /></Layout> },
-    { path: "/adminResume/:id", element: <Layout><StudentResume/></Layout> },
-    { path: "/registationCounsellor", element: <Layout><CounsellorRegistation/></Layout> },
-    { path: "/counsellor", element: <Layout><CounsellorPage/></Layout> },
-    { path: "/counsellor/student-progress", element: <Layout><StudentProgress /></Layout> },
-    { path: "/tests", element: <Layout><Tests /></Layout> },
-    { path: "/tests/:testId", element: <Layout><TestView /></Layout> },
-    { path: "/companypage", element: <Layout><CompanyPage /></Layout> },
-    { path: "/company", element: <Layout><Company /></Layout> },
-    { path: "/admin/applications", element: <Layout><CompanyApplications /></Layout> },
-    { path: "/admin/applications/:companyId", element: <Layout><CompanyApplications /></Layout> },
-    { path: "/placed-students", element: <Layout><PlacedStudents /></Layout> },
-    { path: "/counsellor/applications", element: <Layout><CounsellorApplications /></Layout> },
-    { path: "/placement-drives", element: <Layout><StudentPlacementDrives /></Layout> },
-    { path: "/admin/placement-drives", element: <Layout><PlacementDriveManagement /></Layout> },
-    { path: "/admin/placement-drive/:driveId", element: <Layout><PlacementDriveDetails /></Layout> },
-    { path: "/admin/placement-drive/:driveId/students", element: <Layout><ComprehensiveStudentView /></Layout> },
-    { path: "/admin/placement-drive/:driveId/round/:roundNumber/students", element: <Layout><StudentRoundView /></Layout> },
-    { path: "/complaints", element: <Layout><StudentComplaintForm /></Layout> },
-    { path: "/admin/complaints", element: <Layout><AdminComplaintManagement /></Layout> },
+    
+    // Public routes (no authentication required)
+    { path: "/", element: <PublicLayout><Browse /></PublicLayout> },
+    { path: "/developers", element: <PublicLayout><Developers /></PublicLayout> },
+    { path: "/public-contact", element: <PublicLayout><Contact /></PublicLayout> },
+    { path: "/login", element: <Login /> },
+    
+    // Protected routes (authentication required)
+    { path: "/browse", element: <ProtectedRoute><Layout><Browse /></Layout></ProtectedRoute> },
+    { path: "/developer", element: <ProtectedRoute><Layout><Developers /></Layout></ProtectedRoute> },
+    { path: "/contact", element: <ProtectedRoute><Layout><Contact /></Layout></ProtectedRoute> },
+    { path: "/schedule", element: <ProtectedRoute><Layout><SchedulePage /></Layout></ProtectedRoute> },
+    { path: "/notifications", element: <ProtectedRoute><Layout><Notifications /></Layout></ProtectedRoute> },
+    { path: "/profile", element: <ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute> },
+    { path: "/admin", element: <ProtectedRoute><Layout><AdminPage /></Layout></ProtectedRoute> },
+    { path: "/registation", element: <ProtectedRoute><Layout><StudentRegistation /></Layout></ProtectedRoute> },
+    { path: "/StudentSelectionPage", element: <ProtectedRoute><Layout><StudentSelectionPage /></Layout></ProtectedRoute> },
+    { path: "/studentsDomain", element: <ProtectedRoute><Layout><AllStudentSelections /></Layout></ProtectedRoute> },
+    { path: "/students", element: <ProtectedRoute><Layout><StudentData /></Layout></ProtectedRoute> },
+    { path: "/Certificate", element: <ProtectedRoute><Layout><Certificate /></Layout></ProtectedRoute> },
+    { path: "/resume", element: <ProtectedRoute><Layout><ResumeViewer /></Layout></ProtectedRoute> },
+    { path: "/adminCertificate/:id", element: <ProtectedRoute><Layout><StudentCertificate /></Layout></ProtectedRoute> },
+    { path: "/adminResume/:id", element: <ProtectedRoute><Layout><StudentResume/></Layout></ProtectedRoute> },
+    { path: "/registationCounsellor", element: <ProtectedRoute><Layout><CounsellorRegistation/></Layout></ProtectedRoute> },
+    { path: "/counsellor", element: <ProtectedRoute><Layout><CounsellorPage/></Layout></ProtectedRoute> },
+    { path: "/counsellor/student-progress", element: <ProtectedRoute><Layout><StudentProgress /></Layout></ProtectedRoute> },
+    { path: "/tests", element: <ProtectedRoute><Layout><Tests /></Layout></ProtectedRoute> },
+    { path: "/tests/:testId", element: <ProtectedRoute><Layout><TestView /></Layout></ProtectedRoute> },
+    { path: "/companypage", element: <ProtectedRoute><Layout><CompanyPage /></Layout></ProtectedRoute> },
+    { path: "/company", element: <ProtectedRoute><Layout><Company /></Layout></ProtectedRoute> },
+    { path: "/admin/applications", element: <ProtectedRoute><Layout><CompanyApplications /></Layout></ProtectedRoute> },
+    { path: "/admin/applications/:companyId", element: <ProtectedRoute><Layout><CompanyApplications /></Layout></ProtectedRoute> },
+    { path: "/placed-students", element: <ProtectedRoute><Layout><PlacedStudents /></Layout></ProtectedRoute> },
+    { path: "/counsellor/applications", element: <ProtectedRoute><Layout><CounsellorApplications /></Layout></ProtectedRoute> },
+    { path: "/placement-drives", element: <ProtectedRoute><Layout><StudentPlacementDrives /></Layout></ProtectedRoute> },
+    { path: "/admin/placement-drives", element: <ProtectedRoute><Layout><PlacementDriveManagement /></Layout></ProtectedRoute> },
+    { path: "/admin/placement-drive/:driveId", element: <ProtectedRoute><Layout><PlacementDriveDetails /></Layout></ProtectedRoute> },
+    { path: "/admin/placement-drive/:driveId/students", element: <ProtectedRoute><Layout><ComprehensiveStudentView /></Layout></ProtectedRoute> },
+    { path: "/admin/placement-drive/:driveId/round/:roundNumber/students", element: <ProtectedRoute><Layout><StudentRoundView /></Layout></ProtectedRoute> },
+    { path: "/complaints", element: <ProtectedRoute><Layout><StudentComplaintForm /></Layout></ProtectedRoute> },
+    { path: "/admin/complaints", element: <ProtectedRoute><Layout><AdminComplaintManagement /></Layout></ProtectedRoute> },
   ]);
 
   return (

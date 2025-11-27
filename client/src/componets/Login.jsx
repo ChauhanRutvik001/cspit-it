@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoading, setUser } from "../redux/userSlice";
-import Header from "./Header";
 import axiosInstance from "../utils/axiosInstance";
 import PasswordChange from "./PassWordChange";
 import EnterDataForm from "./EnterDataForm";
 import { signInWithGoogle } from "../firebase/firebase";
-import { FaGoogle } from "react-icons/fa";
+import { FaGoogle, FaArrowLeft } from "react-icons/fa";
 
 const Login = () => {
   const [id, setId] = useState("");
@@ -19,9 +18,11 @@ const Login = () => {
   const [isFirstTimeLogin, setIsFirstTimeLogin] = useState(false);
   const [isFirstTimeData, setIsFirstTimeData] = useState(false);
   const [popUp, setPopUp] = useState("");
+  const [isComponentMounted, setIsComponentMounted] = useState(false);
   const authStatus = useSelector((store) => store.app.authStatus);
   const user = useSelector((store) => store.app.user);
   const navigate = useNavigate();
+  const location = useLocation();
   const dispatch = useDispatch();
 
   const validateLogin = () => {
@@ -32,23 +33,51 @@ const Login = () => {
     return true;
   };
 
+  // Set component as mounted after initial render
   useEffect(() => {
-    // Only redirect if user is already authenticated
-    if (authStatus && user) {
-      console.log("User from Redux:", user);
-      // Role-based redirect for already authenticated users
-      if (user.role === "admin") {
-        navigate("/admin");
-      } else if (user.role === "counsellor") {
-        navigate("/counsellor");
-      } else if (user.role === "student") {
-        navigate("/company");
-      } else {
-        navigate("/");
-      }
+    setIsComponentMounted(true);
+  }, []);
+
+  // Only redirect if user is already authenticated, component is mounted, and we're on login page
+  // Add a delay to avoid race conditions with logout
+  useEffect(() => {
+    console.log('Login useEffect - isComponentMounted:', isComponentMounted, 'authStatus:', authStatus, 'user:', !!user, 'pathname:', location.pathname);
+    
+    // Only redirect if we're truly authenticated and not in a logout transition
+    if (isComponentMounted && authStatus === true && user && user.id && location.pathname === "/login") {
+      console.log("User already authenticated, checking if should redirect...");
+      
+      // Longer delay to avoid race condition with logout
+      const timer = setTimeout(() => {
+        // Triple-check auth status before redirecting
+        if (authStatus === true && user && user.id) {
+          console.log("Confirmed authenticated, redirecting...");
+          // Role-based redirect for already authenticated users
+          if (user.role === "admin") {
+            navigate("/admin", { replace: true });
+          } else if (user.role === "counsellor") {
+            navigate("/counsellor", { replace: true });
+          } else if (user.role === "student") {
+            navigate("/company", { replace: true });
+          } else {
+            navigate("/browse", { replace: true });
+          }
+        } else {
+          console.log('Auth status changed during delay, not redirecting');
+        }
+      }, 1000); // Increased delay to 1 second
+      
+      return () => clearTimeout(timer);
+    } else {
+      console.log('Login useEffect - Not redirecting, staying on login page. Reasons:', {
+        isComponentMounted,
+        authStatus,
+        hasUser: !!user,
+        hasUserId: !!(user && user.id),
+        pathname: location.pathname
+      });
     }
-    // Don't redirect if user is not authenticated - let them stay on login page
-  }, [authStatus, user, navigate]);
+  }, [isComponentMounted, authStatus, user, navigate, location.pathname]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -97,20 +126,20 @@ const Login = () => {
         console.log("User role:", loggedInUser.role);
         dispatch(setUser(loggedInUser));
         
-        // Role-based redirect
+        // Role-based redirect with replace to prevent back button issues
         console.log("Redirecting based on role:", loggedInUser.role);
         if (loggedInUser.role === "admin") {
           console.log("Redirecting to /admin");
-          navigate("/admin");
+          navigate("/admin", { replace: true });
         } else if (loggedInUser.role === "counsellor") {
           console.log("Redirecting to /counsellor");
-          navigate("/counsellor");
+          navigate("/counsellor", { replace: true });
         } else if (loggedInUser.role === "student") {
           console.log("Redirecting to /company");
-          navigate("/company");
+          navigate("/company", { replace: true });
         } else {
-          console.log("Redirecting to / (default)");
-          navigate("/"); // Default fallback
+          console.log("Redirecting to /browse (default)");
+          navigate("/browse", { replace: true }); // Default fallback to authenticated home
         }
       } else {
         toast.error(res.data.message || "Login failed!");
@@ -154,20 +183,20 @@ const Login = () => {
         toast.success(message || "Login successful!");
         dispatch(setUser(loggedInUser));
         
-        // Role-based redirect
+        // Role-based redirect with replace to prevent back button issues
         console.log("Google login - Redirecting based on role:", loggedInUser.role);
         if (loggedInUser.role === "admin") {
           console.log("Redirecting to /admin");
-          navigate("/admin");
+          navigate("/admin", { replace: true });
         } else if (loggedInUser.role === "counsellor") {
           console.log("Redirecting to /counsellor");
-          navigate("/counsellor");
+          navigate("/counsellor", { replace: true });
         } else if (loggedInUser.role === "student") {
           console.log("Redirecting to /company");
-          navigate("/company");
+          navigate("/company", { replace: true });
         } else {
-          console.log("Redirecting to / (default)");
-          navigate("/"); // Default fallback
+          console.log("Redirecting to /browse (default)");
+          navigate("/browse", { replace: true }); // Default fallback to authenticated home
         }
       } else {
         toast.error(response.data.message || "Login failed. This Google account is not registered.");
@@ -205,7 +234,16 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen overflow-hidden ">
+    <div className="flex min-h-screen overflow-hidden">
+      {/* Back to Home Button */}
+      <Link 
+        to="/" 
+        className="absolute top-4 left-4 z-10 bg-white/90 hover:bg-white text-blue-600 px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 text-sm font-medium"
+      >
+        <FaArrowLeft className="w-4 h-4" />
+        Back to Home
+      </Link>
+
       {/* Left Section */}
       <div className="hidden lg:block w-3/3 h-screen">
         <img

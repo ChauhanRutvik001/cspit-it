@@ -12,25 +12,42 @@ function App() {
 
   useEffect(() => {
     const checkAuth = async () => {
+      // Don't check auth if logout is in progress
+      if (window._logoutInProgress) {
+        console.log('App.jsx - Logout in progress, skipping auth check');
+        return;
+      }
+      
       try {
+        console.log('App.jsx - Checking authentication...');
         const authStatus = await AuthService.getCurrentUser();
-        console.log(authStatus);
+        console.log('App.jsx - Auth check result:', authStatus);
         setIsAuthenticated(authStatus.authStatus);
         if (authStatus.authStatus) {
           dispatch(setUser(authStatus.data?.data?.user));
-          // console.log(authStatus.data.user);
-          console.log("User is authenticated");
+          console.log("App.jsx - User is authenticated");
         } else {
           dispatch(logout());
-          console.log("User is not authenticated");
+          console.log("App.jsx - User is not authenticated");
         }
       } catch (error) {
-        console.error("Error checking authentication:", error);
+        console.error("App.jsx - Error checking authentication:", error);
         setIsAuthenticated(false);
+        dispatch(logout());
       }
     };
 
+    // Initial check
     checkAuth();
+    
+    // Set up periodic auth check every 5 minutes (but not during logout)
+    const interval = setInterval(() => {
+      if (!window._logoutInProgress) {
+        checkAuth();
+      }
+    }, 300000); // 5 minutes
+    
+    return () => clearInterval(interval);
   }, [dispatch]);
 
   return (
