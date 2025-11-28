@@ -38,6 +38,7 @@ import StudentPlacementDrives from "./StudentPlacementDrives";
 import Notifications from "./Notifications";
 import StudentComplaintForm from "./StudentComplaintForm";
 import AdminComplaintManagement from "../admin/AdminComplaintManagement";
+import CharusatRankPredictor from "./CharusatRankPredictor";
 
 
 const Body = () => {
@@ -46,12 +47,14 @@ const Body = () => {
     
     // Public routes (no authentication required)
     { path: "/", element: <PublicLayout><Browse /></PublicLayout> },
+    { path: "/rank-predictor", element: <PublicLayout><CharusatRankPredictor /></PublicLayout> },
     { path: "/developers", element: <PublicLayout><Developers /></PublicLayout> },
     { path: "/public-contact", element: <PublicLayout><Contact /></PublicLayout> },
     { path: "/login", element: <Login /> },
     
     // Protected routes (authentication required)
     { path: "/browse", element: <ProtectedRoute><Layout><Browse /></Layout></ProtectedRoute> },
+    { path: "/predictor", element: <ProtectedRoute><Layout><CharusatRankPredictor /></Layout></ProtectedRoute> },
     { path: "/developer", element: <ProtectedRoute><Layout><Developers /></Layout></ProtectedRoute> },
     { path: "/contact", element: <ProtectedRoute><Layout><Contact /></Layout></ProtectedRoute> },
     { path: "/schedule", element: <ProtectedRoute><Layout><SchedulePage /></Layout></ProtectedRoute> },

@@ -1,0 +1,192 @@
+{
+  "DEPSTAR_2025": {
+    "CSE": { 
+      "OPEN": 3802, 
+      "EWS": 4673, 
+      "SEBC": 6917, 
+      "SC": 18693, 
+      "ST": 37221 
+    },
+    "CE": { 
+      "OPEN": 5605, 
+      "EWS": 5882, 
+      "SEBC": 8791, 
+      "SC": 25191, 
+      "ST": null 
+    },
+    "IT": { 
+      "OPEN": 6445, 
+      "EWS": 6716, 
+      "SEBC": 10107, 
+      "SC": 21819, 
+      "ST": null 
+    }
+  },
+  "CSPIT_2025": {
+    "CSE": { 
+      "OPEN": 1791, 
+      "EWS": 2102, 
+      "SEBC": 4119, 
+      "SC": 14655, 
+      "ST": 24020 
+    },
+    "CE": { 
+      "OPEN": 2814, 
+      "EWS": 3393, 
+      "SEBC": 5421, 
+      "SC": 22179, 
+      "ST": 36283 
+    },
+    "AI&ML": { 
+      "OPEN": 3663, 
+      "EWS": 3823, 
+      "SEBC": 10562, 
+      "SC": 25462, 
+      "ST": null 
+    },
+    "IT": { 
+      "OPEN": 5179, 
+      "EWS": 5472, 
+      "SEBC": 8354, 
+      "SC": 18020, 
+      "ST": null 
+    },
+    "EC": { 
+      "OPEN": 6859, 
+      "EWS": 8762, 
+      "SEBC": 16484, 
+      "SC": 25530, 
+      "ST": 25971 
+    },
+    "Electrical": { 
+      "OPEN": 13121, 
+      "EWS": 14760, 
+      "SEBC": 27667, 
+      "SC": 32342, 
+      "ST": null 
+    },
+    "Mechanical": { 
+      "OPEN": 15033, 
+      "EWS": 16238, 
+      "SEBC": 23424, 
+      "SC": 25047, 
+      "ST": null 
+    },
+    "Civil": { 
+      "OPEN": 21352, 
+      "EWS": 22076, 
+      "SEBC": 38118, 
+      "SC": 24000, 
+      "ST": 34040 
+    }
+  },
+  "DEPSTAR_2024": {
+    "CSE": { 
+      "OPEN": 4000, 
+      "EWS": 4850, 
+      "SEBC": 7200, 
+      "SC": 17800, 
+      "ST": 35300 
+    },
+    "CE": { 
+      "OPEN": 5900, 
+      "EWS": 6200, 
+      "SEBC": 9100, 
+      "SC": 23300, 
+      "ST": null 
+    },
+    "IT": { 
+      "OPEN": 6700, 
+      "EWS": 6950, 
+      "SEBC": 10500, 
+      "SC": 20300, 
+      "ST": null 
+    }
+  },
+  "CSPIT_2024": {
+    "CSE": { 
+      "OPEN": 2000, 
+      "EWS": 2300, 
+      "SEBC": 4500, 
+      "SC": 13800, 
+      "ST": 22300 
+    },
+    "CE": { 
+      "OPEN": 3100, 
+      "EWS": 3700, 
+      "SEBC": 5700, 
+      "SC": 20300, 
+      "ST": 34300 
+    },
+    "AI&ML": { 
+      "OPEN": 3900, 
+      "EWS": 4100, 
+      "SEBC": 11100, 
+      "SC": 24300, 
+      "ST": null 
+    },
+    "IT": { 
+      "OPEN": 5400, 
+      "EWS": 5700, 
+      "SEBC": 8700, 
+      "SC": 16800, 
+      "ST": null 
+    },
+    "EC": { 
+      "OPEN": 7200, 
+      "EWS": 9100, 
+      "SEBC": 17300, 
+      "SC": 24300, 
+      "ST": 27300 
+    },
+    "Electrical": { 
+      "OPEN": 13800, 
+      "EWS": 15300, 
+      "SEBC": 28800, 
+      "SC": 33300, 
+      "ST": null 
+    },
+    "Mechanical": { 
+      "OPEN": 15800, 
+      "EWS": 17100, 
+      "SEBC": 24300, 
+      "SC": 26300, 
+      "ST": null 
+    },
+    "Civil": { 
+      "OPEN": 22300, 
+      "EWS": 23300, 
+      "SEBC": 39500, 
+      "SC": 22800, 
+      "ST": 35300 
+    }
+  },
+  "CMPICA": {
+    "BCA": true,
+    "MCA": true
+  },
+  "MANAGEMENT": {
+    "BBA": true,
+    "MBA": true
+  },
+  "branchIcons": {
+    "CSE": "💻",
+    "CE": "🖥️", 
+    "IT": "⚙️",
+    "AI&ML": "🤖",
+    "EC": "⚡",
+    "Electrical": "🔌",
+    "Mechanical": "⚙️",
+    "Civil": "🏗️",
+    "BCA": "💻",
+    "MCA": "🖥️",
+    "BBA": "📊",
+    "MBA": "📈"
+  },
+  "collegeLogos": {
+    "CSPIT": "/cspit.jpg",
+    "DEPSTAR": "/depstar-logo.png",
+    "CMPICA": "/cmpica-logo.png",
+    "MANAGEMENT": "/management-logo.png"
+  }
+}

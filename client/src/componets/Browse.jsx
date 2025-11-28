@@ -1,5 +1,6 @@
 import { motion, useAnimation } from "framer-motion";
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import {
   Briefcase,
   GraduationCap,
@@ -150,6 +151,26 @@ const HeroSection = () => {
               to excel in the professional world. From industry connections to
               career guidance, we pave the path to success.
             </motion.p>
+
+            {/* Call to Action Button */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.8, duration: 0.6 }}
+              className="mt-8 text-center md:text-left"
+            >
+              <Link to="/rank-predictor">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300"
+                >
+                  <Calculator className="w-6 h-6 mr-3" />
+                  Check Your CHARUSAT Admission Chances
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </motion.button>
+              </Link>
+            </motion.div>
           </motion.div>
         </div>
 
@@ -211,6 +232,20 @@ const CDPCDetails = () => {
                   "Feedback via mock campus placement tests, group discussions, and interviews",
               },
               {
+                icon: <Calculator className="h-10 w-10 text-purple-600" />,
+                title: "ACPC Rank Predictor",
+                description: (
+                  <div>
+                    <span>AI-powered tool to predict your admission chances in CHARUSAT colleges based on ACPC rank</span>
+                    <Link to="/rank-predictor" className="block mt-2">
+                      <span className="text-purple-600 font-medium hover:text-purple-800 transition-colors">
+                        Try Now →
+                      </span>
+                    </Link>
+                  </div>
+                ),
+              },
+              {
                 icon: <GraduationCap className="h-10 w-10 text-blue-600" />,
                 title: "Higher Studies Help Desk",
                 description: "Guidance for higher studies in India and abroad",
@@ -234,15 +269,27 @@ const CDPCDetails = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-all hover:border-blue-100 hover:-translate-y-1"
+                className={`p-8 rounded-xl shadow-lg border transition-all hover:shadow-xl hover:-translate-y-1 ${
+                  item.title === "ACPC Rank Predictor" 
+                    ? "bg-gradient-to-br from-purple-50 to-violet-50 border-purple-200 hover:border-purple-300" 
+                    : "bg-white border-gray-100 hover:border-blue-100"
+                }`}
               >
-                <div className="bg-blue-50 p-4 rounded-full inline-block mb-4">
+                <div className={`p-4 rounded-full inline-block mb-4 ${
+                  item.title === "ACPC Rank Predictor" ? "bg-purple-100" : "bg-blue-50"
+                }`}>
                   {item.icon}
                 </div>
                 <h3 className="text-xl font-bold text-gray-800 mb-3">
                   {item.title}
                 </h3>
-                <p className="text-gray-600">{item.description}</p>
+                <div className="text-gray-600">
+                  {typeof item.description === 'string' ? (
+                    <p>{item.description}</p>
+                  ) : (
+                    item.description
+                  )}
+                </div>
               </motion.div>
             ))}
           </div>
