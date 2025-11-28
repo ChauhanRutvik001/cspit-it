@@ -19,6 +19,8 @@
     "dependencies": {
         "concurrently": "^9.0.0",
         "firebase-admin": "^13.2.0",
-        "react-spinners": "^0.15.0"
+        "lucide-react": "^0.555.0",
+        "react-spinners": "^0.15.0",
+        "recharts": "^3.5.0"
     }
 }

@@ -39,6 +39,8 @@ import Notifications from "./Notifications";
 import StudentComplaintForm from "./StudentComplaintForm";
 import AdminComplaintManagement from "../admin/AdminComplaintManagement";
 import CharusatRankPredictor from "./CharusatRankPredictor";
+import PlacementDashboard from "./PlacementDashboard";
+// import ShowcasePage from "../pages/ShowcasePage";
 
 
 const Body = () => {
@@ -47,13 +49,16 @@ const Body = () => {
     
     // Public routes (no authentication required)
     { path: "/", element: <PublicLayout><Browse /></PublicLayout> },
+    // { path: "/showcase", element: <ShowcasePage /> },
     { path: "/rank-predictor", element: <PublicLayout><CharusatRankPredictor /></PublicLayout> },
+    { path: "/placement-dashboard", element: <PublicLayout><PlacementDashboard /></PublicLayout> },
     { path: "/developers", element: <PublicLayout><Developers /></PublicLayout> },
     { path: "/public-contact", element: <PublicLayout><Contact /></PublicLayout> },
     { path: "/login", element: <Login /> },
     
     // Protected routes (authentication required)
     { path: "/browse", element: <ProtectedRoute><Layout><Browse /></Layout></ProtectedRoute> },
+    { path: "/dashboard", element: <ProtectedRoute><Layout><PlacementDashboard /></Layout></ProtectedRoute> },
     { path: "/predictor", element: <ProtectedRoute><Layout><CharusatRankPredictor /></Layout></ProtectedRoute> },
     { path: "/developer", element: <ProtectedRoute><Layout><Developers /></Layout></ProtectedRoute> },
     { path: "/contact", element: <ProtectedRoute><Layout><Contact /></Layout></ProtectedRoute> },
