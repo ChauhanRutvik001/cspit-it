@@ -17,6 +17,7 @@ import {
   Clock,
   AlertCircle
 } from 'lucide-react';
+import { FaGoogle, FaArrowLeft } from "react-icons/fa";
 
 const PlacementDriveManagement = () => {
   const user = useSelector((store) => store.app.user);
@@ -142,7 +143,20 @@ const PlacementDriveManagement = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-      <div className="max-w-8xl mx-auto pt-20 p-4">
+      {/* Fixed Back Button */}
+      <div className="relative top-4 left-4 z-50">
+        <button
+          className="bg-white/90 hover:bg-white text-blue-600 px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 text-sm font-medium backdrop-blur-sm border border-blue-200"
+          onClick={() => navigate(-1)}
+        >
+          <FaArrowLeft className="w-4 h-4" />
+          Back to Dashboard
+        </button>
+      </div>
+      
+      {/* Content with proper top padding */}
+      <div className="pt-10 max-w-8xl mx-auto p-4">
+      
         {/* Header */}
         <div className="bg-white rounded-xl shadow-xl overflow-hidden mb-6">
           <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-8">

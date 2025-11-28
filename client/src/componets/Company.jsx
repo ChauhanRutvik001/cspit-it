@@ -861,8 +861,8 @@ const Company = () => {
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4">
-        <div className="container mx-auto">
-          <div className="bg-white shadow-xl my-16 rounded-2xl overflow-hidden backdrop-blur-sm backdrop-filter">
+        <div className="mx-auto">
+          <div className="bg-white shadow-xl  rounded-2xl overflow-hidden backdrop-blur-sm backdrop-filter">
             {/* Header with Stats */}
             <div className="bg-gradient-to-r from-indigo-600 to-blue-500 p-6 text-white">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">

@@ -3,6 +3,7 @@ import axiosInstance from "../utils/axiosInstance";
 import { useNavigate, useLocation } from "react-router-dom";
 import toast from "react-hot-toast";
 import { Building2, Briefcase, FileText, DollarSign, Globe, Linkedin, ArrowLeft, Save } from "lucide-react";
+import { FaGoogle, FaArrowLeft } from "react-icons/fa";
 
 export default function CompanyPage() {
   const navigate = useNavigate();
@@ -87,7 +88,7 @@ export default function CompanyPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <div className="container mx-auto px-4 py-8">
-        <div className="bg-white shadow-xl my-16 rounded-2xl overflow-hidden">
+        <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-indigo-600 to-blue-500 p-6 text-white">
             <div className="flex items-center justify-between">

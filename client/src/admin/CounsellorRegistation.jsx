@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
 import ExcelUploadInstructions from "../componets/ExcelUploadInstructions";
+import { FaGoogle, FaArrowLeft } from "react-icons/fa";
 
 const CounsellorRegistation = () => {
   const [students, setStudents] = useState([]); // Holds parsed Excel data
@@ -231,12 +232,13 @@ const CounsellorRegistation = () => {
 
   return (
     <div className="relative min-h-screen bg-white text-black p-4 md:p-10">
-      <div className="pl-4 pt-24">
+      <div className="pl-4 mb-10">
         <button
-          className="py-2 px-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-indigo-700 active:scale-95 transition transform duration-200"
+          className="absolute top-4 left-4 z-10 bg-white/90 hover:bg-white text-blue-600 px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 text-sm font-medium"
           onClick={() => navigate(-1)}
         >
-          Back
+          <FaArrowLeft className="w-4 h-4" />
+          Back to Dashboard
         </button>
       </div>
 

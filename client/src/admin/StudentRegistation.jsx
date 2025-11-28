@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
 import ExcelUploadInstructions from "../componets/ExcelUploadInstructions";
+import { FaGoogle, FaArrowLeft } from "react-icons/fa";
 
 const StudentRegistration = () => {
   const [students, setStudents] = useState([]); // Holds parsed Excel data
@@ -28,10 +29,10 @@ const StudentRegistration = () => {
     if (!file) return;
 
     // Verify file extension
-    const fileExt = file.name.split('.').pop().toLowerCase();
-    if (fileExt !== 'xlsx' && fileExt !== 'xls') {
-      toast.error('Please upload a valid Excel file (.xlsx or .xls)');
-      e.target.value = ''; // Clear the file input
+    const fileExt = file.name.split(".").pop().toLowerCase();
+    if (fileExt !== "xlsx" && fileExt !== "xls") {
+      toast.error("Please upload a valid Excel file (.xlsx or .xls)");
+      e.target.value = ""; // Clear the file input
       return;
     }
 
@@ -42,10 +43,10 @@ const StudentRegistration = () => {
       try {
         const data = new Uint8Array(event.target.result); // Read the file as ArrayBuffer
         const workbook = XLSX.read(data, { type: "array" }); // Parse the Excel data into a workbook
-        
+
         if (!workbook.SheetNames || workbook.SheetNames.length === 0) {
-          toast.error('The Excel file is empty or corrupted');
-          e.target.value = ''; // Clear the file input
+          toast.error("The Excel file is empty or corrupted");
+          e.target.value = ""; // Clear the file input
           return;
         }
 
@@ -53,29 +54,37 @@ const StudentRegistration = () => {
         const parsedData = XLSX.utils.sheet_to_json(sheet); // Parse the sheet into JSON data
 
         // Check if data has required headers
-        if (parsedData.length > 0 && (!parsedData[0].hasOwnProperty('ID') || !parsedData[0].hasOwnProperty('NAME'))) {
-          toast.error('Excel file must contain "ID" and "NAME" columns exactly as shown');
-          e.target.value = ''; // Clear the file input
+        if (
+          parsedData.length > 0 &&
+          (!parsedData[0].hasOwnProperty("ID") ||
+            !parsedData[0].hasOwnProperty("NAME"))
+        ) {
+          toast.error(
+            'Excel file must contain "ID" and "NAME" columns exactly as shown'
+          );
+          e.target.value = ""; // Clear the file input
           return;
         }
 
         // Transform parsed data to expected format
-        const formattedData = parsedData.map((row, index) => {
-          // Check for valid data
-          if (!row.ID && !row.NAME) {
-            return null; // Skip empty rows
-          }
-          
-          return {
-            id: row.ID?.toString().toLowerCase() || "", // Match the key 'ID' in the parsed data
-            name: row.NAME?.toString() || "", // Match the key 'Name'
-            index,
-          };
-        }).filter(Boolean); // Remove null items (empty rows)
+        const formattedData = parsedData
+          .map((row, index) => {
+            // Check for valid data
+            if (!row.ID && !row.NAME) {
+              return null; // Skip empty rows
+            }
+
+            return {
+              id: row.ID?.toString().toLowerCase() || "", // Match the key 'ID' in the parsed data
+              name: row.NAME?.toString() || "", // Match the key 'Name'
+              index,
+            };
+          })
+          .filter(Boolean); // Remove null items (empty rows)
 
         if (formattedData.length === 0) {
-          toast.error('No valid data found in the Excel file');
-          e.target.value = ''; // Clear the file input
+          toast.error("No valid data found in the Excel file");
+          e.target.value = ""; // Clear the file input
           return;
         }
 
@@ -87,14 +96,18 @@ const StudentRegistration = () => {
         setErrorMessages([]);
       } catch (error) {
         console.error("Error parsing Excel file:", error);
-        toast.error('Failed to parse the Excel file. The file might be corrupted or in an invalid format.');
-        e.target.value = ''; // Clear the file input
+        toast.error(
+          "Failed to parse the Excel file. The file might be corrupted or in an invalid format."
+        );
+        e.target.value = ""; // Clear the file input
       }
     };
 
     reader.onerror = () => {
-      toast.error('Error reading the file. Please try again with a different file.');
-      e.target.value = ''; // Clear the file input
+      toast.error(
+        "Error reading the file. Please try again with a different file."
+      );
+      e.target.value = ""; // Clear the file input
     };
 
     reader.readAsArrayBuffer(file); // Start reading the file
@@ -228,12 +241,13 @@ const StudentRegistration = () => {
 
   return (
     <div className="relative min-h-screen bg-white text-black p-4 md:p-10">
-      <div className="pl-4 pt-24">
+      <div className="pl-4 mb-10">
         <button
-          className="py-2 px-6 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:from-blue-600 hover:to-indigo-700 active:scale-95 transition transform duration-200"
+          className="absolute top-4 left-4 z-10 bg-white/90 hover:bg-white text-blue-600 px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 text-sm font-medium"
           onClick={() => navigate(-1)}
         >
-          Back
+          <FaArrowLeft className="w-4 h-4" />
+          Back to Dashboard
         </button>
       </div>
 
