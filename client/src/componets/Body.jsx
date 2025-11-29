@@ -40,7 +40,8 @@ import StudentComplaintForm from "./StudentComplaintForm";
 import AdminComplaintManagement from "../admin/AdminComplaintManagement";
 import CharusatRankPredictor from "./CharusatRankPredictor";
 import PlacementDashboard from "./PlacementDashboard";
-// import ShowcasePage from "../pages/ShowcasePage";
+import ShowcasePage from "../pages/ShowcasePage";
+import LogoShowcase from "../pages/LogoShowcase";
 
 
 const Body = () => {
@@ -49,7 +50,8 @@ const Body = () => {
     
     // Public routes (no authentication required)
     { path: "/", element: <PublicLayout><Browse /></PublicLayout> },
-    // { path: "/showcase", element: <ShowcasePage /> },
+    { path: "/showcase", element: <ShowcasePage /> },
+    { path: "/logo-showcase", element: <LogoShowcase onComplete={() => window.location.href = '/'} /> },
     { path: "/rank-predictor", element: <PublicLayout><CharusatRankPredictor /></PublicLayout> },
     { path: "/placement-dashboard", element: <PublicLayout><PlacementDashboard /></PublicLayout> },
     { path: "/developers", element: <PublicLayout><Developers /></PublicLayout> },

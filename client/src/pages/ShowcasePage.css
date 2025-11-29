@@ -1,0 +1,103 @@
+/* ====== CINEMATIC INTRO ANIMATIONS ====== */
+
+/* Custom Fonts */
+.playwrite-nz-guides-regular {
+  font-family: "Playwrite NZ Guides", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Button styles */
+.bg-golden-glow {
+  background-color: #FFD700;
+}
+
+.bg-golden-hover:hover {
+  background-color: #FFC700;
+}
+
+/* Logo zoom-in animation (2-4s) */
+@keyframes logo-zoom {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Cursor blink animation */
+@keyframes cursor-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+@keyframes cursor-blink-dark {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* Shloka fade-in animation */
+@keyframes shloka-fade {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Shimmer effect for shloka */
+@keyframes shimmer {
+  0% {
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+  }
+  50% {
+    text-shadow: 0 0 20px rgba(255, 215, 0, 1), 0 0 30px rgba(255, 215, 0, 0.6);
+  }
+  100% {
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+  }
+}
+
+/* Logo zoom-in class */
+.logo-zoom-in {
+  animation: logo-zoom 2s ease-out forwards;
+}
+
+/* Typing cursor styles */
+.typing-cursor {
+  display: inline-block;
+}
+
+.cursor-blink {
+  animation: cursor-blink 1s infinite;
+  font-weight: 100;
+}
+
+/* Dark cursor for white background */
+.cursor-blink-dark {
+  animation: cursor-blink-dark 1s infinite;
+  font-weight: 100;
+  color: #374151;
+}
+
+/* Golden glow text */
+.text-golden-glow {
+  color: #FFD700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+
+/* Shloka fade-in class */
+.shloka-fade-in {
+  animation: shloka-fade 2s ease-out forwards;
+}
+
+/* Shimmer effect class */
+.shimmer-effect {
+  animation: shimmer 3s ease-in-out infinite;
+}
