@@ -18,6 +18,8 @@ import placement_2021_2022 from '../data/placement_2021_2022.json';
 import placement_2022_2023 from '../data/placement_2022_2023.json';
 import placement_2023_2024 from '../data/placement_2023_2024.json';
 import placement_2024_2025 from '../data/placement_2024_2025.json';
+// Import 2025 student data
+import studentData2025 from '../data/2025_student_data.json';
 
 const allPlacementData = [
   placement_2018_2019,
@@ -268,6 +270,34 @@ const PlacementDashboard = () => {
     return null;
   };
 
+  // --- Company Search Analytics for 2025 ---
+  const companySearchSummary = useMemo(() => {
+    if (!searchTerm) return null;
+    const searchLower = searchTerm.trim().toLowerCase();
+    // Collect year-wise placement counts (2018-2025)
+    const yearWiseCounts = {};
+    allPlacementData.forEach(yearData => {
+      const count = yearData.companies
+        .filter(c => c.company && c.company.toLowerCase().includes(searchLower))
+        .reduce((sum, c) => sum + (c.offers || 0), 0);
+      yearWiseCounts[yearData.year] = count;
+    });
+    // For 2025, get student names placed in searched company
+    const students2025 = studentData2025
+      .filter(s =>
+        s["Company Name"] &&
+        s["Company Name"].toLowerCase().includes(searchLower)
+      )
+      .map(s => s["Full Name"]);
+    // Add 2025 count
+    yearWiseCounts["2024-2025"] = students2025.length;
+
+    return {
+      yearWiseCounts,
+      students2025
+    };
+  }, [searchTerm]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-slate-50 to-blue-50 text-gray-900 font-sans relative overflow-hidden">
       {/* Animated Background */}
@@ -380,15 +410,15 @@ const PlacementDashboard = () => {
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
                 <input
                   type="text"
-                  placeholder="Search companies (e.g., TCS, Infosys, CrestData)..."
+                  placeholder="🔍 Search companies (e.g., TCS, Infosys, CrestData)..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-white border border-gray-400 rounded-xl py-3 pl-12 pr-4 text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
+                  className="w-full bg-blue-50 border border-blue-300 rounded-xl py-3 pl-12 pr-4 text-gray-900 placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-semibold"
                 />
               </div>
               <button
                 onClick={() => setViewMode(viewMode === 'grid' ? 'chart' : 'grid')}
-                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all flex items-center text-white font-semibold"
+                className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl hover:from-blue-700 hover:to-indigo-800 transition-all flex items-center text-white font-semibold shadow"
               >
                 <Eye className="w-5 h-5 mr-2" />
                 {viewMode === 'grid' ? 'Chart View' : 'Grid View'}
@@ -396,12 +426,108 @@ const PlacementDashboard = () => {
             </div>
             <button
               onClick={() => setShowCompanyModal(true)}
-              className="w-full bg-gradient-to-r from-indigo-600 to-blue-700 text-white py-3 px-6 rounded-xl hover:from-indigo-700 hover:to-blue-800 transition-all font-semibold"
+              className="w-full bg-gradient-to-r from-indigo-600 to-blue-700 text-white py-3 px-6 rounded-xl hover:from-indigo-700 hover:to-blue-800 transition-all font-semibold shadow"
             >
               Explore All Companies ({Object.keys(processedData.companyAnalytics).length})
             </button>
           </div>
         </div>
+
+        {searchTerm && (
+          <div className="bg-gradient-to-br from-blue-50 via-white to-green-50 border border-blue-200 rounded-3xl p-8 shadow-2xl mb-10 animate-fade-in">
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center gap-3 mb-2">
+                <Award className="w-8 h-8 text-blue-600 drop-shadow" />
+                <span className="font-extrabold text-2xl text-blue-900 tracking-tight">
+                  Search Results for <span className="bg-blue-100 px-3 py-1 rounded-lg shadow text-blue-700">{searchTerm}</span>
+                </span>
+              </div>
+              <hr className="my-2 border-blue-100" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Year-wise Placement Stats */}
+                <div>
+                  <div className="font-semibold text-lg text-gray-700 mb-3 flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-blue-500" />
+                    Placements by Year
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    {companySearchSummary &&
+                      Object.entries(companySearchSummary.yearWiseCounts).map(([year, count]) => (
+                        <div
+                          key={year}
+                          className={`flex items-center gap-2 px-4 py-3 rounded-2xl shadow border transition-all duration-300 ${
+                            year === "2024-2025"
+                              ? "bg-green-100 border-green-300"
+                              : "bg-blue-100 border-blue-300"
+                          }`}
+                        >
+                          <span className="font-bold text-blue-700">{year}</span>
+                          <span
+                            className={`font-bold text-lg ${
+                              count > 0
+                                ? year === "2024-2025"
+                                  ? "text-green-700"
+                                  : "text-blue-700"
+                                : "text-gray-400"
+                            }`}
+                          >
+                            {count}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+                {/* 2025 Placed Students */}
+                {companySearchSummary && companySearchSummary.students2025.length > 0 && (
+                  <div>
+                    <div className="font-semibold text-lg text-green-700 mb-3 flex items-center gap-2">
+                      <Users className="w-5 h-5 text-green-600" />
+                      2025 Placed Students
+                      <span className="ml-2 bg-green-200 text-green-800 px-2 py-1 rounded text-xs font-bold shadow">
+                        {companySearchSummary.students2025.length}
+                      </span>
+                    </div>
+                    <div className="max-h-48 overflow-y-auto pr-2">
+                      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {studentData2025
+                          .filter(s =>
+                            s["Company Name"] &&
+                            s["Company Name"].toLowerCase().includes(searchTerm.trim().toLowerCase())
+                          )
+                          .map((s, idx) => (
+                            <li
+                              key={idx}
+                              className="flex flex-col gap-1 bg-white border border-green-100 rounded-xl px-4 py-2 shadow hover:bg-green-50 transition"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-full bg-green-200 flex items-center justify-center font-extrabold text-green-700 text-base shadow">
+                                  {s["Full Name"]
+                                    .split(" ")
+                                    .map(n => n[0])
+                                    .join("")
+                                    .substring(0, 2)
+                                    .toUpperCase()}
+                                </div>
+                                <span className="text-gray-900 font-semibold">{s["Full Name"]}</span>
+                              </div>
+                              <div className="ml-12 text-xs text-gray-700">
+                                <span className="font-medium">Charusat ID:</span> {s["CHARUSAT Email Id"] || "-"}
+                              </div>
+                              {s["personal email id"] && (
+                                <div className="ml-12 text-xs text-gray-700">
+                                  <span className="font-medium">Personal Email:</span> {s["personal email id"]}
+                                </div>
+                              )}
+                            </li>
+                          ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Enhanced Charts Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
@@ -521,6 +647,103 @@ const PlacementDashboard = () => {
             </ResponsiveContainer>
           </div>
         </div>
+
+        {/* --- Search Result Summary UI (below chart, improved UI) --- */}
+        {searchTerm && (
+          <div className="bg-gradient-to-br from-blue-50 via-white to-green-50 border border-blue-200 rounded-3xl p-8 shadow-2xl mb-10 animate-fade-in">
+            <div className="flex flex-col gap-6">
+              <div className="flex items-center gap-3 mb-2">
+                <Award className="w-8 h-8 text-blue-600 drop-shadow" />
+                <span className="font-extrabold text-2xl text-blue-900 tracking-tight">
+                  Search Results for <span className="bg-blue-100 px-3 py-1 rounded-lg shadow text-blue-700">{searchTerm}</span>
+                </span>
+              </div>
+              <hr className="my-2 border-blue-100" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Year-wise Placement Stats */}
+                <div>
+                  <div className="font-semibold text-lg text-gray-700 mb-3 flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-blue-500" />
+                    Placements by Year
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    {companySearchSummary &&
+                      Object.entries(companySearchSummary.yearWiseCounts).map(([year, count]) => (
+                        <div
+                          key={year}
+                          className={`flex items-center gap-2 px-4 py-3 rounded-2xl shadow border transition-all duration-300 ${
+                            year === "2024-2025"
+                              ? "bg-green-100 border-green-300"
+                              : "bg-blue-100 border-blue-300"
+                          }`}
+                        >
+                          <span className="font-bold text-blue-700">{year}</span>
+                          <span
+                            className={`font-bold text-lg ${
+                              count > 0
+                                ? year === "2024-2025"
+                                  ? "text-green-700"
+                                  : "text-blue-700"
+                                : "text-gray-400"
+                            }`}
+                          >
+                            {count}
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+                {/* 2025 Placed Students */}
+                {companySearchSummary && companySearchSummary.students2025.length > 0 && (
+                  <div>
+                    <div className="font-semibold text-lg text-green-700 mb-3 flex items-center gap-2">
+                      <Users className="w-5 h-5 text-green-600" />
+                      2025 Placed Students
+                      <span className="ml-2 bg-green-200 text-green-800 px-2 py-1 rounded text-xs font-bold shadow">
+                        {companySearchSummary.students2025.length}
+                      </span>
+                    </div>
+                    <div className="max-h-48 overflow-y-auto pr-2">
+                      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {studentData2025
+                          .filter(s =>
+                            s["Company Name"] &&
+                            s["Company Name"].toLowerCase().includes(searchTerm.trim().toLowerCase())
+                          )
+                          .map((s, idx) => (
+                            <li
+                              key={idx}
+                              className="flex flex-col gap-1 bg-white border border-green-100 rounded-xl px-4 py-2 shadow hover:bg-green-50 transition"
+                            >
+                              <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-full bg-green-200 flex items-center justify-center font-extrabold text-green-700 text-base shadow">
+                                  {s["Full Name"]
+                                    .split(" ")
+                                    .map(n => n[0])
+                                    .join("")
+                                    .substring(0, 2)
+                                    .toUpperCase()}
+                                </div>
+                                <span className="text-gray-900 font-semibold">{s["Full Name"]}</span>
+                              </div>
+                              <div className="ml-12 text-xs text-gray-700">
+                                <span className="font-medium">Charusat ID:</span> {s["CHARUSAT Email Id"] || "-"}
+                              </div>
+                              {s["personal email id"] && (
+                                <div className="ml-12 text-xs text-gray-700">
+                                  <span className="font-medium">Personal Email:</span> {s["personal email id"]}
+                                </div>
+                              )}
+                            </li>
+                          ))}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Top Companies Showcase */}
         <div className="bg-white border border-gray-300 rounded-3xl p-6 shadow-xl mb-8">

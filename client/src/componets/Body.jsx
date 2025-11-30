@@ -41,8 +41,7 @@ import AdminComplaintManagement from "../admin/AdminComplaintManagement";
 import CharusatRankPredictor from "./CharusatRankPredictor";
 import PlacementDashboard from "./PlacementDashboard";
 import ShowcasePage from "../pages/ShowcasePage";
-import LogoShowcase from "../pages/LogoShowcase";
-
+import PlacementJourneyPage from "../pages/PlacementJourneyPage";
 
 const Body = () => {
   const appRouter = createBrowserRouter([
@@ -51,7 +50,7 @@ const Body = () => {
     // Public routes (no authentication required)
     { path: "/", element: <PublicLayout><Browse /></PublicLayout> },
     { path: "/showcase", element: <ShowcasePage /> },
-    { path: "/logo-showcase", element: <LogoShowcase onComplete={() => window.location.href = '/'} /> },
+    { path: "/placement-journey", element: <PlacementJourneyPage onComplete={() => window.location.href = '/'} /> },
     { path: "/rank-predictor", element: <PublicLayout><CharusatRankPredictor /></PublicLayout> },
     { path: "/placement-dashboard", element: <PublicLayout><PlacementDashboard /></PublicLayout> },
     { path: "/developers", element: <PublicLayout><Developers /></PublicLayout> },
