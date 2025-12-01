@@ -26,7 +26,8 @@ router.get("/test", testEndpoint);
 router.post("/create", isAuthorized, isAdmin, createPlacementDrive);
 
 // Get placement drives for a specific company
-router.get("/company/:companyId", isAuthorized, isAdmin, getCompanyPlacementDrives);
+// Accessible to any authenticated user (students see drives for planning)
+router.get("/company/:companyId", isAuthorized, getCompanyPlacementDrives);
 
 // Get students in a specific round
 router.get("/:driveId/round/:roundNumber/students", isAuthorized, isAdmin, getStudentsInRound);

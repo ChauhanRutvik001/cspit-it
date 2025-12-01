@@ -3,6 +3,7 @@ import axiosInstance from "../utils/axiosInstance";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import GeneralPlacementDrivePlanner from "./GeneralPlacementDrivePlanner";
 import {
   X,
   Globe,
@@ -44,6 +45,13 @@ const Company = () => {
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [showCompanyModal, setShowCompanyModal] = useState(false);
   const [studentProgress, setStudentProgress] = useState([]);
+  const [showPlannerModal, setShowPlannerModal] = useState(false);
+  const [plannerCompany, setPlannerCompany] = useState(null);
+  const [plannerDrives, setPlannerDrives] = useState([]);
+  const [plannerMonth, setPlannerMonth] = useState(() => new Date());
+  const [plannerLoading, setPlannerLoading] = useState(false);
+  const [plannerError, setPlannerError] = useState("");
+  const [selectedPlannerDate, setSelectedPlannerDate] = useState(null);
   const [progressLoading, setProgressLoading] = useState(false);
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -62,6 +70,7 @@ const Company = () => {
     rejected: false, // Start collapsed for less important sections
     available: true
   });
+  const [showGeneralPlanner, setShowGeneralPlanner] = useState(false);
   const user = useSelector((store) => store.app?.user);
 
   useEffect(() => {
@@ -405,6 +414,32 @@ const Company = () => {
     setStudentProgress([]);
   };
 
+  const openPlannerForCompany = async (company) => {
+    if (!company?._id) return;
+
+    setPlannerCompany(company);
+    setShowPlannerModal(true);
+    setPlannerMonth(new Date());
+    setSelectedPlannerDate(null);
+    setPlannerError("");
+    setPlannerDrives([]);
+
+    try {
+      setPlannerLoading(true);
+      const response = await axiosInstance.get(`/placement-drive/company/${company._id}`);
+      setPlannerDrives(response.data?.data || []);
+    } catch (error) {
+      console.error("Error fetching placement drives for planner:", error?.response || error);
+      setPlannerError(
+        error?.response?.data?.message ||
+        "Failed to load placement drives for this company."
+      );
+      setPlannerDrives([]);
+    } finally {
+      setPlannerLoading(false);
+    }
+  };
+
   const getStatusBadge = (status) => {
     const statusConfig = {
       shortlisted: { bg: "bg-green-100", text: "text-green-800", icon: CheckCircle },
@@ -596,6 +631,7 @@ const Company = () => {
                   key={`${company._id}-${index}`} 
                   company={company} 
                   priority={isSpecial ? 'high' : 'normal'}
+                  onOpenPlanner={openPlannerForCompany}
                 />
               ))}
             </div>
@@ -619,7 +655,7 @@ const Company = () => {
   });
 
   // Optimized CompanyCard with lazy loading and memoization
-  const CompanyCard = React.memo(({ company, priority = 'normal' }) => {
+  const CompanyCard = React.memo(({ company, priority = 'normal', onOpenPlanner }) => {
     const [imageLoaded, setImageLoaded] = useState(false);
     const [isInView, setIsInView] = useState(priority === 'high'); // Load immediately for special sections
     
@@ -733,6 +769,15 @@ const Company = () => {
             </div>
           </div>
           <div className="pt-4 mt-auto border-t border-gray-100 space-y-3">
+            {/* Planner Button */}
+            <button
+              onClick={() => onOpenPlanner && onOpenPlanner(company)}
+              className="w-full px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg transition-colors flex items-center justify-center text-sm"
+            >
+              <Calendar className="h-4 w-4 mr-2" />
+              View Drive Planner
+            </button>
+
             {/* View Details Button */}
             <button
               onClick={() => handleViewCompanyDetails(company)}
@@ -1269,6 +1314,265 @@ const Company = () => {
     );
   };
 
+  // Company Drive Planner Modal
+  const CompanyDrivePlannerModal = () => {
+    if (!showPlannerModal || !plannerCompany) return null;
+
+    const monthYearLabel = plannerMonth.toLocaleDateString(undefined, {
+      month: "long",
+      year: "numeric",
+    });
+
+    const startOfMonth = new Date(
+      plannerMonth.getFullYear(),
+      plannerMonth.getMonth(),
+      1
+    );
+    const endOfMonth = new Date(
+      plannerMonth.getFullYear(),
+      plannerMonth.getMonth() + 1,
+      0
+    );
+
+    const startWeekday = startOfMonth.getDay(); // 0-6
+    const daysInMonth = endOfMonth.getDate();
+
+    const daysArray = [];
+    for (let i = 0; i < startWeekday; i++) {
+      daysArray.push(null);
+    }
+    for (let d = 1; d <= daysInMonth; d++) {
+      daysArray.push(new Date(plannerMonth.getFullYear(), plannerMonth.getMonth(), d));
+    }
+
+    const normalizeDate = (d) =>
+      new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+
+    const getDrivesForDate = (date) => {
+      if (!date) return [];
+      const target = normalizeDate(date);
+      return plannerDrives.filter((drive) => {
+        if (!drive.startDate || !drive.endDate) return false;
+        const start = new Date(drive.startDate);
+        const end = new Date(drive.endDate);
+        const startNorm = normalizeDate(start);
+        const endNorm = normalizeDate(end);
+        return target >= startNorm && target <= endNorm;
+      });
+    };
+
+    const selectedDateDrives = selectedPlannerDate
+      ? getDrivesForDate(selectedPlannerDate)
+      : [];
+
+    const changeMonth = (direction) => {
+      const delta = direction === "prev" ? -1 : 1;
+      const newMonth = new Date(
+        plannerMonth.getFullYear(),
+        plannerMonth.getMonth() + delta,
+        1
+      );
+      setPlannerMonth(newMonth);
+      setSelectedPlannerDate(null);
+    };
+
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 p-6 text-white flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-semibold flex items-center gap-2">
+                <Calendar className="w-5 h-5" />
+                Drive Planner - {plannerCompany.name}
+              </h2>
+              <p className="text-xs text-blue-100 mt-1">
+                See when this company&apos;s placement drives are scheduled.
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                setShowPlannerModal(false);
+                setPlannerCompany(null);
+                setPlannerDrives([]);
+                setSelectedPlannerDate(null);
+              }}
+              className="p-2 rounded-full hover:bg-white/10 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="p-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Calendar */}
+            <div className="border border-gray-200 rounded-xl p-4 bg-gray-50">
+              <div className="flex items-center justify-between mb-4">
+                <button
+                  onClick={() => changeMonth("prev")}
+                  className="p-1 rounded-full hover:bg-gray-200 transition-colors"
+                >
+                  <ChevronLeft className="w-5 h-5 text-gray-700" />
+                </button>
+                <div className="text-sm font-semibold text-gray-800">
+                  {monthYearLabel}
+                </div>
+                <button
+                  onClick={() => changeMonth("next")}
+                  className="p-1 rounded-full hover:bg-gray-200 transition-colors"
+                >
+                  <ChevronRight className="w-5 h-5 text-gray-700" />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-7 gap-1 text-[11px] font-medium text-gray-500 mb-1">
+                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+                  <div key={d} className="text-center py-1">
+                    {d}
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-7 gap-1 text-xs">
+                {daysArray.map((date, idx) => {
+                  if (!date) {
+                    return <div key={idx} className="h-10" />;
+                  }
+
+                  const drivesOnThisDay = getDrivesForDate(date);
+                  const isToday =
+                    normalizeDate(date) ===
+                    normalizeDate(new Date());
+                  const isSelected =
+                    selectedPlannerDate &&
+                    normalizeDate(selectedPlannerDate) === normalizeDate(date);
+
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() =>
+                        setSelectedPlannerDate(
+                          selectedPlannerDate &&
+                            normalizeDate(selectedPlannerDate) === normalizeDate(date)
+                            ? null
+                            : date
+                        )
+                      }
+                      className={`h-10 rounded-lg flex flex-col items-center justify-center border text-[11px] transition-all ${
+                        isSelected
+                          ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                          : drivesOnThisDay.length > 0
+                          ? "bg-blue-50 text-blue-800 border-blue-200 hover:bg-blue-100"
+                          : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
+                      } ${isToday && !isSelected ? "ring-1 ring-blue-400" : ""}`}
+                    >
+                      <span>{date.getDate()}</span>
+                      {drivesOnThisDay.length > 0 && (
+                        <span className="mt-0.5 h-1.5 w-1.5 rounded-full bg-blue-500" />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="mt-3 flex items-center justify-between text-[11px] text-gray-500">
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1">
+                    <span className="h-2 w-2 rounded-full bg-blue-500" />
+                    Drive day
+                  </span>
+                  <span className="inline-flex items-center gap-1">
+                    <span className="h-2 w-2 rounded-full bg-gray-400" />
+                    No drive
+                  </span>
+                </div>
+                <span>
+                  Total drives: {plannerDrives?.length || 0}
+                </span>
+              </div>
+            </div>
+
+            {/* Drive list / details */}
+            <div className="border border-gray-200 rounded-xl p-4 bg-white flex flex-col">
+              <h3 className="text-sm font-semibold text-gray-800 flex items-center gap-2 mb-2">
+                <Building2 className="w-4 h-4 text-blue-600" />
+                {plannerCompany.name} - Drives
+              </h3>
+
+              {plannerLoading ? (
+                <div className="flex-1 flex items-center justify-center text-gray-500 text-sm">
+                  Loading drives...
+                </div>
+              ) : plannerError ? (
+                <div className="flex-1 flex items-center justify-center text-red-500 text-sm text-center px-4">
+                  {plannerError}
+                </div>
+              ) : plannerDrives.length === 0 ? (
+                <div className="flex-1 flex flex-col items-center justify-center text-gray-500 text-sm">
+                  <Calendar className="w-10 h-10 text-gray-300 mb-2" />
+                  No placement drives found for this company yet.
+                </div>
+              ) : selectedPlannerDate && selectedDateDrives.length === 0 ? (
+                <div className="flex-1 flex flex-col items-center justify-center text-gray-500 text-sm text-center px-4">
+                  <Calendar className="w-8 h-8 text-gray-300 mb-1" />
+                  No drives scheduled on{" "}
+                  {selectedPlannerDate.toLocaleDateString()}.
+                  <span className="block text-xs mt-1">
+                    Try selecting a different date with a blue dot.
+                  </span>
+                </div>
+              ) : (
+                <div className="flex-1 overflow-y-auto space-y-3 pr-1">
+                  {(selectedPlannerDate ? selectedDateDrives : plannerDrives).map(
+                    (drive) => (
+                      <div
+                        key={drive._id}
+                        className="border border-gray-200 rounded-lg p-3 text-xs bg-gray-50"
+                      >
+                        <div className="flex items-start justify-between mb-1.5">
+                          <div className="font-semibold text-gray-900">
+                            {drive.title}
+                          </div>
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 capitalize">
+                            {drive.status}
+                          </span>
+                        </div>
+                        <p className="text-gray-600 mb-1 line-clamp-2">
+                          {drive.description}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2 text-[11px] text-gray-600">
+                          <span className="inline-flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(drive.startDate).toLocaleDateString()}{" "}
+                            -{" "}
+                            {new Date(drive.endDate).toLocaleDateString()}
+                          </span>
+                          <span className="inline-flex items-center gap-1">
+                            <Users className="w-3 h-3" />
+                            {drive.totalRounds || 1} round(s)
+                          </span>
+                        </div>
+                      </div>
+                    )
+                  )}
+                </div>
+              )}
+
+              {selectedPlannerDate && !plannerLoading && plannerDrives.length > 0 && (
+                <p className="mt-2 text-[11px] text-gray-500">
+                  Showing drives for{" "}
+                  <span className="font-medium">
+                    {selectedPlannerDate.toLocaleDateString()}
+                  </span>
+                  . Click again on the date to reset and see all drives.
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Student View
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4">
@@ -1276,29 +1580,39 @@ const Company = () => {
         <div className="bg-white my-16 shadow-xl rounded-2xl overflow-hidden backdrop-blur-sm backdrop-filter">
           {/* Header */}
           <div className="bg-gradient-to-r from-indigo-600 to-blue-500 p-6 text-white">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
               <div>
                 <h2 className="text-3xl font-bold">Available Companies</h2>
                 <p className="mt-1 text-indigo-100">
                   Explore and apply to companies
                 </p>
               </div>
-              <div className="relative w-full sm:w-80">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search companies, domains, locations..."
-                    value={searchTerm}
-                    onChange={handleSearch}
-                    onKeyDown={handleKeyDown}
-                    onFocus={() => setShowSuggestions(searchTerm.trim().length > 0)}
-                    onBlur={() => {
-                      // Delay hiding suggestions to allow clicking
-                      setTimeout(() => setShowSuggestions(false), 200);
-                    }}
-                    className="w-full pl-12 pr-10 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent placeholder-white/60 text-white"
-                  />
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60 h-5 w-5" />
+              {user?.role === 'student' && (
+                <button
+                  onClick={() => setShowGeneralPlanner(true)}
+                  className="px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg hover:bg-white/30 transition-all duration-200 flex items-center gap-2 text-white font-medium whitespace-nowrap"
+                >
+                  <Calendar className="w-5 h-5" />
+                  View All Drives Calendar
+                </button>
+              )}
+            </div>
+            <div className="relative w-full">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search companies, domains, locations..."
+                  value={searchTerm}
+                  onChange={handleSearch}
+                  onKeyDown={handleKeyDown}
+                  onFocus={() => setShowSuggestions(searchTerm.trim().length > 0)}
+                  onBlur={() => {
+                    // Delay hiding suggestions to allow clicking
+                    setTimeout(() => setShowSuggestions(false), 200);
+                  }}
+                  className="w-full pl-12 pr-10 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent placeholder-white/60 text-white"
+                />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60 h-5 w-5" />
                   {searchTerm && (
                     <button
                       onClick={() => {
@@ -1518,11 +1832,16 @@ const Company = () => {
               </div>
             </div>
           </div>
-        </div>
+        {/* Company Detail Modal */}
+        <CompanyDetailModal />
+        <CompanyDrivePlannerModal />
+        
+        {/* General Placement Drive Planner Modal */}
+        <GeneralPlacementDrivePlanner 
+          isOpen={showGeneralPlanner}
+          onClose={() => setShowGeneralPlanner(false)}
+        />
       </div>
-      
-      {/* Company Detail Modal */}
-      <CompanyDetailModal />
     </div>
   );
 };

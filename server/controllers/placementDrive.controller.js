@@ -308,14 +308,20 @@ export const getStudentPlacementDrives = async (req, res) => {
     const { page = 1, limit = 10, status, company } = req.query;
     const skip = (page - 1) * limit;
 
-    let filter = { status: { $in: ['active', 'in_progress', 'completed'] } };
-    if (status) filter.status = status;
-    if (company) filter.company = company;
+    // Build filter - show all drives by default, or filter if status is specified
+    let filter = {};
+    
+    // If a specific status is requested, use it. Otherwise, show all drives
+    if (status) {
+      filter.status = status;
+    }
+    if (company) {
+      filter.company = company;
+    }
 
     const placementDrives = await PlacementDrive.find(filter)
       .populate('company', 'name domain logo')
-      .select('title description startDate endDate status totalRounds company')
-      .sort({ createdAt: -1 })
+      .sort({ startDate: 1, createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit));
 

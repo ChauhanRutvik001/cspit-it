@@ -4,6 +4,7 @@ import AuthService from "./Auth/auth";
 import { useDispatch } from "react-redux";
 import { setUser, logout } from "./redux/userSlice";
 import Body from "./componets/Body";
+import ChatbotWidget from "./componets/ChatbotWidget";
 import { SocketProvider } from "./utils/SocketProvider";
 
 function App() {
@@ -54,6 +55,7 @@ function App() {
     <SocketProvider>
       <div>
         <Body />
+        <ChatbotWidget />
         <Toaster />
       </div>
     </SocketProvider>
