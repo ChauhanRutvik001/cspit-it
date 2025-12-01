@@ -5,7 +5,7 @@ import Schedule from "./Schedule";
 const SchedulePage = () => {
   return (
     <div className="min-h-screen bg-gray-100">
-      <div className="pt-20">
+      <div className="">
         <Schedule />
       </div>
     </div>

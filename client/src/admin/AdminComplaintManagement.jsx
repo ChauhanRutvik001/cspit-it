@@ -17,6 +17,7 @@ import {
   Send,
   Globe
 } from 'lucide-react';
+import { FaGoogle, FaArrowLeft } from "react-icons/fa";
 
 const AdminComplaintManagement = () => {
   const user = useSelector((store) => store.app.user);
@@ -200,7 +201,18 @@ const AdminComplaintManagement = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <div className="mt-16 max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+
+
+      <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        
+        <button
+          className="relative mb-8 z-10 bg-white/90 hover:bg-white text-blue-600 px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 text-sm font-medium"
+          onClick={() => navigate(-1)}
+        >
+          <FaArrowLeft className="w-4 h-4" />
+          Back to Dashboard
+        </button>
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Complaint Management</h1>
