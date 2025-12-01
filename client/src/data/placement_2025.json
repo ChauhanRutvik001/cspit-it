@@ -1,0 +1,290 @@
+{
+  "year": "2024-2025",
+  "companies": [
+    {
+        "company":"Talent System",
+        "package_LPA":"5.40 to 7.2",
+        "offers":2
+    },
+    {
+        "company":"IBM",
+        "package_LPA":8,
+        "offers":1
+    },
+    {
+        "company":"Motorola",
+        "package_LPA":"6 to 8",
+        "offers":2
+    },
+    {
+        "company":"Tatvasoft",
+        "package_LPA":6.02,
+        "offers":3
+    },
+    {
+        "company":"Qualitrol Software",
+        "package_LPA":null,
+        "offers":0
+    },
+    {
+        "company":"Alpha-E-Barcode",
+        "package_LPA":4.5,
+        "offers":1
+    },
+    {
+        "company":"E-Infochip",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"Zignuts",
+        "package_LPA":null,
+        "offers":0
+    },
+    {
+        "company":"Odysseus",
+        "package_LPA":6.6,
+        "offers":1
+    },
+    {
+        "company":"Crest Infosystem",
+        "package_LPA":5.4,
+        "offers":1
+    },
+    {
+        "company":"Meditab",
+        "package_LPA":6.09,
+        "offers":1
+    },
+    {
+        "company":"Thinkbiz",
+        "package_LPA":4.5,
+        "offers":3
+    },
+    {
+        "company":"MASTEK",
+        "package_LPA":null,
+        "offers":0
+    },
+    {
+        "company":"Sculpsoft",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"NJ Technologies",
+        "package_LPA":null,
+        "offers":0
+    },
+    {
+        "company":"O2h Technologies",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"RKIT Software",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"Ridgeant",
+        "package_LPA":null,
+        "offers":0
+    },
+    {
+        "company":"Simform ",
+        "package_LPA":null,
+        "offers":2
+    },
+    {
+        "company":"Moschip",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"GN WebSoft",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"Gateway",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"NavaEra",
+        "package_LPA":4,
+        "offers":1
+    },
+    {
+        "company":"Inventyv",
+        "package_LPA":null,
+        "offers":2
+    },
+    {
+        "company":"Azilen",
+        "package_LPA":null,
+        "offers":3
+    },
+    {
+        "company":"Agami Tech",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"Buchanan Technologies",
+        "package_LPA":null,
+        "offers":2
+    },
+    {
+        "company":"Crest Data",
+        "package_LPA":null,
+        "offers":5
+    },
+    {
+        "company":"Inferenz",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"Liquify Solution",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"Arsenal Tech",
+        "package_LPA":null,
+        "offers":4
+    },
+    {
+        "company":"Cygnet",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"Alian Sotware",
+        "package_LPA":null,
+        "offers":0
+    },
+    {
+        "company":"TCS",
+        "package_LPA":null,
+        "offers":2
+    },
+    {
+        "company":"Zeus Learning",
+        "package_LPA":null,
+        "offers":0
+    },
+    {
+        "company":"Hitech",
+        "package_LPA":null,
+        "offers":0
+    },
+    {
+        "company":"Techno Mantra",
+        "package_LPA":null,
+        "offers":0
+    },
+    {
+        "company":"Cilans System",
+        "package_LPA":null,
+        "offers":0
+    },
+    {
+        "company":"Data Slush",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"Prognostic Infotech",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"Tuvoc Technologies Pvt Ltd.",
+        "package_LPA":null,
+        "offers":3
+    },
+    {
+        "company":"RadixWeb",
+        "package_LPA":null,
+        "offers":2
+    },
+    {
+        "company":"Synoptek India pvt ltd",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"Teachnook",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"Bevolve.ai",
+        "package_LPA":null,
+        "offers":2
+    },
+    {
+        "company":"Micron",
+        "package_LPA":null,
+        "offers":2
+    },
+    {
+        "company":"Intuitive Cloud",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"Alpha e Barcode",
+        "package_LPA":null,
+        "offers":3
+    },
+    {
+        "company":"Radix Web",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"Wappnet",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"Vrindi",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"Video SDK",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"Dynatech",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"DI solutions",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"InExture Solutions Limited",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"iValue Systech Pvt. Ltd.",
+        "package_LPA":null,
+        "offers":1
+    },
+    {
+        "company":"Phonon",
+        "package_LPA":null,
+        "offers":1
+    }
+]
+}

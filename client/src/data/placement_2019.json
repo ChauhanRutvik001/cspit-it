@@ -1,0 +1,376 @@
+{
+    "year": "2018-2019",
+    "companies": [
+       {
+    "sr_no": 1,
+    "company": "Crest Data",
+    "offers": 20,
+    "package_LPA": "3.5-4.5",
+    "remarks": ""
+  },
+  {
+    "sr_no": 2,
+    "company": "Meditab",
+    "offers": 6,
+    "package_LPA": "3.6",
+    "remarks": ""
+  },
+  {
+    "sr_no": 3,
+    "company": "Argusoft",
+    "offers": 2,
+    "package_LPA": "3.5-4.5",
+    "remarks": ""
+  },
+  {
+    "sr_no": 4,
+    "company": "Evosys",
+    "offers": 1,
+    "package_LPA": "3.2",
+    "remarks": ""
+  },
+  {
+    "sr_no": 5,
+    "company": "E-infochip",
+    "offers": 1,
+    "package_LPA": "2.4",
+    "remarks": ""
+  },
+  {
+    "sr_no": 6,
+    "company": "Odysseus",
+    "offers": 1,
+    "package_LPA": "3",
+    "remarks": ""
+  },
+  {
+    "sr_no": 7,
+    "company": "Kothari Infotech",
+    "offers": 0,
+    "package_LPA": "3.6-4.92",
+    "remarks": ""
+  },
+  {
+    "sr_no": 8,
+    "company": "Jeavio",
+    "offers": 1,
+    "package_LPA": "4.8",
+    "remarks": ""
+  },
+  {
+    "sr_no": 9,
+    "company": "Streebo",
+    "offers": 4,
+    "package_LPA": "2.8-3.4",
+    "remarks": ""
+  },
+  {
+    "sr_no": 10,
+    "company": "Cygnet",
+    "offers": 6,
+    "package_LPA": "2.2-3.0",
+    "remarks": ""
+  },
+  {
+    "sr_no": 11,
+    "company": "TCS (Codevita)",
+    "offers": 0,
+    "package_LPA": "7",
+    "remarks": ""
+  },
+  {
+    "sr_no": 12,
+    "company": "TCS (Ninja)",
+    "offers": 4,
+    "package_LPA": "3.37",
+    "remarks": ""
+  },
+  {
+    "sr_no": 13,
+    "company": "Promact Infotech",
+    "offers": 5,
+    "package_LPA": "3.12-3.69",
+    "remarks": ""
+  },
+  {
+    "sr_no": 14,
+    "company": "Indian Navy",
+    "offers": 0,
+    "package_LPA": "9",
+    "remarks": ""
+  },
+  {
+    "sr_no": 15,
+    "company": "Cloud 24x7",
+    "offers": 1,
+    "package_LPA": "3",
+    "remarks": ""
+  },
+  {
+    "sr_no": 16,
+    "company": "EXXAT",
+    "offers": 2,
+    "package_LPA": "3-3.8",
+    "remarks": ""
+  },
+  {
+    "sr_no": 17,
+    "company": "One Advanced",
+    "offers": 0,
+    "package_LPA": "3.5",
+    "remarks": ""
+  },
+  {
+    "sr_no": 18,
+    "company": "ARASTU System",
+    "offers": 0,
+    "package_LPA": "3",
+    "remarks": ""
+  },
+  {
+    "sr_no": 19,
+    "company": "Tatvasoft",
+    "offers": 3,
+    "package_LPA": "2.28",
+    "remarks": ""
+  },
+  {
+    "sr_no": 20,
+    "company": "Knowarth",
+    "offers": 0,
+    "package_LPA": "1.8-2.3",
+    "remarks": ""
+  },
+  {
+    "sr_no": 21,
+    "company": "Teksun",
+    "offers": 0,
+    "package_LPA": "1.8-2.4",
+    "remarks": ""
+  },
+  {
+    "sr_no": 22,
+    "company": "AIMDek",
+    "offers": 0,
+    "package_LPA": "2.5",
+    "remarks": ""
+  },
+  {
+    "sr_no": 23,
+    "company": "Axelor",
+    "offers": 1,
+    "package_LPA": "2.16",
+    "remarks": ""
+  },
+  {
+    "sr_no": 24,
+    "company": "Windowmaker",
+    "offers": 0,
+    "package_LPA": "2.5",
+    "remarks": ""
+  },
+  {
+    "sr_no": 25,
+    "company": "SPEC India",
+    "offers": 0,
+    "package_LPA": "3.2",
+    "remarks": ""
+  },
+  {
+    "sr_no": 26,
+    "company": "Magneto IT",
+    "offers": 0,
+    "package_LPA": "1.8-2.8",
+    "remarks": ""
+  },
+  {
+    "sr_no": 27,
+    "company": "Synoverge",
+    "offers": 0,
+    "package_LPA": "2.65-3.3",
+    "remarks": ""
+  },
+  {
+    "sr_no": 28,
+    "company": "Infostretch",
+    "offers": 0,
+    "package_LPA": "3-3.5",
+    "remarks": ""
+  },
+  {
+    "sr_no": 29,
+    "company": "Zeus Systems",
+    "offers": 0,
+    "package_LPA": "5.01",
+    "remarks": ""
+  },
+  {
+    "sr_no": 30,
+    "company": "INFIBEAM",
+    "offers": 2,
+    "package_LPA": "2.4-3",
+    "remarks": ""
+  },
+  {
+    "sr_no": 31,
+    "company": "GATEWAY",
+    "offers": 2,
+    "package_LPA": "3",
+    "remarks": ""
+  },
+  {
+    "sr_no": 32,
+    "company": "1Rivet",
+    "offers": 0,
+    "package_LPA": "1.8",
+    "remarks": ""
+  },
+  {
+    "sr_no": 33,
+    "company": "Convosys ​Technologies",
+    "offers": 0,
+    "package_LPA": "2.4",
+    "remarks": ""
+  },
+  {
+    "sr_no": 34,
+    "company": "O2h",
+    "offers": 0,
+    "package_LPA": "2.4",
+    "remarks": ""
+  },
+  {
+    "sr_no": 35,
+    "company": "Appit",
+    "offers": 2,
+    "package_LPA": "2.52",
+    "remarks": ""
+  },
+  {
+    "sr_no": 36,
+    "company": "Tatvic Analytics",
+    "offers": 0,
+    "package_LPA": "1.8-3",
+    "remarks": ""
+  },
+  {
+    "sr_no": 37,
+    "company": "KCSPL",
+    "offers": 1,
+    "package_LPA": "2.4",
+    "remarks": ""
+  },
+  {
+    "sr_no": 38,
+    "company": "ArsenalTech",
+    "offers": 0,
+    "package_LPA": "1.8-2.4",
+    "remarks": ""
+  },
+  {
+    "sr_no": 39,
+    "company": "Solute LLP",
+    "offers": 1,
+    "package_LPA": "2-2.4",
+    "remarks": ""
+  },
+  {
+    "sr_no": 40,
+    "company": "Maven Vista",
+    "offers": 0,
+    "package_LPA": "1.83",
+    "remarks": ""
+  },
+  {
+    "sr_no": 41,
+    "company": "Cimcon",
+    "offers": 0,
+    "package_LPA": "2.16",
+    "remarks": ""
+  },
+  {
+    "sr_no": 42,
+    "company": "Squad Technologies",
+    "offers": 0,
+    "package_LPA": "1.92-2.9",
+    "remarks": ""
+  },
+  {
+    "sr_no": 43,
+    "company": "iFour",
+    "offers": 0,
+    "package_LPA": "2.04",
+    "remarks": ""
+  },
+  {
+    "sr_no": 44,
+    "company": "Simform",
+    "offers": 0,
+    "package_LPA": "2.5",
+    "remarks": ""
+  },
+  {
+    "sr_no": 45,
+    "company": "Varaince Infotech",
+    "offers": 0,
+    "package_LPA": "1.44",
+    "remarks": ""
+  },
+  {
+    "sr_no": 46,
+    "company": "Acty System",
+    "offers": 0,
+    "package_LPA": "2.4",
+    "remarks": ""
+  },
+  {
+    "sr_no": 47,
+    "company": "Zealus web",
+    "offers": 0,
+    "package_LPA": "3",
+    "remarks": ""
+  },
+  {
+    "sr_no": 48,
+    "company": "Perfect and Complete sol",
+    "offers": 3,
+    "package_LPA": "4",
+    "remarks": ""
+  },
+  {
+    "sr_no": 49,
+    "company": "Thomson Reuters",
+    "offers": 3,
+    "package_LPA": "1.32",
+    "remarks": ""
+  },
+  {
+    "sr_no": 50,
+    "company": "JC Orthoheal",
+    "offers": 1,
+    "package_LPA": "3",
+    "remarks": ""
+  },
+  {
+    "sr_no": 51,
+    "company": "Neiron India",
+    "offers": 1,
+    "package_LPA": "7.25",
+    "remarks": "Off Campus - 8-12-2020"
+  },
+  {
+    "sr_no": 52,
+    "company": "Digital Science",
+    "offers": 1,
+    "package_LPA": "0.96",
+    "remarks": "Off Campus - 8-12-2020"
+  },
+  {
+    "sr_no": 53,
+    "company": "IBL InfoTech",
+    "offers": 1,
+    "package_LPA": "1.2",
+    "remarks": ""
+  }
+    ]
+}

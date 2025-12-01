@@ -13,24 +13,35 @@ import {
 } from 'lucide-react';
 
 // Import placement data from JSON files
-import placement_2018_2019 from '../data/placement_2018_2019.json';
-import placement_2019_2020 from '../data/placement_2019_2020.json';
-import placement_2020_2021 from '../data/placement_2020_2021.json';
-import placement_2021_2022 from '../data/placement_2021_2022.json';
-import placement_2022_2023 from '../data/placement_2022_2023.json';
-import placement_2023_2024 from '../data/placement_2023_2024.json';
-import placement_2024_2025 from '../data/placement_2024_2025.json';
+import placement_2019 from '../data/placement_2019.json';
+import placement_2020 from '../data/placement_2020.json';
+import placement_2021 from '../data/placement_2021.json';
+import placement_2022 from '../data/placement_2022.json';
+import placement_2023 from '../data/placement_2023.json';
+import placement_2024 from '../data/placement_2024.json';
+import placement_2025 from '../data/placement_2025.json';
 // Import 2025 student data
 import studentData2025 from '../data/2025_student_data.json';
 
+// Data for charts (exclude 2025)
+const chartPlacementData = [
+  placement_2019,
+  placement_2020,
+  placement_2021,
+  placement_2022,
+  placement_2023,
+  placement_2024,
+];
+
+// Data for tables and search (include 2025)
 const allPlacementData = [
-  placement_2018_2019,
-  placement_2019_2020,
-  placement_2020_2021,
-  placement_2021_2022,
-  placement_2022_2023,
-  placement_2023_2024,
-  placement_2024_2025
+  placement_2019,
+  placement_2020,
+  placement_2021,
+  placement_2022,
+  placement_2023,
+  placement_2024,
+  placement_2025
 ];
 
 const chartColors = {
@@ -153,19 +164,23 @@ const PlacementDashboard = () => {
 
   // Process data for analytics
   const processedData = useMemo(() => {
-    // Year-wise summary with enhanced metrics
-    const yearWiseData = allPlacementData.map(yearData => {
+    // Year-wise summary with enhanced metrics (for charts - exclude 2025)
+    const yearWiseData = chartPlacementData.map(yearData => {
       const totalOffers = yearData.companies.reduce((sum, company) => sum + company.offers, 0);
       const totalCompanies = yearData.companies.length;
       const companiesWithOffers = yearData.companies.filter(company => company.offers > 0).length;
-      // Package information removed due to policy
+      
+      // Estimate placement rate based on typical batch size of ~120 students
+      const estimatedBatchSize = 68;
+      const estimatedPlacementRate = totalOffers > 0 ? Math.min((totalOffers / estimatedBatchSize) * 100, 100) : 0;
 
       return {
         year: yearData.year,
         totalOffers,
         totalCompanies,
         companiesWithOffers,
-        successRate: totalCompanies > 0 ? ((companiesWithOffers / totalCompanies) * 100).toFixed(1) : 0,
+        companySuccessRate: totalCompanies > 0 ? ((companiesWithOffers / totalCompanies) * 100).toFixed(1) : 0,
+        placementRate: estimatedPlacementRate.toFixed(1),
         efficiency: totalOffers / totalCompanies || 0
       };
     });
@@ -210,7 +225,7 @@ const PlacementDashboard = () => {
     const radarData = topCompanies.slice(0, 6).map(company => ({
       company: company.name.length > 15 ? company.name.substring(0, 15) + '...' : company.name,
       offers: company.totalOffers,
-      consistency: (company.years.length / allPlacementData.length) * 100
+      consistency: (company.years.length / chartPlacementData.length) * 100
     }));
 
     // Growth trend data
@@ -247,9 +262,11 @@ const PlacementDashboard = () => {
   }, [searchTerm, processedData.companyAnalytics, processedData.topCompanies]);
 
   const summaryStats = useMemo(() => {
-    const totalStudentsPlaced = processedData.yearWiseData.reduce((sum, year) => sum + year.totalOffers, 0);
+    // Include 2025 data in total students placed count
+    const totalStudentsPlaced = processedData.yearWiseData.reduce((sum, year) => sum + year.totalOffers, 0) + 
+                               (placement_2025?.companies?.reduce((sum, company) => sum + company.offers, 0) || 0);
     const totalCompaniesVisited = Object.keys(processedData.companyAnalytics).length;
-    const avgSuccessRate = processedData.yearWiseData.reduce((sum, year) => sum + parseFloat(year.successRate), 0) / processedData.yearWiseData.length;
+    const avgPlacementRate = processedData.yearWiseData.reduce((sum, year) => sum + parseFloat(year.placementRate), 0) / processedData.yearWiseData.length;
     const topRecruiter = processedData.topCompanies[0];
     const currentYear = processedData.yearWiseData[processedData.yearWiseData.length - 1];
     const prevYear = processedData.yearWiseData[processedData.yearWiseData.length - 2];
@@ -258,7 +275,7 @@ const PlacementDashboard = () => {
     return {
       totalStudentsPlaced,
       totalCompaniesVisited,
-      avgSuccessRate: avgSuccessRate.toFixed(1),
+      avgPlacementRate: avgPlacementRate.toFixed(1),
       topRecruiter: topRecruiter ? topRecruiter.name : 'N/A',
       topRecruiterCount: topRecruiter ? topRecruiter.totalOffers : 0,
       growthTrend: growthTrend.toFixed(1)
@@ -368,8 +385,8 @@ const PlacementDashboard = () => {
             color="from-purple-600 to-pink-700" 
           />
           <SummaryCard 
-            title="Success Rate" 
-            value={`${summaryStats.avgSuccessRate}%`}
+            title="Placement Rate" 
+            value={`${summaryStats.avgPlacementRate}%`}
             subtitle="Average placement rate"
             icon={<Target size={24} className="text-white"/>} 
             color="from-green-600 to-emerald-700" 
@@ -551,53 +568,90 @@ const PlacementDashboard = () => {
           <div className="lg:col-span-2 bg-white border border-gray-300 rounded-3xl p-6 shadow-xl">
             <h3 className="text-2xl font-bold mb-6 flex items-center text-gray-900">
               <TrendingUp className="w-6 h-6 mr-3" />
-              Placement Growth Trends
+              Comprehensive Placement Analytics
             </h3>
-            <ResponsiveContainer width="100%" height={350}>
+            <ResponsiveContainer width="100%" height={400}>
               <ComposedChart data={processedData.yearWiseData}>
                 <defs>
-                  <linearGradient id="gradient1" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient id="gradientStudents" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#2563eb" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0.1}/>
+                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0.2}/>
                   </linearGradient>
-                  <linearGradient id="gradient2" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.8}/>
+                  <linearGradient id="gradientCompanies" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.7}/>
                     <stop offset="95%" stopColor="#7c3aed" stopOpacity={0.1}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.3)" />
-                <XAxis dataKey="year" tick={{ fill: '#475569', fontSize: 12 }} />
+                <XAxis 
+                  dataKey="year" 
+                  tick={{ fill: '#475569', fontSize: 12 }} 
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                />
                 <YAxis yAxisId="left" tick={{ fill: '#475569', fontSize: 12 }} />
                 <YAxis yAxisId="right" orientation="right" tick={{ fill: '#475569', fontSize: 12 }} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
+                
+                {/* Students Placed - Primary focus */}
                 <Area 
-                  yAxisId="left" 
+                  yAxisId="left"
                   type="monotone" 
                   dataKey="totalOffers" 
                   stroke="#2563eb" 
+                  strokeWidth={3}
                   fillOpacity={1} 
-                  fill="url(#gradient1)" 
-                  name="Total Placements"
+                  fill="url(#gradientStudents)" 
+                  name="Students Placed"
                 />
+                
+                {/* Companies Visited - Secondary metric */}
                 <Bar 
-                  yAxisId="right" 
+                  yAxisId="right"
                   dataKey="totalCompanies" 
-                  fill="#7c3aed" 
+                  fill="url(#gradientCompanies)" 
                   name="Companies Visited" 
-                  radius={[4, 4, 0, 0]}
+                  radius={[8, 8, 0, 0]}
+                  opacity={0.8}
                 />
+                
+                {/* Growth Line */}
                 <Line 
-                  yAxisId="left" 
+                  yAxisId="left"
                   type="monotone" 
                   dataKey="growth" 
                   stroke="#059669" 
-                  strokeWidth={3} 
+                  strokeWidth={4} 
                   name="Growth %" 
-                  dot={{ fill: '#059669', r: 6 }}
+                  dot={{ fill: '#059669', r: 8, strokeWidth: 3, stroke: '#ffffff' }}
+                  strokeDasharray="5 5"
                 />
               </ComposedChart>
             </ResponsiveContainer>
+            
+            {/* Chart Legend with metrics */}
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="flex items-center justify-center bg-blue-50 rounded-xl p-3">
+                <div className="w-4 h-4 bg-gradient-to-b from-blue-600 to-blue-200 rounded mr-3"></div>
+                <span className="text-sm font-semibold text-blue-800">
+                  Total Students: {processedData.yearWiseData.reduce((sum, year) => sum + year.totalOffers, 0)}
+                </span>
+              </div>
+              <div className="flex items-center justify-center bg-purple-50 rounded-xl p-3">
+                <div className="w-4 h-4 bg-gradient-to-b from-purple-600 to-purple-200 rounded mr-3"></div>
+                <span className="text-sm font-semibold text-purple-800">
+                  Partner Companies: {Object.keys(processedData.companyAnalytics).length}
+                </span>
+              </div>
+              <div className="flex items-center justify-center bg-green-50 rounded-xl p-3">
+                <div className="w-4 h-2 bg-green-600 rounded mr-3" style={{ borderStyle: 'dashed' }}></div>
+                <span className="text-sm font-semibold text-green-800">
+                  Avg Growth: {(processedData.yearWiseData.reduce((sum, year) => sum + year.growth, 0) / processedData.yearWiseData.length).toFixed(1)}%
+                </span>
+              </div>
+            </div>
           </div>
 
           {/* Company Performance Radar */}
@@ -633,11 +687,11 @@ const PlacementDashboard = () => {
             </ResponsiveContainer>
           </div>
 
-          {/* Company Success Rate Distribution */}
+          {/* Placement Rate Distribution */}
           <div className="bg-white border border-gray-300 rounded-3xl p-6 shadow-xl">
             <h3 className="text-xl font-bold mb-4 flex items-center text-gray-900">
               <Award className="w-5 h-5 mr-2" />
-              Success Rate Trends
+              Placement Rate Trends
             </h3>
             <ResponsiveContainer width="100%" height={300}>
               <AreaChart data={processedData.yearWiseData}>
@@ -653,11 +707,11 @@ const PlacementDashboard = () => {
                 <Tooltip content={<CustomTooltip />} />
                 <Area 
                   type="monotone" 
-                  dataKey="successRate" 
+                  dataKey="placementRate" 
                   stroke="#059669" 
                   fillOpacity={1} 
                   fill="url(#gradient3)" 
-                  name="Success Rate (%)"
+                  name="Placement Rate (%)"
                 />
               </AreaChart>
             </ResponsiveContainer>

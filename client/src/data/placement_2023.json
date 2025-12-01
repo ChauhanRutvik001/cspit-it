@@ -1,0 +1,460 @@
+{
+  "year": "2022-2023",
+  "companies": [
+    {
+        "sr_no": 1,
+        "company": "Infocusp",
+        "offers": 0,
+        "package_LPA": "9-15",
+        "remarks": ""
+    },
+    {
+        "sr_no": 2,
+        "company": "Versor Investments",
+        "offers": 0,
+        "package_LPA": "9.75 - 10.5",
+        "remarks": ""
+    },
+    {
+        "sr_no": 3,
+        "company": "Meditab",
+        "offers": 5,
+        "package_LPA": "6-7.5",
+        "remarks": ""
+    },
+    {
+        "sr_no": 4,
+        "company": "Intituve Cloud",
+        "offers": 4,
+        "package_LPA": "10",
+        "remarks": ""
+    },
+    {
+        "sr_no": 5,
+        "company": "Simform",
+        "offers": 6,
+        "package_LPA": "6.5",
+        "remarks": ""
+    },
+    {
+        "sr_no": 6,
+        "company": "Crestdata",
+        "offers": 12,
+        "package_LPA": "6",
+        "remarks": ""
+    },
+    {
+        "sr_no": 7,
+        "company": "Argusoft",
+        "offers": 0,
+        "package_LPA": "6.50- 7.50",
+        "remarks": ""
+    },
+    {
+        "sr_no": 8,
+        "company": "ScaleEdge",
+        "offers": 0,
+        "package_LPA": "5.1 - 6.2",
+        "remarks": ""
+    },
+    {
+        "sr_no": 9,
+        "company": "SmartSense",
+        "offers": 8,
+        "package_LPA": "6",
+        "remarks": "Through internship"
+    },
+    {
+        "sr_no": 10,
+        "company": "Asite ",
+        "offers": 3,
+        "package_LPA": "2022-09-05",
+        "remarks": ""
+    },
+    {
+        "sr_no": 11,
+        "company": "M&M",
+        "offers": 0,
+        "package_LPA": "2022-07-06",
+        "remarks": "12k stipend"
+    },
+    {
+        "sr_no": 12,
+        "company": "Kody Technolabs",
+        "offers": 0,
+        "package_LPA": "5",
+        "remarks": ""
+    },
+    {
+        "sr_no": 13,
+        "company": "Tatvasoft ",
+        "offers": 2,
+        "package_LPA": "3-4.8",
+        "remarks": ""
+    },
+    {
+        "sr_no": 14,
+        "company": "Zignuts",
+        "offers": 2,
+        "package_LPA": "2022-05-04",
+        "remarks": ""
+    },
+    {
+        "sr_no": 15,
+        "company": "Techblic",
+        "offers": 0,
+        "package_LPA": null,
+        "remarks": ""
+    },
+    {
+        "sr_no": 16,
+        "company": "Aubergine Solutions",
+        "offers": 0,
+        "package_LPA": "2022-06-05",
+        "remarks": ""
+    },
+    {
+        "sr_no": 17,
+        "company": "Bit01",
+        "offers": 0,
+        "package_LPA": "4",
+        "remarks": "1 Lac Bonus at completion of 2 Years Bond"
+    },
+    {
+        "sr_no": 18,
+        "company": "Mastek",
+        "offers": 0,
+        "package_LPA": "4.2",
+        "remarks": "Internship + Full-Time Employment"
+    },
+    {
+        "sr_no": 19,
+        "company": "Motadata",
+        "offers": 0,
+        "package_LPA": "2022-07-03",
+        "remarks": ""
+    },
+    {
+        "sr_no": 20,
+        "company": "Odoo",
+        "offers": 1,
+        "package_LPA": "5",
+        "remarks": ""
+    },
+    {
+        "sr_no": 21,
+        "company": "Synoptek",
+        "offers": 1,
+        "package_LPA": "5.5",
+        "remarks": ""
+    },
+    {
+        "sr_no": 22,
+        "company": "Squad",
+        "offers": 2,
+        "package_LPA": "3-4.2",
+        "remarks": ""
+    },
+    {
+        "sr_no": 23,
+        "company": "Bacancy",
+        "offers": 1,
+        "package_LPA": "4-4.5",
+        "remarks": "2 Years’ agreements"
+    },
+    {
+        "sr_no": 24,
+        "company": "TCS (Ninja)",
+        "offers": 1,
+        "package_LPA": "3.35",
+        "remarks": ""
+    },
+    {
+        "sr_no": 25,
+        "company": "Motorola",
+        "offers": 3,
+        "package_LPA": "8",
+        "remarks": "Through internship"
+    },
+    {
+        "sr_no": 26,
+        "company": "OPSHUB",
+        "offers": 0,
+        "package_LPA": null,
+        "remarks": ""
+    },
+    {
+        "sr_no": 27,
+        "company": "Odysseus Solutions",
+        "offers": 0,
+        "package_LPA": "3",
+        "remarks": ""
+    },
+    {
+        "sr_no": 28,
+        "company": "Celebal",
+        "offers": 0,
+        "package_LPA": "2022-08-07",
+        "remarks": ""
+    },
+    {
+        "sr_no": 29,
+        "company": "Jevio",
+        "offers": 0,
+        "package_LPA": "7",
+        "remarks": "15K stipend"
+    },
+    {
+        "sr_no": 30,
+        "company": "Capgemini",
+        "offers": 0,
+        "package_LPA": "5.75",
+        "remarks": ""
+    },
+    {
+        "sr_no": 31,
+        "company": "Tech Mahindra",
+        "offers": 0,
+        "package_LPA": "3.25",
+        "remarks": ""
+    },
+    {
+        "sr_no": 32,
+        "company": "IBM",
+        "offers": 0,
+        "package_LPA": "11",
+        "remarks": "30k stipend"
+    },
+    {
+        "sr_no": 33,
+        "company": "MG Motors",
+        "offers": 0,
+        "package_LPA": "7",
+        "remarks": ""
+    },
+    {
+        "sr_no": 34,
+        "company": "GetOnCRM Solutions",
+        "offers": 1,
+        "package_LPA": "3.5 to 6.5",
+        "remarks": ""
+    },
+    {
+        "sr_no": 35,
+        "company": "ACE INFOWAY",
+        "offers": 0,
+        "package_LPA": "2.65-4",
+        "remarks": ""
+    },
+    {
+        "sr_no": 36,
+        "company": "Thinkbiz",
+        "offers": 4,
+        "package_LPA": "4.7",
+        "remarks": "8k stipend"
+    },
+    {
+        "sr_no": 37,
+        "company": "Anblicks",
+        "offers": 4,
+        "package_LPA": "3.5-4.5",
+        "remarks": "5k stipend"
+    },
+    {
+        "sr_no": 38,
+        "company": "Jamsfy Technology",
+        "offers": 1,
+        "package_LPA": null,
+        "remarks": "off-campus"
+    },
+    {
+        "sr_no": 39,
+        "company": "Sarkstriker",
+        "offers": 1,
+        "package_LPA": null,
+        "remarks": "off-campus"
+    },
+    {
+        "sr_no": 40,
+        "company": "medkart pharmacy",
+        "offers": 1,
+        "package_LPA": null,
+        "remarks": "off-campus"
+    },
+    {
+        "sr_no": 41,
+        "company": "iMOPS",
+        "offers": 2,
+        "package_LPA": null,
+        "remarks": "off-campus"
+    },
+    {
+        "sr_no": 42,
+        "company": "Jekson vision",
+        "offers": 1,
+        "package_LPA": null,
+        "remarks": "off-campus"
+    },
+    {
+        "sr_no": 43,
+        "company": "Rivaan infotech",
+        "offers": 1,
+        "package_LPA": null,
+        "remarks": "off-campus"
+    },
+    {
+        "sr_no": 44,
+        "company": "Sony Research India",
+        "offers": 1,
+        "package_LPA": null,
+        "remarks": "off-campus"
+    },
+    {
+        "sr_no": 45,
+        "company": "Fractal analytics ",
+        "offers": 1,
+        "package_LPA": null,
+        "remarks": "off-campus"
+    },
+    {
+        "sr_no": 46,
+        "company": "Primavera",
+        "offers": 0,
+        "package_LPA": "4.2",
+        "remarks": "5k stipend"
+    },
+    {
+        "sr_no": 47,
+        "company": "Navaera Systems",
+        "offers": 0,
+        "package_LPA": "4",
+        "remarks": "8k stipend"
+    },
+    {
+        "sr_no": 48,
+        "company": "Odyseuss",
+        "offers": 0,
+        "package_LPA": "4.2",
+        "remarks": ""
+    },
+    {
+        "sr_no": 49,
+        "company": "Sciative Solutions",
+        "offers": 0,
+        "package_LPA": "6",
+        "remarks": ""
+    },
+    {
+        "sr_no": 50,
+        "company": "GoPronto",
+        "offers": 0,
+        "package_LPA": "5.8 - 6.5 LPA",
+        "remarks": ""
+    },
+    {
+        "sr_no": 51,
+        "company": "Tridhya Tech",
+        "offers": 0,
+        "package_LPA": null,
+        "remarks": ""
+    },
+    {
+        "sr_no": 52,
+        "company": "Covrize IT Solutions",
+        "offers": 0,
+        "package_LPA": null,
+        "remarks": ""
+    },
+    {
+        "sr_no": 53,
+        "company": "Scale Capacity",
+        "offers": 0,
+        "package_LPA": null,
+        "remarks": ""
+    },
+    {
+        "sr_no": 54,
+        "company": "TridhyaTech Pvt Ltd",
+        "offers": 0,
+        "package_LPA": "4.50-5.20",
+        "remarks": ""
+    },
+    {
+        "sr_no": 55,
+        "company": "Kothari Infotech",
+        "offers": 0,
+        "package_LPA": "6-7.2",
+        "remarks": ""
+    },
+    {
+        "sr_no": 56,
+        "company": "Solute Technoloabs",
+        "offers": 0,
+        "package_LPA": "4.50-5",
+        "remarks": ""
+    },
+    {
+        "sr_no": 57,
+        "company": "Streebo",
+        "offers": 0,
+        "package_LPA": "4",
+        "remarks": ""
+    },
+    {
+        "sr_no": 58,
+        "company": "Injala",
+        "offers": 0,
+        "package_LPA": "4",
+        "remarks": "10k stipend"
+    },
+    {
+        "sr_no": 59,
+        "company": "Krish technolabs",
+        "offers": 0,
+        "package_LPA": "3.0 - 4.8",
+        "remarks": "15k stipend"
+    },
+    {
+        "sr_no": 60,
+        "company": "Wappnet",
+        "offers": 0,
+        "package_LPA": "4 - 5.0 LPA",
+        "remarks": "up to 10k stipend"
+    },
+    {
+        "sr_no": 61,
+        "company": "Codal Systems",
+        "offers": 0,
+        "package_LPA": null,
+        "remarks": ""
+    },
+    {
+        "sr_no": 62,
+        "company": "INKEY",
+        "offers": 0,
+        "package_LPA": "3.72",
+        "remarks": "10k stipend"
+    },
+    {
+        "sr_no": 63,
+        "company": "Vayana Network",
+        "offers": 0,
+        "package_LPA": "6.5",
+        "remarks": "15k stipend"
+    },
+    {
+        "sr_no": 64,
+        "company": "Synoverge",
+        "offers": 0,
+        "package_LPA": "3.5-4.5",
+        "remarks": ""
+    },
+    {
+        "sr_no": 65,
+        "company": "UCI india",
+        "offers": 1,
+        "package_LPA": "3",
+        "remarks": "10k stipend"
+    }
+]
+}

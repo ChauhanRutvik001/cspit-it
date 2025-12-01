@@ -1,0 +1,259 @@
+{
+  "year": "2019-2020",
+  "companies": 
+[
+  {
+    "sr_no": 1,
+    "company": "Infostretch",
+    "offers": 2,
+    "package_LPA": "3.5",
+    "remarks": ""
+  },
+  {
+    "sr_no": 2,
+    "company": "CrestData",
+    "offers": 18,
+    "package_LPA": "3.5-5",
+    "remarks": ""
+  },
+  {
+    "sr_no": 3,
+    "company": "Meditab",
+    "offers": 3,
+    "package_LPA": "3.6",
+    "remarks": ""
+  },
+  {
+    "sr_no": 4,
+    "company": "Kothari Infotech",
+    "offers": 1,
+    "package_LPA": "3.6",
+    "remarks": ""
+  },
+  {
+    "sr_no": 5,
+    "company": "Odysseus",
+    "offers": 1,
+    "package_LPA": "3",
+    "remarks": ""
+  },
+  {
+    "sr_no": 6,
+    "company": "Perfect VIP",
+    "offers": 1,
+    "package_LPA": "3.1",
+    "remarks": ""
+  },
+  {
+    "sr_no": 7,
+    "company": "Jeavio",
+    "offers": 1,
+    "package_LPA": "4",
+    "remarks": ""
+  },
+  {
+    "sr_no": 8,
+    "company": "Evosys",
+    "offers": 0,
+    "package_LPA": "5",
+    "remarks": ""
+  },
+  {
+    "sr_no": 9,
+    "company": "E-Infochips",
+    "offers": 7,
+    "package_LPA": "2.4",
+    "remarks": ""
+  },
+  {
+    "sr_no": 10,
+    "company": "Gateway",
+    "offers": 8,
+    "package_LPA": "4.18-4.6",
+    "remarks": ""
+  },
+  {
+    "sr_no": 11,
+    "company": "Volansys",
+    "offers": 2,
+    "package_LPA": "2.8",
+    "remarks": ""
+  },
+  {
+    "sr_no": 12,
+    "company": "Arastu",
+    "offers": 0,
+    "package_LPA": "2.53-3.25",
+    "remarks": ""
+  },
+  {
+    "sr_no": 13,
+    "company": "Tatvasoft",
+    "offers": 2,
+    "package_LPA": "2.64-3.6",
+    "remarks": ""
+  },
+  {
+    "sr_no": 14,
+    "company": "Biztech",
+    "offers": 1,
+    "package_LPA": "3",
+    "remarks": ""
+  },
+  {
+    "sr_no": 15,
+    "company": "TCS (Digital)",
+    "offers": 1,
+    "package_LPA": "7",
+    "remarks": ""
+  },
+  {
+    "sr_no": 16,
+    "company": "Tatvic Analytics",
+    "offers": 0,
+    "package_LPA": "3",
+    "remarks": ""
+  },
+  {
+    "sr_no": 17,
+    "company": "Matrix",
+    "offers": 0,
+    "package_LPA": "3",
+    "remarks": ""
+  },
+  {
+    "sr_no": 18,
+    "company": "TCS (Ninja)",
+    "offers": 4,
+    "package_LPA": "3.33",
+    "remarks": ""
+  },
+  {
+    "sr_no": 19,
+    "company": "Simform",
+    "offers": 0,
+    "package_LPA": "3.6",
+    "remarks": "Off Campus"
+  },
+  {
+    "sr_no": 20,
+    "company": "Infostrech",
+    "offers": 0,
+    "package_LPA": "3.2",
+    "remarks": "Off Campus"
+  },
+  {
+    "sr_no": 21,
+    "company": "Zealous Web",
+    "offers": 1,
+    "package_LPA": "2.64",
+    "remarks": ""
+  },
+  {
+    "sr_no": 22,
+    "company": "Peaas Software",
+    "offers": 0,
+    "package_LPA": "3-4",
+    "remarks": "Off Campus"
+  },
+  {
+    "sr_no": 23,
+    "company": "Alterego",
+    "offers": 1,
+    "package_LPA": "3",
+    "remarks": ""
+  },
+  {
+    "sr_no": 24,
+    "company": "Promact",
+    "offers": 1,
+    "package_LPA": "3.19-3.69",
+    "remarks": ""
+  },
+  {
+    "sr_no": 25,
+    "company": "Cloud 24*7",
+    "offers": 0,
+    "package_LPA": "3-6",
+    "remarks": ""
+  },
+  {
+    "sr_no": 26,
+    "company": "Kody Technologies",
+    "offers": 0,
+    "package_LPA": "3",
+    "remarks": ""
+  },
+  {
+    "sr_no": 27,
+    "company": "Rapidops",
+    "offers": 1,
+    "package_LPA": "3.6",
+    "remarks": ""
+  },
+  {
+    "sr_no": 28,
+    "company": "Thomson Reuters",
+    "offers": 1,
+    "package_LPA": "3.6",
+    "remarks": ""
+  },
+  {
+    "sr_no": 29,
+    "company": "Magneto IT",
+    "offers": 0,
+    "package_LPA": "2.6",
+    "remarks": ""
+  },
+  {
+    "sr_no": 30,
+    "company": "MBAF",
+    "offers": 0,
+    "package_LPA": "3-6",
+    "remarks": ""
+  },
+  {
+    "sr_no": 31,
+    "company": "BYJUS",
+    "offers": 0,
+    "package_LPA": "10",
+    "remarks": ""
+  },
+  {
+    "sr_no": 32,
+    "company": "Jaro Education",
+    "offers": 0,
+    "package_LPA": "12",
+    "remarks": ""
+  },
+  {
+    "sr_no": 33,
+    "company": "Radix Web",
+    "offers": 1,
+    "package_LPA": "2.4",
+    "remarks": ""
+  },
+  {
+    "sr_no": 34,
+    "company": "Capgemini",
+    "offers": 3,
+    "package_LPA": "3.8",
+    "remarks": "Off Campus"
+  },
+  {
+    "sr_no": 35,
+    "company": "Innoventix Solutions",
+    "offers": 1,
+    "package_LPA": "2.4",
+    "remarks": "Off Campus"
+  },
+  {
+    "sr_no": 36,
+    "company": "TCS (Offcampus)",
+    "offers": 1,
+    "package_LPA": "3.36",
+    "remarks": "Off Campus"
+  }
+]
+
+}
