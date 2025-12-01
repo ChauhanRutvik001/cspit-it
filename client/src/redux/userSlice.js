@@ -38,10 +38,15 @@ const userSlice = createSlice({
   reducers: {
     // When setting the user, clear any stored avatar URL
     setUser: (state, action) => {
-      state.authStatus = true;
-      state.user = { ...action.payload };
-      if (state.user && state.user.profile) {
-        state.user.profile.avatarUrl = null;
+      if (action.payload) {
+        state.authStatus = true;
+        state.user = { ...action.payload };
+        if (state.user && state.user.profile) {
+          state.user.profile.avatarUrl = null;
+        }
+      } else {
+        state.authStatus = false;
+        state.user = null;
       }
     },
     setLoading: (state, action) => {

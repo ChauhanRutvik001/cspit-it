@@ -42,6 +42,7 @@ import CharusatRankPredictor from "./CharusatRankPredictor";
 import PlacementDashboard from "./PlacementDashboard";
 import ShowcasePage from "../pages/ShowcasePage";
 import PlacementJourneyPage from "../pages/PlacementJourneyPage";
+import Alumni2022 from "./Alumni2022";
 
 const Body = () => {
   const appRouter = createBrowserRouter([
@@ -52,14 +53,17 @@ const Body = () => {
     { path: "/showcase", element: <ShowcasePage /> },
     { path: "/placement-journey", element: <PlacementJourneyPage onComplete={() => window.location.href = '/'} /> },
     { path: "/rank-predictor", element: <PublicLayout><CharusatRankPredictor /></PublicLayout> },
-    { path: "/placement-dashboard", element: <PublicLayout><PlacementDashboard /></PublicLayout> },
+    { path: "/placement-dashboard-public", element: <PublicLayout><PlacementDashboard /></PublicLayout> },
     { path: "/developers", element: <PublicLayout><Developers /></PublicLayout> },
     { path: "/public-contact", element: <PublicLayout><Contact /></PublicLayout> },
     { path: "/login", element: <Login /> },
+    { path: "/alumni-2022-public", element: <PublicLayout><Alumni2022 /></PublicLayout> },
     
     // Protected routes (authentication required)
     { path: "/browse", element: <ProtectedRoute><Layout><Browse /></Layout></ProtectedRoute> },
-    { path: "/dashboard", element: <ProtectedRoute><Layout><PlacementDashboard /></Layout></ProtectedRoute> },
+    // { path: "/dashboard", element: <ProtectedRoute><Layout><PlacementDashboard /></Layout></ProtectedRoute> },
+    { path: "/placement-dashboard", element: <ProtectedRoute><Layout><PlacementDashboard /></Layout></ProtectedRoute> },
+    { path: "/alumni-2022", element: <ProtectedRoute><Layout><Alumni2022 /></Layout></ProtectedRoute> },
     { path: "/predictor", element: <ProtectedRoute><Layout><CharusatRankPredictor /></Layout></ProtectedRoute> },
     { path: "/developer", element: <ProtectedRoute><Layout><Developers /></Layout></ProtectedRoute> },
     { path: "/contact", element: <ProtectedRoute><Layout><Contact /></Layout></ProtectedRoute> },

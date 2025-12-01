@@ -12,7 +12,8 @@ import {
   GraduationCap, 
   Layers,
   Medal,
-  Target
+  Target,
+  MessageSquare
 } from "lucide-react";
 
 // Skeleton loader for table rows with YouTube-style shimmer effect
@@ -242,6 +243,13 @@ const AdminPage = () => {
               >
                 <Target className="h-5 w-5" />
                 <span>Placement Drives</span>
+              </button>
+              <button
+                onClick={() => navigate("/admin/complaints")}
+                className="flex items-center justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-4 py-3 rounded-lg shadow-sm transition duration-150 ease-in-out"
+              >
+                <MessageSquare className="h-5 w-5" />
+                <span>Complaints</span>
               </button>
             </div>
           </div>

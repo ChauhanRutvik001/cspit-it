@@ -1,4 +1,6 @@
 import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { 
   BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, 
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
@@ -57,7 +59,7 @@ const COLORS = [
 ];
 
 // Enhanced Summary Card Component
-const SummaryCard = ({ title, value, subtitle, icon, color, trend }) => (
+const SummaryCard = ({ title, value, subtitle, icon, color, trend, action }) => (
   <div className={`relative overflow-hidden bg-gradient-to-br ${color} rounded-3xl p-6 shadow-2xl hover:scale-105 transform transition-all duration-300 border border-white/10`}>
     <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
     <div className="relative z-10">
@@ -74,7 +76,15 @@ const SummaryCard = ({ title, value, subtitle, icon, color, trend }) => (
       </div>
       <h3 className="text-lg font-medium text-white/90 mb-1">{title}</h3>
       <p className="text-3xl font-bold text-white mb-1">{value}</p>
-      {subtitle && <p className="text-sm text-white/70">{subtitle}</p>}
+      {subtitle && <p className="text-sm text-white/70 mb-3">{subtitle}</p>}
+      {action && (
+        <button
+          onClick={action.onClick}
+          className="mt-2 px-4 py-2 bg-white/20 hover:bg-white/30 text-white text-sm font-medium rounded-xl border border-white/20 hover:border-white/40 transition-all duration-200 backdrop-blur-sm"
+        >
+          {action.label}
+        </button>
+      )}
     </div>
   </div>
 );
@@ -133,6 +143,8 @@ const StatCard = ({ label, value, unit = '', icon, color = 'from-blue-500 to-pur
 );
 
 const PlacementDashboard = () => {
+  const navigate = useNavigate();
+  const authStatus = useSelector((store) => store.app.authStatus);
   const [selectedYear, setSelectedYear] = useState('2024-2025');
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -336,6 +348,10 @@ const PlacementDashboard = () => {
             trend={parseFloat(summaryStats.growthTrend)}
             icon={<Users size={24} className="text-white"/>} 
             color="from-blue-600 to-indigo-700" 
+            action={authStatus ? {
+              label: "View Alumni",
+              onClick: () => navigate('/alumni-2022')
+            } : undefined}
           />
           <SummaryCard 
             title="Partner Companies" 

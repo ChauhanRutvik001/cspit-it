@@ -11,9 +11,10 @@ import { useSocket } from "../utils/SocketProvider";
 
 // Navigation items
 const navigation = [
-  { name: "Company", to: "/company" },
-  { name: "Tests", to: "/tests" },
+  { name: "Home", to: "/browse" },
   { name: "Schedule", to: "/schedule" },
+  { name: "Company", to: "/company" },
+  { name: "Placement Dashboard", to: "/placement-dashboard" },
   { name: "Developer", to: "/developer" },
   { name: "Contact Us", to: "/contact" },
 ];
@@ -210,7 +211,6 @@ const Header = () => {
       
       // Clear local state first to immediately update UI
       dispatch(logout());
-      dispatch(setUser(null));
       
       console.log('Redux state cleared');
       
@@ -291,7 +291,15 @@ const Header = () => {
                   </div>
                   <div className="hidden sm:ml-6 md:block">
                     <div className="flex space-x-4">
-                      {navigation.map((item) => (
+                      {navigation
+                        .filter((item) => {
+                          // Hide Contact Us and Developer for admin users
+                          if (user?.role === "admin" && (item.name === "Contact Us" || item.name === "Developer")) {
+                            return false;
+                          }
+                          return true;
+                        })
+                        .map((item) => (
                         <Link
                           key={item.name}
                           to={item.to}
@@ -318,34 +326,6 @@ const Header = () => {
                           aria-current={isActive("/admin") ? "page" : undefined}
                         >
                           Registration
-                        </Link>
-                      )}
-                      {user?.role === "admin"  && (
-                        <Link
-                          to="/admin/complaints"
-                          className={classNames(
-                            isActive("/admin/complaints")
-                              ? "bg-blue-200 text-blue-700"
-                              : "text-gray-600 hover:bg-blue-100 hover:text-blue-600",
-                            "rounded-md px-3 py-2 text-sm font-medium"
-                          )}
-                          aria-current={isActive("/admin/complaints") ? "page" : undefined}
-                        >
-                          Complaints
-                        </Link>
-                      )}
-                      {user?.role === "student"  && (
-                        <Link
-                          to="/complaints"
-                          className={classNames(
-                            isActive("/complaints")
-                              ? "bg-blue-200 text-blue-700"
-                              : "text-gray-600 hover:bg-blue-100 hover:text-blue-600",
-                            "rounded-md px-3 py-2 text-sm font-medium"
-                          )}
-                          aria-current={isActive("/complaints") ? "page" : undefined}
-                        >
-                          Complaints
                         </Link>
                       )}
                       {user?.role === "counsellor"  && (
@@ -541,7 +521,15 @@ const Header = () => {
             </div>
             <Disclosure.Panel className="md:hidden">
               <div className="space-y-1 px-2 pb-3 pt-2">
-                {navigation.map((item) => (
+                {navigation
+                  .filter((item) => {
+                    // Hide Contact Us and Developer for admin users in mobile menu
+                    if (user?.role === "admin" && (item.name === "Contact Us" || item.name === "Developer")) {
+                      return false;
+                    }
+                    return true;
+                  })
+                  .map((item) => (
                   <Disclosure.Button
                     key={item.name}
                     as={Link}
@@ -569,34 +557,6 @@ const Header = () => {
                     aria-current={isActive("/admin") ? "page" : undefined}
                   >
                     Registration
-                  </Link>
-                )}
-                {user?.role === "admin" && (
-                  <Link
-                    to="/admin/complaints"
-                    className={classNames(
-                      isActive("/admin/complaints")
-                        ? "bg-blue-200 text-blue-700"
-                        : "text-gray-600 hover:bg-blue-100 hover:text-blue-600",
-                      "block rounded-md px-3 py-2 text-base font-medium"
-                    )}
-                    aria-current={isActive("/admin/complaints") ? "page" : undefined}
-                  >
-                    Complaints
-                  </Link>
-                )}
-                {user?.role === "student" && (
-                  <Link
-                    to="/complaints"
-                    className={classNames(
-                      isActive("/complaints")
-                        ? "bg-blue-200 text-blue-700"
-                        : "text-gray-600 hover:bg-blue-100 hover:text-blue-600",
-                      "block rounded-md px-3 py-2 text-base font-medium"
-                    )}
-                    aria-current={isActive("/complaints") ? "page" : undefined}
-                  >
-                    Complaints
                   </Link>
                 )}
                 {user?.role === "counsellor" && (

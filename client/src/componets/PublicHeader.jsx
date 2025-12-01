@@ -8,6 +8,8 @@ const publicNavigation = [
   { name: "Home", to: "/" },
   { name: "Developer", to: "/developers" },
   { name: "Contact Us", to: "/public-contact" },
+  { name: "Placement Dashboard", to: "/placement-dashboard-public" },
+  { name: "Alumni", to: "/alumni-2022-public" },
 ];
 
 function classNames(...classes) {
