@@ -43,13 +43,14 @@ import PlacementDashboard from "./PlacementDashboard";
 import ShowcasePage from "../pages/ShowcasePage";
 import PlacementJourneyPage from "../pages/PlacementJourneyPage";
 import Alumni2022 from "./Alumni2022";
+import SmartRedirect from "./SmartRedirect";  // Import the new component
 
 const Body = () => {
   const appRouter = createBrowserRouter([
     { path: "*", element: <NotFoundError /> },
     
-    // Public routes (no authentication required)
-    { path: "/", element: <PublicLayout><Browse /></PublicLayout> },
+    // Smart redirect for root route - checks authentication and redirects appropriately
+    { path: "/", element: <SmartRedirect /> },
     { path: "/showcase", element: <ShowcasePage /> },
     { path: "/placement-journey", element: <PlacementJourneyPage onComplete={() => window.location.href = '/'} /> },
     { path: "/rank-predictor", element: <PublicLayout><CharusatRankPredictor /></PublicLayout> },
