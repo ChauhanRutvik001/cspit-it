@@ -191,13 +191,13 @@ const GeneralPlacementDrivePlanner = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-2xl max-w-7xl w-full max-h-[95vh] overflow-hidden shadow-2xl flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 p-6 text-white flex items-center justify-between">
+        <div className="bg-gray-900 p-6 text-white flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold flex items-center gap-2">
               <Calendar className="w-6 h-6" />
               All Companies Placement Drive Planner
             </h2>
-            <p className="text-xs text-emerald-100 mt-2">
+            <p className="text-xs text-gray-00 mt-2">
               View all placement drives scheduled across all companies in one calendar
             </p>
           </div>
