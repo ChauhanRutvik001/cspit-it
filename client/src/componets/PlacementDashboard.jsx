@@ -339,7 +339,7 @@ const PlacementDashboard = () => {
       
       <div className="relative z-10 p-4 sm:p-6 lg:p-8">
         {/* Hero Section */}
-        <div className="relative text-center rounded-3xl p-8 md:p-12 mb-8 overflow-hidden bg-gray-950 dient-to-r from-blue-600 via-indigo-700 to-purple-700 shadow-2xl">
+        <div className="relative text-center rounded-3xl p-8 md:p-12 mb-8 overflow-hidden bg-gray-900 dient-to-r from-blue-600 via-indigo-700 to-purple-700 shadow-2xl">
           <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
           <div className="relative z-10">
             <div className="flex items-center justify-center mb-4">

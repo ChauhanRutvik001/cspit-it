@@ -909,7 +909,7 @@ const Company = () => {
         <div className="mx-auto">
           <div className="bg-white shadow-xl  rounded-2xl overflow-hidden backdrop-blur-sm backdrop-filter">
             {/* Header with Stats */}
-            <div className="bg-gradient-to-r from-indigo-600 to-blue-500 p-6 text-white">
+            <div className="bg-gradient-to-r from-gray-800 to-gray-900 p-6 text-white">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                   <h2 className="text-3xl font-bold">Companies Overview</h2>

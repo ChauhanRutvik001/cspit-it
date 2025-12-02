@@ -175,7 +175,7 @@ const AdminPage = () => {
       <div className="max-full mx-auto p-4">
         <div className="bg-white rounded-xl shadow-xl overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-8">
+          <div className="bg-gradient-to-r from-gray-800 to-gray-900 px-6 py-8">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
               <div className="flex items-center space-x-3 mb-4 md:mb-0">
                 <Users className="h-8 w-8 text-white" />

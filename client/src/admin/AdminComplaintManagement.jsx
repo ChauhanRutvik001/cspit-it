@@ -15,7 +15,9 @@ import {
   TrendingUp,
   X,
   Send,
-  Globe
+  Globe,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { FaGoogle, FaArrowLeft } from "react-icons/fa";
 
@@ -205,22 +207,37 @@ const AdminComplaintManagement = () => {
 
       <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        
         <button
-          className="relative mb-8 z-10 bg-white/90 hover:bg-white text-blue-600 px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 text-sm font-medium"
+          className="relative mb-5 z-10 bg-white/90 hover:bg-white text-blue-600 px-4 py-2 rounded-full shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2 text-sm font-medium"
           onClick={() => navigate(-1)}
         >
           <FaArrowLeft className="w-4 h-4" />
           Back to Dashboard
         </button>
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Complaint Management</h1>
-          <p className="text-gray-600">Manage and respond to student complaints</p>
+
+        <div className='bg-white rounded-xl shadow-xl overflow-hidden'>
+
+        <div className="bg-white overflow-hidden mb-4">
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
+              <div className="flex items-center space-x-3 mb-4 md:mb-0">
+                <MessageSquare className="h-8 w-8 text-white" />
+                <h1 className="text-3xl font-bold text-white font-['Poppins']">Complaint Management</h1>
+              </div>
+              <div className="flex items-center space-x-2 text-white">
+                <span className="bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm">
+                  <span className="font-medium">Total Complaints:</span>{" "}
+                  <span className="font-bold">{totalComplaints}</span>
+                </span>
+              </div>
+            </div>
+            <p className="text-indigo-100 mt-2 text-lg">Manage and respond to student complaints</p>
+          </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="border-b border-gray-200 mb-8">
+        <div className="border-b border-gray-200 mb-2">
           <nav className="-mb-px flex space-x-8">
             <button
               onClick={() => setActiveTab('all')}
@@ -250,70 +267,72 @@ const AdminComplaintManagement = () => {
         {/* All Complaints Tab */}
         {activeTab === 'all' && (
           <div>
-            {/* Filters */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">Filter Complaints</h3>
-                <button
-                  onClick={clearFilters}
-                  className="text-sm text-blue-600 hover:text-blue-800"
-                >
-                  Clear All
-                </button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                  <select
-                    value={filters.status}
-                    onChange={(e) => handleFilterChange('status', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            {/* Filter Section */}
+            <div className="bg-white overflow-hidden mb-6">
+              <div className="px-6 py-5">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900">Filter Complaints</h3>
+                  <button
+                    onClick={clearFilters}
+                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                   >
-                    <option value="">All Statuses</option>
-                    {statuses.map((status) => (
-                      <option key={status} value={status}>
-                        {status}
-                      </option>
-                    ))}
-                  </select>
+                    Clear All
+                  </button>
                 </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <select
+                      value={filters.status}
+                      onChange={(e) => handleFilterChange('status', e.target.value)}
+                      className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    >
+                      <option value="">All Statuses</option>
+                      {statuses.map((status) => (
+                        <option key={status} value={status}>
+                          {status}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                  <select
-                    value={filters.category}
-                    onChange={(e) => handleFilterChange('category', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">All Categories</option>
-                    {categories.map((category) => (
-                      <option key={category} value={category}>
-                        {category}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                    <select
+                      value={filters.category}
+                      onChange={(e) => handleFilterChange('category', e.target.value)}
+                      className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    >
+                      <option value="">All Categories</option>
+                      {categories.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-                  <select
-                    value={filters.priority}
-                    onChange={(e) => handleFilterChange('priority', e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">All Priorities</option>
-                    {priorities.map((priority) => (
-                      <option key={priority} value={priority}>
-                        {priority}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
+                    <select
+                      value={filters.priority}
+                      onChange={(e) => handleFilterChange('priority', e.target.value)}
+                      className="w-full px-3 py-2 border-2 border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                    >
+                      <option value="">All Priorities</option>
+                      {priorities.map((priority) => (
+                        <option key={priority} value={priority}>
+                          {priority}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-                <div className="flex items-end">
-                  <div className="text-sm text-gray-600">
-                    Total: {totalComplaints} complaints
+                  <div className="flex items-end">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-2 text-sm text-blue-800">
+                      <span className="font-medium">Filtered:</span> {complaints.length} complaints
+                    </div>
                   </div>
                 </div>
               </div>
@@ -323,73 +342,81 @@ const AdminComplaintManagement = () => {
             <div className="bg-white rounded-lg shadow-md">
               {loading ? (
                 <div className="p-8 text-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                  <p className="text-gray-600 mt-2">Loading complaints...</p>
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                  <p className="text-gray-600 text-lg font-medium">Loading complaints...</p>
                 </div>
               ) : complaints.length === 0 ? (
-                <div className="p-8 text-center">
-                  <MessageSquare className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">No complaints found</p>
+                <div className="p-16 text-center">
+                  <MessageSquare className="h-16 w-16 text-gray-400 mx-auto mb-6" />
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">No complaints found</h3>
+                  <p className="text-gray-600">No complaints match your current filters</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                    <thead className="bg-gray-100">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                           Complaint ID
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                           Title
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                           Category
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                           Priority
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                           Status
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                           Date
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                           Actions
                         </th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {complaints.map((complaint) => (
-                        <tr key={complaint._id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {complaint.complaintId}
+                        <tr key={complaint._id} className="hover:bg-gray-50 transition-colors duration-150">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-gray-900">
+                              {complaint.complaintId}
+                            </div>
                           </td>
-                          <td className="px-6 py-4 text-sm text-gray-900">
-                            <div className="max-w-xs truncate">{complaint.title}</div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {complaint.category}
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-gray-900 max-w-xs">
+                              <div className="font-medium truncate">{complaint.title}</div>
+                            </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getPriorityColor(complaint.priority)}`}>
+                            <div className="text-sm text-gray-900">{complaint.category}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full border ${getPriorityColor(complaint.priority)}`}>
                               {complaint.priority}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(complaint.status)}`}>
+                            <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full border ${getStatusColor(complaint.status)}`}>
                               {complaint.status}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {new Date(complaint.createdAt).toLocaleDateString()}
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm text-gray-900">
+                              {new Date(complaint.createdAt).toLocaleDateString()}
+                            </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <button
                               onClick={() => openResponseModal(complaint)}
-                              className="text-blue-600 hover:text-blue-900 mr-3"
+                              className="inline-flex items-center px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors duration-200 shadow-sm"
                             >
-                              <Eye className="w-4 h-4" />
+                              <Eye className="w-4 h-4 mr-2" />
+                              <span className="font-medium">View</span>
                             </button>
                           </td>
                         </tr>
@@ -401,49 +428,32 @@ const AdminComplaintManagement = () => {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 flex justify-between sm:hidden">
+                <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+                  <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
+                    <div className="text-sm text-gray-700">
+                      Page <span className="font-medium">{filters.page}</span> of{' '}
+                      <span className="font-medium">{totalPages}</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
                       <button
                         onClick={() => setFilters(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                         disabled={filters.page === 1}
-                        className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                        className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                       >
+                        <ChevronLeft className="h-4 w-4 mr-1" />
                         Previous
                       </button>
+                      <div className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md">
+                        Page {filters.page} of {totalPages}
+                      </div>
                       <button
                         onClick={() => setFilters(prev => ({ ...prev, page: Math.min(totalPages, prev.page + 1) }))}
                         disabled={filters.page === totalPages}
-                        className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                        className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
                       >
                         Next
+                        <ChevronRight className="h-4 w-4 ml-1" />
                       </button>
-                    </div>
-                    <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                      <div>
-                        <p className="text-sm text-gray-700">
-                          Page <span className="font-medium">{filters.page}</span> of{' '}
-                          <span className="font-medium">{totalPages}</span>
-                        </p>
-                      </div>
-                      <div>
-                        <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                          <button
-                            onClick={() => setFilters(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
-                            disabled={filters.page === 1}
-                            className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                          >
-                            Previous
-                          </button>
-                          <button
-                            onClick={() => setFilters(prev => ({ ...prev, page: Math.min(totalPages, prev.page + 1) }))}
-                            disabled={filters.page === totalPages}
-                            className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                          >
-                            Next
-                          </button>
-                        </nav>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -542,126 +552,164 @@ const AdminComplaintManagement = () => {
 
         {/* Response Modal */}
         {showResponseModal && selectedComplaint && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-            <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-medium text-gray-900">
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-xl shadow-2xl w-full max-w-6xl max-h-[95vh] overflow-hidden">
+              {/* Modal Header */}
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4 flex justify-between items-center">
+                <h3 className="text-xl font-bold text-white">
                   Complaint Details & Response
                 </h3>
                 <button
                   onClick={closeResponseModal}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-white hover:text-gray-200 p-1 rounded-full hover:bg-white/20 transition-colors"
                 >
                   <X className="h-6 w-6" />
                 </button>
               </div>
 
-              <div className="mb-6">
-                <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                  <h4 className="font-medium text-gray-900 mb-2">{selectedComplaint.title}</h4>
-                  <p className="text-sm text-gray-600 mb-2">
-                    <strong>ID:</strong> {selectedComplaint.complaintId}
-                  </p>
-                  <p className="text-sm text-gray-600 mb-2">
-                    <strong>Category:</strong> {selectedComplaint.category}
-                  </p>
-                  <p className="text-sm text-gray-600 mb-2">
-                    <strong>Priority:</strong> {selectedComplaint.priority}
-                  </p>
-                  <p className="text-sm text-gray-600 mb-3">
-                    <strong>Submitted:</strong> {new Date(selectedComplaint.createdAt).toLocaleDateString()}
-                  </p>
-                  <p className="text-gray-700">{selectedComplaint.description}</p>
+              {/* Modal Content - Two Column Layout */}
+              <div className="flex flex-col lg:flex-row h-[calc(95vh-80px)]">
+                {/* Left Column - Complaint Details */}
+                <div className="lg:w-1/2 p-6 bg-gray-50 overflow-y-auto">
+                  <div className="bg-white rounded-lg p-4 shadow-sm">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="text-lg font-semibold text-gray-900 truncate pr-4">{selectedComplaint.title}</h4>
+                      <div className="flex gap-2 flex-shrink-0">
+                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(selectedComplaint.priority)}`}>
+                          {selectedComplaint.priority}
+                        </span>
+                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(selectedComplaint.status)}`}>
+                          {selectedComplaint.status}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+                      <div>
+                        <span className="font-medium text-gray-700">ID:</span>
+                        <span className="text-gray-600 ml-1">{selectedComplaint.complaintId}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Category:</span>
+                        <span className="text-gray-600 ml-1">{selectedComplaint.category}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Submitted:</span>
+                        <span className="text-gray-600 ml-1">{new Date(selectedComplaint.createdAt).toLocaleDateString()}</span>
+                      </div>
+                      <div>
+                        <span className="font-medium text-gray-700">Student:</span>
+                        <span className="text-gray-600 ml-1">{selectedComplaint.studentId || 'Anonymous'}</span>
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <h5 className="font-medium text-gray-700 mb-2">Description:</h5>
+                      <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-700 leading-relaxed max-h-40 overflow-y-auto">
+                        {selectedComplaint.description}
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <form onSubmit={handleResponseSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Status *
-                    </label>
-                    <select
-                      value={responseForm.status}
-                      onChange={(e) => setResponseForm(prev => ({ ...prev, status: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      required
-                    >
-                      {statuses.map((status) => (
-                        <option key={status} value={status}>
-                          {status}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                {/* Right Column - Response Form */}
+                <div className="lg:w-1/2 p-6 overflow-y-auto">
+                  <form onSubmit={handleResponseSubmit} className="space-y-4 h-full flex flex-col">
+                    <div className="flex-1 space-y-4">
+                      <div className="grid grid-cols-1 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Status *
+                          </label>
+                          <select
+                            value={responseForm.status}
+                            onChange={(e) => setResponseForm(prev => ({ ...prev, status: e.target.value }))}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            required
+                          >
+                            {statuses.map((status) => (
+                              <option key={status} value={status}>
+                                {status}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Admin Response
-                    </label>
-                    <textarea
-                      value={responseForm.adminResponse}
-                      onChange={(e) => setResponseForm(prev => ({ ...prev, adminResponse: e.target.value }))}
-                      rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Provide your response to the student..."
-                      maxLength={1500}
-                    />
-                    <p className="text-xs text-gray-500 mt-1">{responseForm.adminResponse.length}/1500 characters</p>
-                  </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Admin Response
+                          </label>
+                          <textarea
+                            value={responseForm.adminResponse}
+                            onChange={(e) => setResponseForm(prev => ({ ...prev, adminResponse: e.target.value }))}
+                            rows={4}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Provide your response to the student..."
+                            maxLength={1500}
+                          />
+                          <p className="text-xs text-gray-500 mt-1">{responseForm.adminResponse.length}/1500 characters</p>
+                        </div>
 
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="isPublic"
-                      checked={responseForm.isPublic}
-                      onChange={(e) => setResponseForm(prev => ({ ...prev, isPublic: e.target.checked }))}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <label htmlFor="isPublic" className="ml-2 text-sm text-gray-700">
-                      <Globe className="w-4 h-4 inline mr-1" />
-                      Make this complaint visible on public board (only if resolved)
-                    </label>
-                  </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="isPublic"
+                            checked={responseForm.isPublic}
+                            onChange={(e) => setResponseForm(prev => ({ ...prev, isPublic: e.target.checked }))}
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="isPublic" className="ml-2 text-sm text-gray-700">
+                            <Globe className="w-4 h-4 inline mr-1" />
+                            Make visible on public board (only if resolved)
+                          </label>
+                        </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Internal Notes (Not visible to students)
-                    </label>
-                    <textarea
-                      value={responseForm.internalNotes}
-                      onChange={(e) => setResponseForm(prev => ({ ...prev, internalNotes: e.target.value }))}
-                      rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Internal notes for admin reference..."
-                    />
-                  </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                            Internal Notes (Admin Only)
+                          </label>
+                          <textarea
+                            value={responseForm.internalNotes}
+                            onChange={(e) => setResponseForm(prev => ({ ...prev, internalNotes: e.target.value }))}
+                            rows={3}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Internal notes for admin reference..."
+                          />
+                        </div>
+                      </div>
+                    </div>
 
-                  <div className="flex justify-end space-x-3 pt-4">
-                    <button
-                      type="button"
-                      onClick={closeResponseModal}
-                      className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 flex items-center"
-                    >
-                      {loading ? (
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                      ) : (
-                        <Send className="w-4 h-4 mr-2" />
-                      )}
-                      Update Complaint
-                    </button>
-                  </div>
-                </form>
+                    {/* Action Buttons - Fixed at bottom */}
+                    <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 mt-4">
+                      <button
+                        type="button"
+                        onClick={closeResponseModal}
+                        className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center font-medium transition-colors"
+                      >
+                        {loading ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                        ) : (
+                          <Send className="w-4 h-4 mr-2" />
+                        )}
+                        Update Complaint
+                      </button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
         )}
       </div>
+      </div>
+
     </div>
   );
 };
