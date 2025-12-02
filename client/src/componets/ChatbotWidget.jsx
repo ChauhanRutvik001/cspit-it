@@ -1,5 +1,5 @@
-import React, { useMemo, useState } from "react";
-import { MessageCircle, X, Send, Loader2 } from "lucide-react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
+import { MessageCircle, X, Send, Loader2, Bot, Sparkles, Zap, Users, TrendingUp, Brain } from "lucide-react";
 import GeminiCareerAdvisor from "../services/geminiAI";
 import placement_2019 from "../data/placement_2019.json";
 import placement_2020 from "../data/placement_2020.json";
@@ -96,43 +96,10 @@ If a user asks about a specific company or year, first reason using this data an
   }, []);
 };
 
-const ChatbotWidget = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const [messages, setMessages] = useState([
-    {
-      role: "bot",
-      content:
-        "Hi! I’m your CSPIT-IT Placement Assistant.\n\nYou can ask me anything about:\n• Placement statistics and company trends\n• How to prepare for placements and interviews\n• General queries about the placement process and opportunities.\n\nWhat would you like to know?",
-    },
-  ]);
-
-  const placementSummary = usePlacementSummary();
-
-  const handleSend = async () => {
-    const question = input.trim();
-    if (!question || isLoading) return;
-
-    const userMessage = {
-      role: "user",
-      content: question,
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
-    setIsLoading(true);
-
-    try {
-      const lastMessages = messages.slice(-6); // keep recent short history
-      const historyText = lastMessages
-        .map(
-          (m) =>
-            `${m.role === "user" ? "Student" : "Assistant"}: ${m.content}`
-        )
-        .join("\n");
-
-      const prompt = `
+// AI Response function
+const getAIResponse = async (userMessage, placementSummary) => {
+  try {
+    const prompt = `
 You are an AI chatbot embedded in the CSPIT-IT Placement Management System website.
 You are talking to students, alumni, counsellors, and admins of the CSPIT IT Department in India.
 
@@ -145,38 +112,115 @@ Your goals:
 Context (RAG knowledge, do NOT repeat verbatim unless needed):
 ${placementSummary}
 
-Conversation history (most recent first):
-${historyText}
-
 User question:
-${question}
+${userMessage}
 
 Now give a concise, friendly answer. Use bullet points only when needed, and keep the tone supportive and practical.
-      `.trim();
+    `.trim();
 
-      const responseText = await GeminiCareerAdvisor.generateContent(prompt);
+    const response = await GeminiCareerAdvisor.generateContent(prompt);
+    return response || "Sorry, I could not generate a response at the moment.";
+  } catch (error) {
+    console.error("Error in getAIResponse:", error);
+    throw error;
+  }
+};
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "bot",
-          content: responseText || "Sorry, I could not generate a response.",
-        },
-      ]);
+const ChatbotWidget = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
+  const [messages, setMessages] = useState([
+    {
+      role: "bot",
+      content:
+        "👋 Welcome to your AI-powered Placement Assistant!\n\n✨ I'm here to help you with:\n🏢 Placement statistics & company insights\n📈 Interview preparation strategies\n🎯 Career guidance & opportunities\n📊 Historical placement trends\n\nWhat would you like to explore today?",
+    },
+  ]);
+
+  const placementSummary = usePlacementSummary();
+
+  // Auto-scroll to bottom when new messages arrive
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  // Focus input when opening
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      setTimeout(() => inputRef.current?.focus(), 100);
+    }
+  }, [isOpen]);
+
+  // Typing indicator simulation
+  const simulateTyping = async (text) => {
+    setIsTyping(true);
+    await new Promise(resolve => setTimeout(resolve, Math.min(text.length * 20, 2000)));
+    setIsTyping(false);
+  };
+
+  const handleSend = async () => {
+    if (!input.trim() || isLoading) return;
+
+    const userMessage = input.trim();
+    setInput("");
+    
+    // Add user message with enhanced styling
+    const newUserMessage = {
+      role: "user",
+      content: userMessage,
+      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    };
+    
+    setMessages((prev) => [...prev, newUserMessage]);
+    setIsLoading(true);
+
+    try {
+      // Get AI response
+      const response = await getAIResponse(userMessage, placementSummary);
+      
+      // Simulate typing before showing response
+      await simulateTyping(response);
+      
+      const botMessage = {
+        role: "bot",
+        content: response,
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      
+      setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
-      console.error("Chatbot error:", error);
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "bot",
-          content:
-            "Sorry, I’m having trouble answering right now. Please try again in a moment.",
-        },
-      ]);
+      console.error("Error getting AI response:", error);
+      const errorMessage = {
+        role: "bot",
+        content: "⚠️ I apologize, but I'm experiencing some technical difficulties right now. Please try again in a moment, or contact your placement cell for immediate assistance.",
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      };
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
   };
+
+
+
+
+
+
+  // Quick action buttons for common queries
+  const quickActions = [
+    { icon: Users, text: "Top Companies", query: "What are the top recruiting companies at CSPIT-IT?" },
+    { icon: TrendingUp, text: "Placement Stats", query: "Show me the latest placement statistics and trends." },
+    { icon: Brain, text: "Interview Tips", query: "Give me some interview preparation tips and strategies." },
+    { icon: Zap, text: "Career Guide", query: "Help me with career guidance and opportunities in tech." }
+  ];
 
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -185,114 +229,260 @@ Now give a concise, friendly answer. Use bullet points only when needed, and kee
     }
   };
 
-   return (
-     <>
-       {/* Floating button bottom-right */}
-       <div className="fixed bottom-6 right-6 z-40">
-         {!isOpen && (
-           <button
-             onClick={() => setIsOpen(true)}
-             className="flex items-center gap-2 px-4 py-3 rounded-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-[0_12px_30px_rgba(15,23,42,0.45)] hover:scale-105 hover:shadow-[0_18px_45px_rgba(15,23,42,0.55)] transition-all duration-150"
-           >
-             <div className="relative flex items-center justify-center w-9 h-9 rounded-full bg-white/10">
-               <MessageCircle className="w-5 h-5" />
-               <span className="absolute -top-1 -right-1 inline-flex h-3 w-3 rounded-full bg-emerald-400 border border-slate-900"></span>
-             </div>
-             <span className="hidden sm:inline text-sm font-semibold">
-               AI Assistant
-             </span>
-           </button>
-         )}
-       </div>
- 
-       {/* Chat window bottom-right */}
-       {isOpen && (
-         <div className="fixed bottom-6 right-6 z-40 w-[320px] sm:w-[380px] max-h-[72vh] flex flex-col rounded-2xl bg-white/90 backdrop-blur-xl shadow-[0_18px_60px_rgba(15,23,42,0.55)] border border-slate-200/70 overflow-hidden">
-           {/* Header */}
-           <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white">
-             <div className="flex items-center gap-2">
-               <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white/15 border border-white/20">
-                 <MessageCircle className="w-4 h-4" />
-               </div>
-               <div className="flex flex-col">
-                 <span className="font-semibold text-sm">
-                   CSPIT-IT Placement Assistant
-                 </span>
-                 <span className="text-[11px] text-blue-100">
-                   Ask anything about placements & companies
-                 </span>
-               </div>
-             </div>
-             <button
-               onClick={() => setIsOpen(false)}
-               className="p-1 rounded-full hover:bg-white/10 transition-colors"
-             >
-               <X className="w-4 h-4" />
-             </button>
-           </div>
- 
-           {/* Messages */}
-           <div className="flex-1 px-3 py-2 space-y-2 overflow-y-auto bg-gradient-to-br from-slate-50 via-slate-50 to-blue-50">
-             {messages.map((m, idx) => (
-               <div
-                 key={idx}
-                 className={`flex ${
-                   m.role === "user" ? "justify-end" : "justify-start"
-                 }`}
-               >
-                 <div
-                   className={`max-w-[80%] rounded-2xl px-3 py-2 text-xs whitespace-pre-wrap leading-relaxed ${
-                     m.role === "user"
-                       ? "bg-blue-600 text-white rounded-br-sm shadow-md"
-                       : "bg-white/90 text-slate-900 border border-slate-200 rounded-bl-sm shadow-sm"
-                   }`}
-                 >
-                   {m.content}
-                 </div>
-               </div>
-             ))}
-             {isLoading && (
-               <div className="flex justify-start">
-                 <div className="flex items-center gap-2 bg-white/90 border border-slate-200 rounded-2xl px-3 py-2 text-xs text-slate-500 shadow-sm">
-                   <Loader2 className="w-3 h-3 animate-spin" />
-                   Thinking...
-                 </div>
-               </div>
-             )}
-           </div>
- 
-           {/* Input */}
-           <div className="border-t border-slate-200 bg-white/95 px-3 py-2">
-             <div className="flex items-end gap-2">
-               <textarea
-                 rows={1}
-                 value={input}
-                 onChange={(e) => setInput(e.target.value)}
-                 onKeyDown={handleKeyDown}
-                 placeholder="Ask about placements, companies, or preparation..."
-                 className="flex-1 resize-none text-xs border border-slate-300 rounded-xl px-2 py-2 bg-slate-50 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-               />
-               <button
-                 onClick={handleSend}
-                 disabled={isLoading || !input.trim()}
-                 className="p-2 rounded-full bg-blue-600 text-white disabled:bg-slate-300 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors shadow-sm"
-               >
-                 {isLoading ? (
-                   <Loader2 className="w-4 h-4 animate-spin" />
-                 ) : (
-                   <Send className="w-4 h-4" />
-                 )}
-               </button>
-             </div>
-             <p className="mt-1 text-[10px] text-slate-400">
-               AI-generated answers using CSPIT-IT placement data; verify for
-               official use.
-             </p>
-           </div>
-         </div>
-       )}
-     </>
-   );
+  const handleQuickAction = (query) => {
+    setInput(query);
+  };
+
+  return (
+    <>
+      {/* Next-level Floating Button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        {!isOpen && (
+          <div className="relative group">
+            {/* Floating rings animation */}
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-75 animate-pulse"></div>
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-ping opacity-30"></div>
+            
+            <button
+              onClick={() => setIsOpen(true)}
+              className="relative flex items-center gap-3 px-6 py-4 rounded-full bg-gradient-to-br from-gray-900 via-gray-900 to-purple-900 text-white shadow-[0_20px_50px_rgba(0,0,0,0.4)] hover:shadow-[0_25px_60px_rgba(0,0,0,0.5)] hover:scale-105 transition-all duration-300 border border-white/10 backdrop-blur-xl group-hover:border-white/20"
+            >
+              <div className="relative">
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 shadow-inner">
+                  <Bot className="w-5 h-5 text-white" />
+                  <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-yellow-300 animate-bounce" />
+                </div>
+                {/* Pulsing dot */}
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full animate-pulse border-2 border-slate-900"></div>
+              </div>
+              <div className="hidden sm:block">
+                <div className="text-sm font-bold bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-transparent">
+                  AI Assistant
+                </div>
+                <div className="text-xs text-slate-300">
+                  Powered by AI ✨
+                </div>
+              </div>
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* Next-level Chat Interface */}
+      {isOpen && (
+        <div className="fixed bottom-6 right-6 z-50 w-[350px] sm:w-[420px] max-h-[85vh] flex flex-col rounded-3xl overflow-hidden shadow-[0_25px_80px_rgba(0,0,0,0.4)] border border-white/20 backdrop-blur-2xl">
+          
+          {/* Premium Header */}
+          <div className="relative bg-gray-900 text-white p-5">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/20 via-purple-600/20 to-pink-600/20"></div>
+            <div className="absolute inset-0 opacity-50" style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+            }}></div>
+            
+            <div className="relative flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400 via-purple-500 to-pink-500 shadow-xl border border-white/20">
+                    <Bot className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="absolute -top-1 -right-1 flex items-center justify-center w-5 h-5 rounded-full bg-emerald-400 border-2 border-slate-900">
+                    <Sparkles className="w-2.5 h-2.5 text-slate-900" />
+                  </div>
+                </div>
+                <div>
+                  <div className="text-base font-bold bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-transparent">
+                    CSPIT-IT AI Assistant
+                  </div>
+                  <div className="text-sm text-slate-300 flex items-center gap-2">
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                    Online & Ready
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="p-2 rounded-full hover:bg-white/10 transition-all duration-200 group border border-white/10 hover:border-white/20"
+              >
+                <X className="w-5 h-5 group-hover:rotate-90 transition-transform duration-200" />
+              </button>
+            </div>
+          </div>
+
+          {/* Quick Actions Bar */}
+          <div className="bg-gradient-to-r from-slate-50 via-blue-50 to-purple-50 p-3 border-b border-white/20">
+            <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+              {quickActions.map((action, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => handleQuickAction(action.query)}
+                  className="flex items-center gap-2 px-3 py-2 rounded-full bg-white/80 hover:bg-white border border-slate-200 hover:border-blue-300 transition-all duration-200 whitespace-nowrap text-xs font-medium text-slate-700 hover:text-blue-700 shadow-sm hover:shadow-md group"
+                >
+                  <action.icon className="w-3.5 h-3.5 group-hover:scale-110 transition-transform duration-200" />
+                  {action.text}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Premium Messages Area */}
+          <div className="flex-1 p-4 space-y-4 overflow-y-auto bg-gradient-to-br from-white via-slate-50 to-blue-50/50 max-h-96">
+            {messages.map((m, idx) => (
+              <div
+                key={idx}
+                className={`flex ${m.role === "user" ? "justify-end" : "justify-start"} animate-in slide-in-from-bottom-2 duration-300`}
+                style={{ animationDelay: `${idx * 50}ms` }}
+              >
+                {m.role === "bot" && (
+                  <div className="flex items-end gap-2 max-w-[85%]">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-md">
+                      <Bot className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="bg-white/90 backdrop-blur-sm border border-slate-200/80 rounded-2xl rounded-bl-md px-4 py-3 shadow-lg hover:shadow-xl transition-shadow duration-200">
+                      <div className="text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">
+                        {m.content}
+                      </div>
+                      {m.timestamp && (
+                        <div className="text-xs text-slate-400 mt-2">
+                          {m.timestamp}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                {m.role === "user" && (
+                  <div className="flex items-end gap-2 max-w-[85%]">
+                    <div className="bg-gradient-to-br from-blue-600 via-purple-600 to-blue-700 text-white rounded-2xl rounded-br-md px-4 py-3 shadow-lg">
+                      <div className="text-sm leading-relaxed">
+                        {m.content}
+                      </div>
+                      {m.timestamp && (
+                        <div className="text-xs text-blue-100 mt-2 opacity-75">
+                          {m.timestamp}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+            
+            {/* Typing Indicator */}
+            {isTyping && (
+              <div className="flex justify-start animate-in slide-in-from-bottom-2">
+                <div className="flex items-center gap-2">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-md">
+                    <Bot className="w-4 h-4 text-white" />
+                  </div>
+                  <div className="bg-white/90 backdrop-blur-sm border border-slate-200/80 rounded-2xl rounded-bl-md px-4 py-3 shadow-lg">
+                    <div className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-pink-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      <span className="ml-2 text-xs text-slate-500">AI is thinking...</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {isLoading && !isTyping && (
+              <div className="flex justify-start animate-in slide-in-from-bottom-2">
+                <div className="flex items-center gap-2">
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-md">
+                    <Loader2 className="w-4 h-4 text-white animate-spin" />
+                  </div>
+                  <div className="bg-white/90 backdrop-blur-sm border border-slate-200/80 rounded-2xl rounded-bl-md px-4 py-3 shadow-lg">
+                    <div className="text-sm text-slate-600">Processing your request...</div>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Premium Input Area */}
+          <div className="bg-gradient-to-r from-white via-slate-50 to-blue-50 border-t border-slate-200/50 p-4">
+            <div className="flex items-end gap-3">
+              <div className="flex-1 relative">
+                <div className="relative rounded-2xl bg-white/90 border border-slate-300 shadow-sm hover:shadow-lg transition-all duration-200 focus-within:ring-2 focus-within:ring-blue-500/30 focus-within:border-blue-400 overflow-hidden">
+                  <textarea
+                    ref={inputRef}
+                    rows={1}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Ask me anything about placements, companies, or career guidance..."
+                    className="w-full resize-none text-sm px-4 py-3.5 bg-transparent border-none focus:outline-none placeholder:text-slate-400 min-h-[52px] max-h-32"
+                    style={{ 
+                      minHeight: '52px',
+                      lineHeight: '1.5',
+                      scrollbarWidth: 'thin'
+                    }}
+                  />
+                  {/* Input decorations */}
+                  <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-blue-200 to-transparent opacity-50"></div>
+                  
+                  {/* Character count and clear button */}
+                  <div className="absolute bottom-2 right-2 flex items-center gap-2">
+                    {input && (
+                      <>
+                        <span className="text-xs text-slate-400 bg-slate-100 px-2 py-1 rounded-full">
+                          {input.length}
+                        </span>
+                        <button
+                          onClick={() => setInput("")}
+                          className="p-1 hover:bg-slate-200 rounded-full transition-all duration-200 group"
+                          title="Clear message"
+                        >
+                          <X className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  
+                  {/* Microphone button (visual only) */}
+                  {!input && (
+                    <div className="absolute bottom-3 right-3 p-1.5 rounded-full bg-slate-100 opacity-50">
+                      <div className="w-3 h-3 rounded-full bg-slate-400"></div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <button
+                onClick={handleSend}
+                disabled={isLoading || !input.trim()}
+                className="relative p-3.5 rounded-2xl bg-gradient-to-br from-blue-600 via-purple-600 to-blue-700 text-white disabled:from-slate-300 disabled:to-slate-400 disabled:cursor-not-allowed hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl disabled:hover:scale-100 group min-h-[52px] flex items-center justify-center"
+              >
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-400 to-purple-500 opacity-0 group-hover:opacity-20 transition-opacity duration-200"></div>
+                <div className="absolute inset-0 rounded-2xl bg-white/10 opacity-0 group-active:opacity-30 transition-opacity duration-100"></div>
+                {isLoading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <Send className="w-5 h-5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-200" />
+                )}
+              </button>
+            </div>
+            
+            {/* Enhanced footer */}
+            <div className="mt-4 flex items-center justify-between">
+              <div className="text-xs text-slate-400 flex items-center gap-2">
+                <Sparkles className="w-3 h-3 text-yellow-500" />
+                <span>AI-powered by Gemini</span>
+              </div>
+              <div className="text-xs text-slate-400 flex items-center gap-1">
+                <span>Press</span>
+                <kbd className="px-1.5 py-0.5 bg-slate-200 text-slate-600 rounded text-xs font-mono">Enter</kbd>
+                <span>to send</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
 };
 
 export default ChatbotWidget;
