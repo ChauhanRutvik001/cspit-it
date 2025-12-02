@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { motion, useInView } from 'framer-motion';
 import { 
   BarChart, Bar, LineChart, Line, AreaChart, Area, PieChart, Pie, Cell, 
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, 
@@ -299,6 +300,29 @@ const PlacementDashboard = () => {
     return null;
   };
 
+  // Custom Animated Bar Component
+  const AnimatedBar = ({ fill, payload, x, y, width, height }) => {
+    // Ensure we use Recharts-calculated geometry, with a tiny min height for visibility
+    const dataIndex = processedData.yearWiseData.findIndex(d => d.year === payload?.year);
+    const safeIndex = dataIndex >= 0 ? dataIndex : 0;
+    const h = Math.max(0, height || 0);
+    const finalHeight = h > 0 ? Math.max(2, h) : 0;
+    const finalY = h > 0 ? (y - (finalHeight - h)) : y;
+
+    return (
+      <motion.rect
+        x={x}
+        y={finalY}
+        width={width}
+        height={finalHeight}
+        fill={fill}
+        initial={{ height: 0, y: finalY + finalHeight }}
+        animate={{ height: finalHeight, y: finalY }}
+        transition={{ duration: 0.8, delay: safeIndex * 0.35, ease: "easeOut" }}
+      />
+    );
+  };
+
   // --- Company Search Analytics for 2025 ---
   const companySearchSummary = useMemo(() => {
     if (!searchTerm) return null;
@@ -563,9 +587,21 @@ const PlacementDashboard = () => {
         )}
 
         {/* Enhanced Charts Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 60 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8"
+        >
           {/* Growth Trend Chart */}
-          <div className="lg:col-span-2 bg-white border border-gray-300 rounded-3xl p-6 shadow-xl">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="lg:col-span-2 bg-white border border-gray-300 rounded-3xl p-6 shadow-xl"
+          >
             <h3 className="text-2xl font-bold mb-6 flex items-center text-gray-900">
               <TrendingUp className="w-6 h-6 mr-3" />
               Comprehensive Placement Analytics
@@ -591,7 +627,12 @@ const PlacementDashboard = () => {
                   height={80}
                 />
                 <YAxis yAxisId="left" tick={{ fill: '#475569', fontSize: 12 }} />
-                <YAxis yAxisId="right" orientation="right" tick={{ fill: '#475569', fontSize: 12 }} />
+                <YAxis 
+                  yAxisId="right" 
+                  orientation="right" 
+                  tick={{ fill: '#475569', fontSize: 12 }} 
+                  domain={[0, (dataMax) => dataMax + 5]} 
+                />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
                 
@@ -605,6 +646,9 @@ const PlacementDashboard = () => {
                   fillOpacity={1} 
                   fill="url(#gradientStudents)" 
                   name="Students Placed"
+                  isAnimationActive={true}
+                  animationDuration={12000}
+                  animationBegin={0}
                 />
                 
                 {/* Companies Visited - Secondary metric */}
@@ -614,7 +658,10 @@ const PlacementDashboard = () => {
                   fill="url(#gradientCompanies)" 
                   name="Companies Visited" 
                   radius={[8, 8, 0, 0]}
-                  opacity={0.8}
+                  opacity={0.85}
+                  isAnimationActive={true}
+                  animationDuration={10000}
+                  animationBegin={0}
                 />
                 
                 {/* Growth Line */}
@@ -627,12 +674,21 @@ const PlacementDashboard = () => {
                   name="Growth %" 
                   dot={{ fill: '#059669', r: 8, strokeWidth: 3, stroke: '#ffffff' }}
                   strokeDasharray="5 5"
+                  isAnimationActive={true}
+                  animationDuration={10000}
+                  animationBegin={0}
                 />
               </ComposedChart>
             </ResponsiveContainer>
             
             {/* Chart Legend with metrics */}
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 2.1 }}
+              className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4"
+            >
               <div className="flex items-center justify-center bg-blue-50 rounded-xl p-3">
                 <div className="w-4 h-4 bg-gradient-to-b from-blue-600 to-blue-200 rounded mr-3"></div>
                 <span className="text-sm font-semibold text-blue-800">
@@ -651,11 +707,17 @@ const PlacementDashboard = () => {
                   Avg Growth: {(processedData.yearWiseData.reduce((sum, year) => sum + year.growth, 0) / processedData.yearWiseData.length).toFixed(1)}%
                 </span>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Company Performance Radar */}
-          <div className="bg-white border border-gray-300 rounded-3xl p-6 shadow-xl">
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="bg-white border border-gray-300 rounded-3xl p-6 shadow-xl"
+          >
             <h3 className="text-xl font-bold mb-4 flex items-center text-gray-900">
               <Target className="w-5 h-5 mr-2" />
               Top Companies Performance
@@ -685,10 +747,16 @@ const PlacementDashboard = () => {
                 <Legend />
               </RadarChart>
             </ResponsiveContainer>
-          </div>
+          </motion.div>
 
           {/* Placement Rate Distribution */}
-          <div className="bg-white border border-gray-300 rounded-3xl p-6 shadow-xl">
+          <motion.div 
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            className="bg-white border border-gray-300 rounded-3xl p-6 shadow-xl"
+          >
             <h3 className="text-xl font-bold mb-4 flex items-center text-gray-900">
               <Award className="w-5 h-5 mr-2" />
               Placement Rate Trends
@@ -715,8 +783,8 @@ const PlacementDashboard = () => {
                 />
               </AreaChart>
             </ResponsiveContainer>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* --- Search Result Summary UI (below chart, improved UI) --- */}
         
