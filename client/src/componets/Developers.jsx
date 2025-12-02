@@ -53,14 +53,14 @@ const Developers = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       {/* Hero Section */}
-      <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 overflow-hidden">
+      <div className="relative bg-gray-900 overflow-hidden">
         <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="absolute inset-0">
           <div className="absolute top-0 left-0 w-96 h-96 bg-white opacity-10 rounded-full -translate-x-48 -translate-y-48 animate-pulse"></div>
           <div className="absolute bottom-0 right-0 w-96 h-96 bg-white opacity-10 rounded-full translate-x-48 translate-y-48 animate-pulse delay-1000"></div>
         </div>
         
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <div className="animate-fade-in-up">
             <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight">
               Meet Our <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">Dream Team</span>
@@ -337,7 +337,7 @@ const Developers = () => {
       </div>
 
       {/* Footer Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+      <div className="bg-gray-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <div className="mb-8">
             <img

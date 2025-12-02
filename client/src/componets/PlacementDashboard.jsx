@@ -339,7 +339,7 @@ const PlacementDashboard = () => {
       
       <div className="relative z-10 p-4 sm:p-6 lg:p-8">
         {/* Hero Section */}
-        <div className="relative text-center rounded-3xl p-8 md:p-12 mb-8 overflow-hidden bg-gradient-to-r from-blue-600 via-indigo-700 to-purple-700 shadow-2xl">
+        <div className="relative text-center rounded-3xl p-8 md:p-12 mb-8 overflow-hidden bg-gray-950 dient-to-r from-blue-600 via-indigo-700 to-purple-700 shadow-2xl">
           <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
           <div className="relative z-10">
             <div className="flex items-center justify-center mb-4">
@@ -420,13 +420,13 @@ const PlacementDashboard = () => {
                   label="Total Offers"
                   value={selectedYearData.companies.reduce((sum, company) => sum + company.offers, 0)}
                   icon={<Briefcase className="w-5 h-5 text-white" />}
-                  color="from-blue-500 to-cyan-500"
+                  color="from-gray-900 to-gray-700"
                 />
                 <StatCard
                   label="Companies"
                   value={selectedYearData.companies.length}
                   icon={<Building2 className="w-5 h-5 text-white" />}
-                  color="from-purple-500 to-pink-500"
+                  color="from-gray-700 to-gray-900"
                 />
               </div>
             )}
@@ -719,101 +719,7 @@ const PlacementDashboard = () => {
         </div>
 
         {/* --- Search Result Summary UI (below chart, improved UI) --- */}
-        {searchTerm && (
-          <div className="bg-gradient-to-br from-blue-50 via-white to-green-50 border border-blue-200 rounded-3xl p-8 shadow-2xl mb-10 animate-fade-in">
-            <div className="flex flex-col gap-6">
-              <div className="flex items-center gap-3 mb-2">
-                <Award className="w-8 h-8 text-blue-600 drop-shadow" />
-                <span className="font-extrabold text-2xl text-blue-900 tracking-tight">
-                  Search Results for <span className="bg-blue-100 px-3 py-1 rounded-lg shadow text-blue-700">{searchTerm}</span>
-                </span>
-              </div>
-              <hr className="my-2 border-blue-100" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Year-wise Placement Stats */}
-                <div>
-                  <div className="font-semibold text-lg text-gray-700 mb-3 flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-blue-500" />
-                    Placements by Year
-                  </div>
-                  <div className="flex flex-wrap gap-3">
-                    {companySearchSummary &&
-                      Object.entries(companySearchSummary.yearWiseCounts).map(([year, count]) => (
-                        <div
-                          key={year}
-                          className={`flex items-center gap-2 px-4 py-3 rounded-2xl shadow border transition-all duration-300 ${
-                            year === "2024-2025"
-                              ? "bg-green-100 border-green-300"
-                              : "bg-blue-100 border-blue-300"
-                          }`}
-                        >
-                          <span className="font-bold text-blue-700">{year}</span>
-                          <span
-                            className={`font-bold text-lg ${
-                              count > 0
-                                ? year === "2024-2025"
-                                  ? "text-green-700"
-                                  : "text-blue-700"
-                                : "text-gray-400"
-                            }`}
-                          >
-                            {count}
-                          </span>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-                {/* 2025 Placed Students */}
-                {companySearchSummary && companySearchSummary.students2025.length > 0 && (
-                  <div>
-                    <div className="font-semibold text-lg text-green-700 mb-3 flex items-center gap-2">
-                      <Users className="w-5 h-5 text-green-600" />
-                      2025 Placed Students
-                      <span className="ml-2 bg-green-200 text-green-800 px-2 py-1 rounded text-xs font-bold shadow">
-                        {companySearchSummary.students2025.length}
-                      </span>
-                    </div>
-                    <div className="max-h-48 overflow-y-auto pr-2">
-                      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {studentData2025
-                          .filter(s =>
-                            s["Company Name"] &&
-                            s["Company Name"].toLowerCase().includes(searchTerm.trim().toLowerCase())
-                          )
-                          .map((s, idx) => (
-                            <li
-                              key={idx}
-                              className="flex flex-col gap-1 bg-white border border-green-100 rounded-xl px-4 py-2 shadow hover:bg-green-50 transition"
-                            >
-                              <div className="flex items-center gap-3">
-                                <div className="w-9 h-9 rounded-full bg-green-200 flex items-center justify-center font-extrabold text-green-700 text-base shadow">
-                                  {s["Full Name"]
-                                    .split(" ")
-                                    .map(n => n[0])
-                                    .join("")
-                                    .substring(0, 2)
-                                    .toUpperCase()}
-                                </div>
-                                <span className="text-gray-900 font-semibold">{s["Full Name"]}</span>
-                              </div>
-                              <div className="ml-12 text-xs text-gray-700">
-                                <span className="font-medium">Charusat ID:</span> {s["CHARUSAT Email Id"] || "-"}
-                              </div>
-                              {s["personal email id"] && (
-                                <div className="ml-12 text-xs text-gray-700">
-                                  <span className="font-medium">Personal Email:</span> {s["personal email id"]}
-                                </div>
-                              )}
-                            </li>
-                          ))}
-                      </ul>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
+        
 
         {/* Top Companies Showcase */}
         <div className="bg-white border border-gray-300 rounded-3xl p-6 shadow-xl mb-8">

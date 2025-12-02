@@ -163,7 +163,7 @@ const HeroSection = () => {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 via-violet-600 to-indigo-600 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300"
+                  className="inline-flex items-center px-8 py-4 bg-gray-800 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300"
                 >
                   <Calculator className="w-6 h-6 mr-3" />
                   Check Your CHARUSAT Admission Chances

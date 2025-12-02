@@ -36,7 +36,7 @@ const Alumni2022 = () => {
   const githubCount = filteredAlumni.filter(a => a.GitHub_Profile).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-indigo-100 p-10">
+    <div className="min-h-screen bg-gray-50  p-10">
       <div className="max-w-7xl mx-auto">
         
         {/* Back to Dashboard Button for authenticated users */}
@@ -54,7 +54,7 @@ const Alumni2022 = () => {
 
         {/* Hero Section */}
         <div className="mb-10 text-center">
-          <h1 className="text-4xl font-extrabold text-blue-900 mb-2 tracking-tight drop-shadow-sm">
+          <h1 className="text-4xl font-extrabold text-black-900 mb-2 tracking-tight drop-shadow-sm">
             2022 Batch Alumni
           </h1>
           <p className="text-lg text-gray-700 mb-6">
@@ -117,7 +117,7 @@ const Alumni2022 = () => {
               <div
                 key={idx}
                 className="
-                  relative bg-white rounded-2xl shadow-lg border border-blue-100 
+                  relative bg-white rounded-2xl shadow-lg border border-gray-100 
                   p-8 flex flex-col items-center group transition-all duration-500
                   hover:border-blue-400 hover:shadow-2xl 
                   hover:scale-[1.03] hover:-translate-y-2 
@@ -133,7 +133,7 @@ const Alumni2022 = () => {
                     {/* Main Circle */}
                     <div className="
                       w-20 h-20 rounded-full 
-                      bg-gradient-to-br from-blue-600 to-blue-400 
+                      bg-gradient-to-br from-gray-700 to-gray-900 
                       flex items-center justify-center text-3xl font-extrabold text-white 
                       shadow-lg border-4 border-blue-200
                       group-hover:border-blue-500 

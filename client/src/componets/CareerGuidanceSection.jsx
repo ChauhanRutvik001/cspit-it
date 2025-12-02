@@ -286,7 +286,7 @@ const CareerGuidanceSection = () => {
           transition={{ duration: 0.8 }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center gap-2 mb-6 px-6 py-3 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+          <div className="inline-flex items-center gap-2 mb-6 px-6 py-3 rounded-full bg-gray-800 text-white">
             <Target size={24} />
             <span className="font-semibold text-lg">Post-Engineering Career Navigator</span>
           </div>
@@ -313,7 +313,7 @@ const CareerGuidanceSection = () => {
                   onClick={() => setSelectedBranch(branch)}
                   className={`p-4 rounded-xl font-semibold transition-all duration-300 ${
                     selectedBranch === branch
-                      ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg transform scale-105"
+                      ? "bg-gray-800 text-white shadow-lg transform scale-105"
                       : "bg-gray-50 text-gray-700 hover:bg-gray-100 border-2 border-transparent hover:border-blue-200"
                   }`}
                 >
@@ -506,7 +506,7 @@ const CareerGuidanceSection = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
-          className="bg-gradient-to-r from-blue-600 via-purple-600 to-orange-600 rounded-2xl p-8 text-white text-center"
+          className="bg-gray-900 rounded-2xl p-8 text-white text-center"
         >
           <h3 className="text-3xl font-bold mb-4">Generate My Personalized Career Plan</h3>
           <p className="text-blue-100 mb-8 text-lg">

@@ -61,7 +61,7 @@ const Contact = () => {
             {/* Contact Information */}
             <div className="space-y-8">
               <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-                <div className="bg-gradient-to-r from-indigo-600 to-blue-500 p-6">
+                <div className="bg-gray-800 p-6">
                   <h2 className="text-2xl font-bold text-white">Contact Information</h2>
                   <p className="text-indigo-100 mt-2">Feel free to reach out to us through any of these channels</p>
                 </div>
@@ -126,7 +126,7 @@ const Contact = () => {
 
             {/* Contact Form */}
             <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-              <div className="bg-gradient-to-r from-indigo-600 to-blue-500 p-6">
+              <div className="bg-gray-800 p-6">
                 <h2 className="text-2xl font-bold text-white">Send us a Message</h2>
                 <p className="text-indigo-100 mt-2">We'll get back to you as soon as possible</p>
               </div>

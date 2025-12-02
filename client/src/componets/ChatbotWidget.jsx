@@ -199,7 +199,7 @@ Now give a concise, friendly answer. Use bullet points only when needed, and kee
                <span className="absolute -top-1 -right-1 inline-flex h-3 w-3 rounded-full bg-emerald-400 border border-slate-900"></span>
              </div>
              <span className="hidden sm:inline text-sm font-semibold">
-               Placement Assistant
+               AI Assistant
              </span>
            </button>
          )}
