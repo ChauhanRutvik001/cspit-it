@@ -3,7 +3,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon app.js",
-    "start": "node app.js"
+    "start": "node app.js",
+    "seed:demo": "node ./scripts/seedDemoData.js"
   },
   "dependencies": {
     "axios": "^1.7.7",
