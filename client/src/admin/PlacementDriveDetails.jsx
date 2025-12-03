@@ -142,31 +142,8 @@ const PlacementDriveDetails = () => {
 
   const handleCompleteRound = async (roundId) => {
     try {
-      // First, get the students who are in this round
-      const round = rounds.find(r => r._id === roundId);
-      const studentsResponse = await axiosInstance.get(`/placement-drive/${driveId}/round/${round?.roundNumber}/students`);
-      const studentsInRound = studentsResponse.data.students || [];
-      
-      if (studentsInRound.length === 0) {
-        toast.error('No students found in this round');
-        return;
-      }
-
-      // Show confirmation dialog with student count
-      const confirmMessage = `Are you sure you want to complete this round?\n\nThis will:\n- Mark all ${studentsInRound.length} pending students as either shortlisted or rejected\n- Automatically advance shortlisted students to the next round\n- Mark rejected students as eliminated from the placement drive\n\nNote: You can view and manage individual students by clicking the "View Students" button first.`;
-      
-      if (!window.confirm(confirmMessage)) {
-        return;
-      }
-
-      // For now, we'll complete the round with an empty shortlist
-      // In a real implementation, you would want to show a student selection UI
-      // The backend will automatically handle all pending students as rejected unless they're in the shortlisted array
-      await axiosInstance.patch(`/placement-round/${roundId}/complete`, {
-        shortlistedStudents: [] // Empty array means all students will be marked as rejected
-      });
-      
-      toast.success('Round completed successfully. All pending students have been marked as rejected. Use "View Students" to manage individual student progress.');
+      await axiosInstance.patch(`/placement-round/${roundId}/complete`, {});
+      toast.success('Round marked as completed.');
       fetchDriveDetails();
     } catch (error) {
       console.error('Error completing round:', error);

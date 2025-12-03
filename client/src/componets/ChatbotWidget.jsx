@@ -131,6 +131,8 @@ const ChatbotWidget = () => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  // Show subtle decorative animations only on startup for a few seconds
+  const [showStartupAnimation, setShowStartupAnimation] = useState(true);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const [messages, setMessages] = useState([
@@ -158,6 +160,12 @@ const ChatbotWidget = () => {
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [isOpen]);
+
+  // disable startup animations after a short delay
+  useEffect(() => {
+    const t = setTimeout(() => setShowStartupAnimation(false), 3000);
+    return () => clearTimeout(t);
+  }, []);
 
   // Typing indicator simulation
   const simulateTyping = async (text) => {
@@ -239,9 +247,9 @@ const ChatbotWidget = () => {
       <div className="fixed bottom-6 right-6 z-50">
         {!isOpen && (
           <div className="relative group">
-            {/* Floating rings animation */}
-            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-75 animate-pulse"></div>
-            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 animate-ping opacity-30"></div>
+            {/* Floating rings animation (only on startup) */}
+            <div className={`absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-75 ${showStartupAnimation ? 'animate-pulse' : ''}`}></div>
+            <div className={`absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 ${showStartupAnimation ? 'animate-ping opacity-30' : 'opacity-30'}`}></div>
             
             <button
               onClick={() => setIsOpen(true)}
@@ -250,10 +258,10 @@ const ChatbotWidget = () => {
               <div className="relative">
                 <div className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 shadow-inner">
                   <Bot className="w-5 h-5 text-white" />
-                  <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-yellow-300 animate-bounce" />
+                  <Sparkles className={`absolute -top-1 -right-1 w-4 h-4 text-yellow-300 ${showStartupAnimation ? 'animate-bounce' : ''}`} />
                 </div>
                 {/* Pulsing dot */}
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full animate-pulse border-2 border-slate-900"></div>
+                <div className={`absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full ${showStartupAnimation ? 'animate-pulse' : ''} border-2 border-slate-900`}></div>
               </div>
               <div className="hidden sm:block">
                 <div className="text-sm font-bold bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-transparent">
@@ -294,7 +302,7 @@ const ChatbotWidget = () => {
                     CSPIT-IT AI Assistant
                   </div>
                   <div className="text-sm text-slate-300 flex items-center gap-2">
-                    <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                    <div className={`w-2 h-2 bg-emerald-400 rounded-full ${showStartupAnimation ? 'animate-pulse' : ''}`}></div>
                     Online & Ready
                   </div>
                 </div>

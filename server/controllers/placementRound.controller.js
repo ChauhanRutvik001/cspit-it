@@ -411,7 +411,9 @@ export const startPlacementRound = async (req, res) => {
 export const completePlacementRound = async (req, res) => {
   try {
     const { roundId } = req.params;
-    const { shortlistedStudents = [] } = req.body; // Array of student IDs who are shortlisted
+    // If `shortlistedStudents` is omitted from the request body, we will only mark the round as completed
+    // and NOT change any student statuses. This prevents accidental mass rejections when the body is empty.
+    const { shortlistedStudents } = req.body || {};
 
     const placementRound = await PlacementRound.findByIdAndUpdate(
       roundId,
@@ -426,6 +428,17 @@ export const completePlacementRound = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Placement round not found"
+      });
+    }
+
+    // If caller did not provide a shortlist array, do not modify any student statuses.
+    // This makes the endpoint safe to call when the intent is only to mark the round as completed.
+    if (!Array.isArray(shortlistedStudents)) {
+      console.log(`Round ${placementRound.roundNumber} marked as completed with no student changes (no shortlist provided).`);
+      return res.status(200).json({
+        success: true,
+        message: 'Round marked as completed. No student statuses were modified because no shortlist was provided.',
+        data: { placementRound }
       });
     }
 
