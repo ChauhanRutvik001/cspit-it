@@ -97,17 +97,22 @@ const PlacementDriveManagement = () => {
   };
 
   const handleDeleteDrive = async (driveId) => {
-    if (!window.confirm('Are you sure you want to delete this placement drive?')) {
+    const drive = placementDrives.find(d => d._id === driveId);
+    const confirmMessage = drive?.status === 'completed' 
+      ? 'Warning: This placement drive is completed and may have placed students. Deleting it will unplace those students. Are you sure you want to proceed?'
+      : 'Are you sure you want to delete this placement drive? This action cannot be undone.';
+    
+    if (!window.confirm(confirmMessage)) {
       return;
     }
 
     try {
-      await axiosInstance.delete(`/placement-drive/${driveId}`);
-      toast.success('Placement drive deleted successfully');
+      const response = await axiosInstance.delete(`/placement-drive/${driveId}`);
+      toast.success(response.data.message || 'Placement drive deleted successfully');
       fetchPlacementDrives();
     } catch (error) {
       console.error('Error deleting placement drive:', error);
-      toast.error('Failed to delete placement drive');
+      toast.error(error.response?.data?.message || 'Failed to delete placement drive');
     }
   };
 

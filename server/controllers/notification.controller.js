@@ -332,6 +332,10 @@ export const notifyStudentStatusChange = async (studentId, status, placementDriv
         message = `🎊 CONGRATULATIONS! You have been successfully placed at ${companyName}! Your hard work has paid off!`;
         notificationType = "placement_update";
         break;
+      case 'unplaced':
+        message = `⚠️ Important Notice: Due to placement drive deletion, your placement status with ${companyName} has been updated. You are now available for other opportunities. Please contact your counsellor for guidance.`;
+        notificationType = "placement_update";
+        break;
       default:
         message = `📝 Your status for ${companyName} has been updated${roundNumber ? ` - Round ${roundNumber}` : ''}.`;
     }

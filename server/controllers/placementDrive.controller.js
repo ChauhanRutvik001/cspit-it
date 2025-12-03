@@ -195,6 +195,76 @@ export const deletePlacementDrive = async (req, res) => {
   try {
     const { driveId } = req.params;
 
+    // First, get the placement drive details to find the company
+    const placementDrive = await PlacementDrive.findById(driveId).populate('company', 'name');
+    
+    if (!placementDrive) {
+      return res.status(404).json({
+        success: false,
+        message: "Placement drive not found"
+      });
+    }
+
+    // Find all students who were placed through this drive
+    const placedStudents = await StudentRoundProgress.find({
+      placementDrive: driveId,
+      overallStatus: 'placed',
+      finalResult: 'selected'
+    }).populate('student', 'fullName email');
+
+    console.log(`Found ${placedStudents.length} students placed through drive ${driveId}`);
+
+    // Unplace all students who were placed through this drive
+    if (placedStudents.length > 0) {
+      const studentIds = placedStudents.map(progress => progress.student._id);
+      
+      // Update User model to mark students as unplaced
+      await User.updateMany(
+        { 
+          _id: { $in: studentIds },
+          placedCompany: placementDrive.company._id
+        },
+        {
+          $unset: {
+            placedCompany: "",
+            placedDate: ""
+          },
+          $set: {
+            isPlaced: false,
+            updatedAt: new Date()
+          }
+        }
+      );
+
+      // Update Application status back to 'approved' for these students
+      await Application.updateMany(
+        {
+          student: { $in: studentIds },
+          company: placementDrive.company._id,
+          status: 'placed'
+        },
+        {
+          $set: {
+            status: 'approved',
+            updatedAt: new Date()
+          }
+        }
+      );
+
+      // Notify each student about being unplaced
+      for (const progress of placedStudents) {
+        await notifyStudentStatusChange(
+          progress.student._id, 
+          'unplaced', 
+          driveId, 
+          null, 
+          placementDrive.company.name
+        );
+      }
+
+      console.log(`Unplaced ${studentIds.length} students from company ${placementDrive.company.name}`);
+    }
+
     // Delete related data
     await Promise.all([
       PlacementRound.deleteMany({ placementDrive: driveId }),
@@ -204,7 +274,7 @@ export const deletePlacementDrive = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: "Placement drive deleted successfully"
+      message: `Placement drive deleted successfully. ${placedStudents.length} students have been marked as unplaced.`
     });
   } catch (error) {
     console.error("Error deleting placement drive:", error);
